@@ -16,7 +16,7 @@ class CheckSet(BaseModel):
     secret: str = Field(..., env='ATUSEC')
     log_rod: PositiveInt = Field(..., env='LOG_H')
 
-class SpotSettings(BaseSettings):
+class Settings(BaseSettings):
     """"connect to postgres and load data warehouse"""
     
     auth_key: Optional[str]
@@ -33,7 +33,7 @@ class SpotSettings(BaseSettings):
 
     # to override more_settings:
     # export my_prefix_more_settings='{"foo": "x", "apple": 1}'
-    more_settings: SubModel = SubModel()
+    #more_settings: SubModel = SubModel()
 
     class Config:
         env_prefix = 'my_prefix_'  # defaults to no prefix, i.e. ""

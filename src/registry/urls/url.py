@@ -5,7 +5,7 @@ from flask import Blueprint
 from registry.registry import Login, Logout, Register
 
 
-registryBp = Blueprint('event', __name__)
+registryBp = Blueprint('registry', __name__)
 
 registryApi = Api(app=registryBp)
 registryApi.add_resource(resource=Register, urls='/reg')

@@ -1,8 +1,8 @@
 
-from datetime import datetime
-from uuid import UUID
+import datetime
+
 from pydantic import BaseModel, validator, FilePath, Field, PositiveInt
-from typing import Union, Optional
+from typing import Optional
 
 from setting.dbcon import DbSet as db
 
@@ -27,7 +27,7 @@ class CreateAward(BaseModel):
     org: str
     med: FilePath
     awdt: datetime.date
-    dt = Field(default=datetime.now())
+    dt = Field(default=datetime.datetime.now())
 
 class Createpub(BaseModel):
     """Create a spotlight either from external source or internal source"""
@@ -37,14 +37,14 @@ class Createpub(BaseModel):
     dttl: str
     med: FilePath
     pdt: datetime.date
-    dt = Field(default=datetime.now())
+    dt = Field(default=datetime.datetime.now())
 
 class CreateStory(BaseModel):
     """serialize search results"""
 
     title: str
     sumry: str
-    dt: Field(default=datetime.now())
+    dt = Field(default=datetime.datetime.now())
 
 class CreateStoryvasn(BaseModel):
     """serialize search results"""
@@ -54,14 +54,14 @@ class CreateStoryvasn(BaseModel):
     title: str
     vason: str
     refdt: datetime.date
-    dt: Field(default=datetime.now())
+    dt = Field(default=datetime.datetime.now())
 
 class CreateQuote(BaseModel):
     """serialize list of events that requires user attention including its source"""
 
     vasn: PositiveInt
     qot: str
-    dt = Field(default=datetime.now())
+    dt = Field(default=datetime.datetime.now())
 
 class SerializedLimelight(Usr):
     """serialize notification of events from arenas and voice of people of interest"""
@@ -71,7 +71,7 @@ class SerializedLimelight(Usr):
     title: str
     files: FilePath
     descn: Optional[str]
-    timestamp = Field(default=datetime.now())
+    timestamp = Field(default=datetime.datetime.now())
 
     def __init__(__pydantic_self__, **data: int) -> None:
         soc_count = db._model.soc_count(db.get_db, data.get('objid'))

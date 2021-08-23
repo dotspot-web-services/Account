@@ -5,7 +5,7 @@ from flask import Blueprint
 from user.grocery import Pubs, Awards, Story, versn
 
 
-groceBp = Blueprint('event', __name__)
+groceBp = Blueprint('grocery', __name__)
 
 
 groceApi = Api(app=groceBp )

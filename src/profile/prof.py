@@ -9,14 +9,14 @@ from profile.profSerializer import  (
 )
 from setting.dbcon import DbSet as db, Auth
 
-__authenticate = Auth.authenticate
+authenticate = Auth.authenticate
 
 class Basic(Resource):
     """
     basic education or acquired skill
     """
 
-    @__authenticate
+    @authenticate
     def post(self, usr):
         # get the post data
         bsic_data = request.get_json()
@@ -41,7 +41,7 @@ class Accademics(Resource):
     User Login Resource
     """
 
-    @__authenticate
+    @authenticate
     def post(self, usr):
         # get the post data
         acad_data = request.get_json()
@@ -72,7 +72,7 @@ class Resacher(Resource):
     Logout Resource
     """
     
-    @__authenticate
+    @authenticate
     def post(self, usr):
         # get the post data
         rsrch_data = request.get_json()
@@ -100,7 +100,7 @@ class Works(Resource):
     basic education or acquired skill
     """
 
-    @__authenticate
+    @authenticate
     def post(self, usr):
         # get the post data
         prof_data = request.get_json()

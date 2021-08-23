@@ -9,7 +9,7 @@ from pydantic.types import FilePath
 from flask import g, jsonify
 from werkzeug.wrappers import request
 
-from .base.setting import SpotSettings, CheckSet
+from .base.setting import Settings, CheckSet
 
 
 #PGDB_URI = "postgres://QuestMasterDb:tFAtf6hCXdRhfWZ@questdb.cugmxolkmuvk.us-east-2.rds.amazonaws.com:5432/quest"
@@ -19,7 +19,6 @@ class DbSet:
     def __init__(self, sql_file_path=None) -> None:
         self.sql: FilePath = sql_file_path
     _model = ""
-    oda = CheckSet()
 
     @property
     def sql(self):
@@ -34,7 +33,7 @@ class DbSet:
     @staticmethod
     def __conxn():
         try:
-            return connect(SpotSettings().dict().get('pg_dsn'))
+            return connect(Settings().dict().get('pg_dsn'))
         except Exception as err:
             print(err)        
 
@@ -64,14 +63,14 @@ class Auth(DbSet):
                 'iat': datetime.datetime.utcnow(),
                 'sub': usr
             }
-            return jwt.encode(payload, self.oda.secret, algorithm='HS256')
+            return jwt.encode(payload, CheckSet().secret, algorithm='HS256')
         except Exception as e:
             return e
 
     
-    def authenticate(self, func, *args, **kwargs):
+    def authenticate(func):
         @wraps(func)
-        def decode_auth():
+        def decode_auth(self):
             token = None
 
             if 'x-access-token' in request.headers:
@@ -79,11 +78,11 @@ class Auth(DbSet):
             if not token:
                 return jsonify({'message': 'Token is missing'})
             try:
-               data = jwt.decode(token, self.oda.secret)
+               data = jwt.decode(token, CheckSet().secret)
                usr = self._model.get_usr(self.get_db(), usr=data['public_id'])
             except:
                 return jsonify({'message': 'Token is invalid'}), 401
-            return func(usr, args, kwargs)
+            return func(usr)
         return decode_auth
 
 if __name__ == "__main__":

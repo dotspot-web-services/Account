@@ -13,10 +13,10 @@ def setAp(config):
     accounts.config.from_pyfile(config)
     accounts.register_blueprint(registryBp, url_prefix="/Registry")
     accounts.register_blueprint(profBp, url_prefix="/Profiles")
-    accounts.register_blueprint(groceBp, url_prefix="/Groceris")
+    accounts.register_blueprint(groceBp, url_prefix="/Groceries")
 
     return accounts
 
 if __name__ == "__main__":
-    accs = setAp('config.py')
-    accs.run(debug=True)
+    accounts = setAp('config.py')
+    accounts.run(debug=True)

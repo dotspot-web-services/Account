@@ -1,0 +1,37 @@
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: accs
+    tier: backend
+  name: accounts-intel
+spec:
+  type: ClusterIP
+  selector:
+    app: accs
+    tier: backend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: accs
+    tier: frontend
+  name: accounts-action
+spec:
+  ports:
+  - name: "81"
+    port: 802
+    targetPort: 8000
+  selector:
+    app: accs
+    tier: frontend
+status:
+  loadBalancer: {}

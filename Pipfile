@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 flask = "*"
-pydantic = "*"
+pydantic = {extras = ["email"], version = "*"}
 bleach = "*"
 ptvsd = "*"
 anosql = "*"
@@ -15,6 +15,7 @@ psycopg2 = "*"
 python-dotenv = "*"
 pyjwt = "*"
 flask-bcrypt = "*"
+uwsgi = "*"
 
 [dev-packages]
 safety = "*"

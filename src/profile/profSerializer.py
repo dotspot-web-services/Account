@@ -1,5 +1,5 @@
 
-from datetime import datetime
+import datetime
 from pydantic import BaseModel, validator, FilePath, Field, PositiveInt, EmailStr
 from typing import Union, Optional
 
@@ -9,55 +9,51 @@ from setting.dbcon import DbSet as db
 class Usr(BaseModel):
     """Create a spotlight either from external source or internal source"""
 
-    id: PositiveInt
     name: str
     avatar: FilePath
 
     @validator('name')
-    def checkName(cls, name):
+    def check_name(cls, name):
         if ' ' not in name:
             raise ValueError('must contain a space')
         return name.title()
 
-class Phone(BaseModel):
-    number: str
-
-    @validator('phone')
-    def checkName(cls, phone):
-        if ' ' not in phone:
-            raise ValueError('must contain a space')
-        return phone.title()
-
-class LogCheck(BaseModel):
+class Basic(BaseModel):
     """check login data"""
-    cnt: Union[EmailStr, Phone]
-    pwd: str
 
-class RegCheck(LogCheck):
+    arena: int
+    dspln: str
+    place: str
+    strtd: datetime.date
+    endd: datetime.date
+
+class Acads(Basic):
+    ttl: str
+
+class Resrch(BaseModel):
     """Create a spotlight either from external source or internal source"""
 
-    fullname: str
-    dob: datetime.date
-    pwd: str
+    acad: int
     pwd2: str
-    cntyp: bool
-    sex: bool
-    ip: str
-    dt = Field(default=datetime.now())
+    typ: bool
+    org: str
+    displn: str
+    email = EmailStr
+    strtd: datetime.date
+    endd: datetime.date
+    dt = Field(default=datetime.datetime.now())
 
-    @validator('pwd2')
-    def check_pwd(cls, v, values):
-        if 'pwd' in values and v != values['pwd1']:
-            raise ValueError('passwords do no match')
-        return v
+class Workplace(BaseModel):
+    """Create a spotlight either from external source or internal source"""
 
-    @validator('fullname')
-    def check_pwd(cls, fullname):
-        if len(fullname.split(' ') < 2 > 3):
-            raise ValueError('this is not a full name')
-        return fullname.title()
+    arena: str
+    plc: str
+    rol: bool
+    strtd: datetime.date
+    endd: datetime.date
+    dt = Field(default=datetime.datetime.now())
 
-class SerializedLimelight(Usr):
+class SerializedProf(Usr):
     """serialize notification of events from arenas and voice of people of interest"""
 
     objid: PositiveInt
@@ -65,7 +61,7 @@ class SerializedLimelight(Usr):
     title: str
     files: Union[FilePath, list]
     descn: Optional[str]
-    timestamp = Field(default=datetime.now())
+    timestamp = Field(default=datetime.datetime.now())
 
     def __init__(__pydantic_self__, **data: int) -> None:
         soc_count = db._model.soc_count(db.get_db, data.get('objid'))

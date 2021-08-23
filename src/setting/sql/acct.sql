@@ -51,10 +51,10 @@ VALUES (:usr, :cnt, :typ, :dt);
 -- name: in_basic<!
 -- create user basic profile
 INSERT INTO basic (
-   usrbs, arnbs, dscp, place, strt, endt, bsdt, typ
+   usrbs, arnbs, typ, place, dscp, strt, endt, bsdt
 )
 VALUES (
-   :usr, :arena, :dspln, :plc, :strt, :endt, :dt, :typ
+   :usr, :arena, :acad, :plc, :dspln, :strt, :endt, :dt
 );
 
 -- name: acadqfn
@@ -65,10 +65,10 @@ WHERE B.usrbs = :usr AND B.acad IS TRUE
 -- name: in_acad<!
 -- create user basic profile
 INSERT INTO accademics (
-   bacid, title
+   arnac, bacid, title, strt, endt, acadt
 )
 VALUES (
-   :bcid, :ttl
+   :arena, :base, :ttl, :strt, :endt, :dt
 );
 
 -- name: rsrchaqfn
@@ -76,21 +76,29 @@ VALUES (
 SELECT A.title FROM public.accademics A
 JOIN public.basic B
    ON B.basid = A.bacid
-WHERE B.usrbs = :usr
+WHERE B.usrbs = :usr AND A.acad IS TRUE
 
 -- name: in_rsrcha<!
 -- create user basic profile
-INSERT INTO research (
-   acres, usres, typ, org, dscp, email, rscdt, strt, endt
-)
-VALUES (
-   :acad, :usr, :typ, :org, :dspln, :eml, :dt, :strtd, :endd
-);
+BEGIN
+   DECLARE cont INT
+   INSERT INTO contacts (cntid, contfrom, cont, email, verifd, contdt)
+   VALUES (
+      :usr, :cnt, :dt
+   );
+   SELECT @cont = scope_identity()
+   INSERT INTO research (
+      acres, cntres, typ, org, dscp, strt, endt, rscdt
+   )
+   VALUES (
+      :acad, @cont, :typ, :org, :dspln, :strtd, :endd, :dt
+   );
+END
 
 -- name: in_work<!
 -- create user basic profile
 INSERT INTO workplace (
-   usrwkp, arwkp, place, job, strt, endt, wkdt
+   usrwkp, arwkp, place, job, strt, endt, wokdt
 )
 VALUES (
    :usr, :arena, :plc, :rol, :strtd, :endd, :dt
@@ -100,10 +108,10 @@ VALUES (
 -- name: in_awd<!
 -- create user basic profile
 INSERT INTO awards (
-   usraw, typ, arnaw, org, pix, awardt, awdt
+   usraw, typ, arnawd, org, awardt, awdt
 )
 VALUES (
-   :usr, :typ, :arena, :org, :pix, :awdt, :dt
+   :usr, :typ, :arena, :org, :awdt, :dt
 );
 
 -- name: in_pub<!
@@ -115,6 +123,7 @@ VALUES (
    :resrch, :fld, :ttl, :fyl, :pubdt, :dt
 );
 
+--! service
 -- name: in_stry<!
 -- create user basic profile
 INSERT INTO storys (
