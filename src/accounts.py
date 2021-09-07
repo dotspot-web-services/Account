@@ -1,5 +1,5 @@
 
-from flask import Flask
+from flask import Flask, g
 
 from registry.urls.url import registryBp
 from profile.urls.url import profBp
@@ -20,3 +20,9 @@ def setAp(config):
 if __name__ == "__main__":
     accounts = setAp('config.py')
     accounts.run(debug=True)
+
+    @accounts.teardown_appcontext
+    def teardown_db(exception):
+        db = getattr(g, '_database', None)
+        if db is not None:
+            db.close()

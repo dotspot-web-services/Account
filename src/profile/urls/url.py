@@ -8,7 +8,7 @@ from profile.prof import Basic, Accademics,  Resacher, Works
 profBp = Blueprint('Accounts', __name__)
 profAp = Api(app=profBp)
 
-profAp.add_resource(resource=Basic, urls='/Basics')
-profAp.add_resource(resource=Accademics, urls='/Accademics')
-profAp.add_resource(resource=Resacher, urls='/Researcher')
-profAp.add_resource(resource=Works, urls='/Works')
+profAp.add_resource(Basic, '/Basics')
+profAp.add_resource(Accademics, '/Accademics')
+profAp.add_resource(Resacher, '/Researcher')
+profAp.add_resource(Works, '/Works')

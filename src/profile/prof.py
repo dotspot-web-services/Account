@@ -1,64 +1,85 @@
 
 from flask_restful import Resource
 from flask import make_response, request
-import bleach
+from bleach import clean
 
 from profile.profSerializer import  (
-    Basic, Acads,  Resrch,
+    Basics, Acads,  Resrch,
     Workplace
 )
-from setting.dbcon import DbSet as db, Auth
+from setting.decs import Auth as authenticate, Cors as corsify
+from setting.dbcon import DbSet
 
-authenticate = Auth.authenticate
 
 class Basic(Resource):
     """
     basic education or acquired skill
     """
 
+    def __init__(self):
+        self._db = DbSet()
+
+    @corsify
     @authenticate
     def post(self, usr):
         # get the post data
         bsic_data = request.get_json()
         
-        check = Basic(
-            arena=bsic_data.get('arn'), dspln=bsic_data.get('displn'), place=bsic_data.get('plc'),
-            strtd=bsic_data.get('strt'), endd=bsic_data.get('end')
+        check = Basics(
+            dspln=bsic_data.get('displn'), place=bsic_data.get('plc'),
+            strtd=bsic_data.get('strt'), endd=bsic_data.get('end'), acad=bsic_data.get('acad')
         )
 
+        if isinstance(usr, tuple):
+            return usr
+        usr = usr[0].get('usr')
+        with self._db.get_db() as con:
+            data = self._db._model.in_basic(
+                    con, usr=usr, dspln=clean(check.dspln), plc=clean(check.place), 
+                    strtd=check.strtd, endd=check.endd, acad=check.acad
+                )
+        #self._db.get_db().commit()
+
         try:
-            db._model.in_basic(
-                db, usr=usr, arena=check.arena, dspln=bleach(check.dspln), 
-                plc=bleach(check.place), strt=check.strtd, endd=check.endd, dt=check.dt
-            )
+            #with self._db.get_db(dict=True) as con:
+            
+            #con.commit
+            print(data)
             return make_response({'status': 'successful'}, 201)
             
         except Exception as e:
-            return make_response({'status': 'successful', 'error': f'{e}'}, 201)
+            return make_response({'status': 'failed', 'error': f'{data}'}, 401)
+    
+    @corsify
+    def get(self):
+        return make_response("this is a get request, it's reachable", 201)
 
-class Accademics(Resource):
+
+class Accademics(Basic):
     """
     User Login Resource
     """
 
+    @corsify
     @authenticate
     def post(self, usr):
         # get the post data
         acad_data = request.get_json()
         
-        if db._model.acadqfn(db, usr=usr):
+        if self._db._model.acadqfn(self._db.get_db(), usr=usr):
             return make_response({'status': 'failed', 'message': 'not qualified for this profile'}, 401)
 
         check = Acads(
-            arena=acad_data.get('arn'), dspln=acad_data.get('displn'), place=acad_data.get('plc'),
-            strtd=acad_data.get('strt'), endd=acad_data.get('end'), ttl=acad_data.get('ttl')
+            arena=acad_data.get('base'), dspln=acad_data.get('displn'), place=acad_data.get('plc'),
+            ttl=acad_data.get('ttl'), strtd=acad_data.get('strt'), endd=acad_data.get('end')
         )
 
         try:
-            db._model.in_acad(
-                db, usr=usr, arena=check.arena, dspln=bleach(check.dspln), plc=bleach(check.plc), 
-                strt=check.strtd, endd=check.endd, dt=check.dt, ttl=check.ttl
-            )
+            with self._db.get_db() as con:
+                self._db._model.in_acad(
+                    con, usr=usr, arena=check.arena, dspln=clean(check.dspln), plc=clean(check.place), 
+                    ttl=clean(check.ttl), strt=check.strtd, endd=check.endd
+                )
             return make_response({'status': 'successful'}, 201)
             
         except Exception as e:
@@ -67,17 +88,18 @@ class Accademics(Resource):
     def get():
         """reset password"""
 
-class Resacher(Resource):
+class Resacher(Accademics):
     """
     Logout Resource
     """
     
+    @corsify
     @authenticate
     def post(self, usr):
         # get the post data
         rsrch_data = request.get_json()
         
-        if db._model.rsrchaqfn(db, usr=usr):
+        if self._db._model.rsrchaqfn(self._db(dict=True), usr=usr):
             return make_response({'status': 'failed', 'message': 'not qualified for this profile'}, 401)
 
         check = Resrch(
@@ -86,20 +108,22 @@ class Resacher(Resource):
         )
 
         try:
-            db._model.in_rsrcha(
-                db, usr=usr, acad=check.acad, org=bleach(check.org), dspln=bleach(check.displn), 
-                strtd=check.strtd, endd=check.endd, dt=check.dt, typ=check.typ
-            )
+            with self._db.get_db() as con:
+                self._db._model.in_rsrcha(
+                    con, usr=usr, acad=check.acad, org=clean(check.org), dspln=clean(check.displn), 
+                    strtd=check.strtd, endd=check.endd, typ=check.typ
+                )
             return make_response({'status': 'successful'}, 201)
             
         except Exception as e:
             return make_response({'status': 'successful', 'error': f'{e}'}, 201)
 
-class Works(Resource):
+class Works(Resacher):
     """
     basic education or acquired skill
     """
 
+    @corsify
     @authenticate
     def post(self, usr):
         # get the post data
@@ -111,10 +135,11 @@ class Works(Resource):
         )
 
         try:
-            db._model.in_work(
-                db, usr=usr, arena=check.arena, plc=bleach(check.plc), rol=bleach(check.rol), 
-                strt=check.strtd, endd=check.endd, dt=check.dt
-            )
+            with self._db.get_db() as con:
+                self._db._model.in_work(
+                    con, usr=usr, arena=check.arena, plc=clean(check.plc), rol=clean(check.rol), 
+                    strt=check.strtd, endd=check.endd
+                )
             return make_response({'status': 'successful'}, 201)
             
         except Exception as e:

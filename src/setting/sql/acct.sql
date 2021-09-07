@@ -2,16 +2,14 @@
 --! REGISTRY
 -- name: check_acc
 -- check the existence of a user
-SELECT U.extid as usr, L.pwdlog as pwd FROM public.contacts C
+SELECT U.extid as usr, U.pwdlog as pwd FROM public.contacts C
 JOIN public.users U
-   ON U.usrid = C.contfrom
-JOIN public.logs L
-   ON L.usrlg = C.contfrom
+   ON U.ddot = C.contfrom
 WHERE C.cont = :contact;
 
 -- name: get_usr
 -- get a user
-SELECT usrid as usr FROM public.users 
+SELECT ddot as usr FROM public.users 
 WHERE extid = :usr;
 
 -- name: check_tkn
@@ -23,23 +21,17 @@ SELECT * FROM public.logtoken L WHERE L.token = :tkn;
 INSERT INTO logtoken (token, tokdt)
 VALUES (:tkn, :dt);
 
+--- name: check_cont
+--- check if a user already exists
+SELECT cntid FROM contacts WHERE cont = :cnt;
+
 -- name: in_acc<!
 -- create a user contact
-BEGIN
-   DECLARE usr INT
-   INSERT INTO users (
-      usrid, iprange, active, fullname, dob, gender, dated
-   )
-   VALUES (
-      :ip, :actv, :fname, :dob, :gend, :dtd
-   );
-   SELECT @usr = scope_identity()
-   INSERT INTO contacts (contfrom, cont, contyp, contdt)
-   VALUES (@usr, :cnt, :cntyp, :dtd);
-   INSERT INTO logs (usrlg, pwdlog, logdt)
-   VALUES (@usr, :pwd, :dtd);
-   RETURNING usr;
-END
+INSERT INTO public.users(fullname, dob, gender, pwdlog, contact, email)
+VALUES(:fname, :bday, :mel, :pwd, :cnt, :emel)
+ON CONFLICT DO NOTHING
+RETURNING extid;
+
 
 -- name: in_cont
 -- create a user contact
@@ -50,12 +42,12 @@ VALUES (:usr, :cnt, :typ, :dt);
 --! PROFILE
 -- name: in_basic<!
 -- create user basic profile
-INSERT INTO basic (
-   usrbs, arnbs, typ, place, dscp, strt, endt, bsdt
+INSERT INTO basics (
+   usrbs, acad, place, dscp, strt, endt
 )
 VALUES (
-   :usr, :arena, :acad, :plc, :dspln, :strt, :endt, :dt
-);
+   :usr, :acad, :plc, :dspln, :strtd, :endd
+) ON CONFLICT DO NOTHING RETURNING basid;
 
 -- name: acadqfn
 -- create user basic profile
@@ -65,10 +57,10 @@ WHERE B.usrbs = :usr AND B.acad IS TRUE
 -- name: in_acad<!
 -- create user basic profile
 INSERT INTO accademics (
-   arnac, bacid, title, strt, endt, acadt
+   arnac, bacid, title, strt, endt
 )
 VALUES (
-   :arena, :base, :ttl, :strt, :endt, :dt
+   :arena, :base, :ttl, :strt, :endt
 );
 
 -- name: rsrchaqfn
@@ -148,139 +140,3 @@ INSERT INTO qotes (vsnqot, usrqt, qote, qotdt)
 VALUES (
    :vasn, :usr, :qot, :dt
 );
-
-
-
--- ! arena
--- name: check_arena
--- get the one spotlight
-SELECT FROM public.spotlights WHERE spotid = :spotid
-
--- name: in_arena!
--- insert an arena basic setup
-insert INTO public.arena(uidarn,	arena, logo, about, arndt, libty)
-values (:usr, :dname, :dlogo, :abt, :dt, :lty);
-
--- name: updt_arn!
--- insert an arena basic setup
-UPDATE public.aren A
-SET A.arena = :aname, A.logo = :alog, A.about = :abt
-WHERE A.arenaid = :arena
-
--- name: in_rul!
--- insert an arena basic setup
-insert INTO public.rule(arulid,	drul, approved, ruldt)
-values (:arid,	:rul, :aprvd, :dt);
-
--- name: rules
--- get the one spotlight
-SELECT R.drul FROM public.rule R
-WHERE R.arulid = :arena AND R.approved > 1
-ORDER BY R.ruldt
-
--- name: updt_rul!
--- insert an arena basic setup
-UPDATE public.rule R
-SET R.drul = :updt
-WHERE R.rulid = :rul
-
--- name: in_mem!
--- insert an arena basic setup
-insert INTO public.arenausrs(arenausrid,	arenausr, usrstatus, arnusrdt, privi)
-values (:arena, :usr, :statu, :dt, :priv);
-
--- name: mems
--- get the one spotlight
-SELECT U.fullname, P.pixaddr FROM public.arenausrs A
-JOIN users U
-   ON A.arenausr = U.usrid
-JOIN pix P
-   ON U.ddot = P.pixfrom
-WHERE A.arenausrid = :usr
-ORDER P.pixaddr BY P.pixdt
-
--- name: in_netwk!
--- insert an arena basic setup
-insert INTO public.arenausrs(ntkusr, ntname, dscn, ntkdt)
-values (:usr, :wkname, :descn, :dt);
-
--- name: netwks
--- get the one spotlight
-SELECT N.ntname, N.dscn, N.ntkdt FROM public.network N
-WHERE N.ntkusr = :usr
-ORDER BY N.ntkdt
-
--- name: in_ppl!
--- insert an arena basic setup
-insert INTO public.people(pplusr, dscn, ppldt, evnt)
-values (:usr, :descn, :dt, :evnt);
-
--- name: ppl
--- get the one spotlight
-SELECT P.dscn, P.ppldt FROM public.people P
-JOIN users U
-   ON A.P.pplusr = U.usrid
-JOIN pix P
-   ON U.usrid = P.pixfrom
-WHERE P.pplusr = :usr
-ORDER BY P.ppldt
-
--- name: in_netusr!
--- insert an arena basic setup
-insert INTO public.netuser(ntkprj, pplusr, npjdt)
-values (:prj, :usr, :dt);
-
--- name: netusrs!
--- insert an arena basic setup
-SELECT N.ntname, N.dscn, N.ntkdt FROM public.network N
-WHERE N.ntkusr = :usr
-ORDER BY N.ntkdt
-
--- name: in_pjt!
--- insert an arena basic setup
-insert INTO public.project(prjowner, prjname, prjdt)
-values (:prjonr, :pname, :dt);
-
--- name: pjts!
--- insert an arena basic setup
-SELECT N.ntname, N.dscn, N.ntkdt FROM public.network N
-WHERE N.ntkusr = :usr
-ORDER BY N.ntkdt
-
--- name: in_pjtmem!
--- insert an arena basic setup
-insert INTO public.projmems(promems, prjmem, memdt)
-values (:proj, :mem, :dt);
-
--- name: pjtmems!
--- insert an arena basic setup
-SELECT N.ntname, N.dscn, N.ntkdt FROM public.network N
-WHERE N.ntkusr = :usr
-ORDER BY N.ntkdt
-
--- name: in_conf!
--- insert an arena basic setup
-insert INTO public.configs(confrom,	conf, confdt)
-values (:cfrom, :config, :dt);
-
--- name: confs!
--- insert an arena basic setup
-SELECT N.ntname, N.dscn, N.ntkdt FROM public.network N
-WHERE N.ntkusr = :usr
-ORDER BY N.ntkdt
-
--- name: updt_conf!
--- insert an arena basic setup
-UPDATE public.configs C
-SET C.conf = :confupdt
-WHERE C.confid = :conf
-
--- ! VOICE
--- name: spot_resp!
--- insert response to an external spotlight
-BEGIN TRANSACTION
-   DECLARE @DataID int;
-   INSERT INTO DataTable (Column1 ...) VALUES (....);
-   SELECT @DataID = scope_identity();
-   INSERT INTO LinkTable VALUES (@ObjectID, @DataID);
-COMMIT

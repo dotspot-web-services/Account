@@ -2,10 +2,11 @@
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: quest
+  name: accounts-intel
   labels:
     app: accs
     tier: backend
-  name: accounts-intel
 spec:
   type: ClusterIP
   selector:
@@ -16,15 +17,15 @@ spec:
       port: 80
       targetPort: 8080
 
-
 ---
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: quest
+  name: accounts-action
   labels:
     app: accs
     tier: frontend
-  name: accounts-action
 spec:
   ports:
   - name: "81"

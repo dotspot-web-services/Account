@@ -2,6 +2,7 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
+  namespace: quest
   name: quest-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$1
@@ -11,19 +12,19 @@ spec:
       http:
         paths:
         - backend:
-            serviceName: accounts-server
+            serviceName: accounts-action
             servicePort: 802
 
     - host: arena.questarenz.com
       http:
         paths:
         - backend:
-            serviceName: arena-server
+            serviceName: arena-action
             servicePort: 810
 
     - host: spotlights.questarenz.com
       http:
         paths:
         - backend:
-            serviceName: spots-server
+            serviceName: spots-action
             servicePort: 820

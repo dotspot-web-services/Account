@@ -1,46 +1,46 @@
 
-import datetime
-from functools import wraps
+#from functools import wraps
+#from re import S
 
-import jwt
-from psycopg2 import connect
-from anosql import from_path
+from psycopg2 import connect, extras
+from aiosql import from_path
 from pydantic.types import FilePath
-from flask import g, jsonify
-from werkzeug.wrappers import request
+from flask import g
 
 from .base.setting import Settings, CheckSet
 
 
 #PGDB_URI = "postgres://QuestMasterDb:tFAtf6hCXdRhfWZ@questdb.cugmxolkmuvk.us-east-2.rds.amazonaws.com:5432/quest"
 
-class DbSet:
+class DbSet(object):
     """"""
-    def __init__(self, sql_file_path=None) -> None:
+    def __init__(self, sql_file_path=None):
         self.sql: FilePath = sql_file_path
-    _model = ""
+        self._model = from_path(
+            sql_path=self.sql, driver_adapter='psycopg2'
+        )
+    _oda = CheckSet()
 
     @property
     def sql(self):
-        return self.sql
+        return self.__sql
 
     @sql.setter
-    def sql(self, sq):
+    def sql(self, sq=None):
         if sq is None:
-            sq = 'setting/sql/acct.sql'
-        self._model = from_path(sql_path=sq, driver_name='psycopg2')
+            self.__sql = 'src/setting/sql/acct.sql'
 
-    @staticmethod
-    def __conxn():
-        try:
-            return connect(Settings().dict().get('pg_dsn'))
-        except Exception as err:
-            print(err)        
+    # cursor_factory=extras.RealDictCursor        
 
-    def get_db(self):
+    def get_db(self, dict=False):
         db = getattr(g, '_database', None)
         if db is None:
-            db = g._database = self.__conxn()
+            db = g._database = connect(Settings().dict().get('pg_dsn'))
+        if dict is False:
+            #db.autocommit = True
+            db = g._database = connect(Settings().dict().get('pg_dsn'))
+        else:
+            db.cursor_factory = extras.RealDictCursor
         return db
 
     #@app.teardown_appcontext
@@ -49,42 +49,6 @@ class DbSet:
         if db is not None:
             db.close()
 
-class Auth(DbSet):
-    """decode auth and check validity"""
-
-    def encode_auth(self, usr):
-        """
-        Generates the Auth Token
-        :return: string
-        """
-        try:
-            payload = {
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=5),
-                'iat': datetime.datetime.utcnow(),
-                'sub': usr
-            }
-            return jwt.encode(payload, CheckSet().secret, algorithm='HS256')
-        except Exception as e:
-            return e
-
-    
-    def authenticate(func):
-        @wraps(func)
-        def decode_auth(self):
-            token = None
-
-            if 'x-access-token' in request.headers:
-                token = request.headers['x-access-token']
-            if not token:
-                return jsonify({'message': 'Token is missing'})
-            try:
-               data = jwt.decode(token, CheckSet().secret)
-               usr = self._model.get_usr(self.get_db(), usr=data['public_id'])
-            except:
-                return jsonify({'message': 'Token is invalid'}), 401
-            return func(usr)
-        return decode_auth
 
 if __name__ == "__main__":
     pg = DbSet()
-    print(pg.__conxn())

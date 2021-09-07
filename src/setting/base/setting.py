@@ -1,20 +1,18 @@
 
 from typing import Set, Optional
 from pydantic import (
-    BaseModel,
     BaseSettings,
     PyObject,
     RedisDsn,
     PostgresDsn,
-    PositiveInt,
-    Field,
+    Field
 )
 
 
-class CheckSet(BaseModel):
+class CheckSet(BaseSettings):
     """set data up"""
-    secret: str = Field(..., env='ATUSEC')
-    log_rod: PositiveInt = Field(..., env='LOG_H')
+    secret: Optional[str] = Field( env='ATUSEC')
+    log_rod: Optional[int] = Field( env='LOG_H')
 
 class Settings(BaseSettings):
     """"connect to postgres and load data warehouse"""

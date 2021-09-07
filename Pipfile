@@ -16,6 +16,8 @@ python-dotenv = "*"
 pyjwt = "*"
 flask-bcrypt = "*"
 uwsgi = "*"
+flask-cors = "*"
+aiosql = "*"
 
 [dev-packages]
 safety = "*"

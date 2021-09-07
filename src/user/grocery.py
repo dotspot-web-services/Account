@@ -8,14 +8,15 @@ import bleach
 from user.grocerySerializer import  (
     CreateAward, CreateStoryvasn, Createpub, CreateQuote, CreateStory,
 )
-from setting.dbcon import DbSet as db, Auth
-
-authenticate = Auth.authenticate
+from setting.decs import Auth as authenticate, Cors as corsify
+from setting.dbcon import DbSet
 
 class Awards(Resource):
     """
     User Resource
     """
+    def __init__(self) -> None:
+        self.db = DbSet()
 
     @authenticate
     def post(self, usr):
@@ -28,10 +29,11 @@ class Awards(Resource):
         )
 
         try:
-            db._model.in_awd(
-                db, usr=usr, typ=check.typ, arena=check.arena, org=bleach(check.org), 
-                pix=check.med, awdt=check.awdt, dt=check.dt
-            )
+            with self._db.get_db() as con:
+                self.db._model.in_awd(
+                    con, usr=usr, typ=check.typ, arena=check.arena, org=bleach(check.org), 
+                    pix=check.med, awdt=check.awdt, dt=check.dt
+                )
             return make_response({'status': 'successful'}, 201)
             
         except Exception as e:
@@ -52,10 +54,11 @@ class Pubs(Resource):
         )
 
         try:
-            db._model.in_pub(
-                db, usr=usr, srch=check.rsrch, fld=bleach(check.dfld), ttl=bleach(check.dttl), 
-                fyl=check.med, pdt=check.pdt, dt=check.dt
-            )
+            with self._db.get_db() as con:
+                self.db._model.in_pub(
+                    con, usr=usr, srch=check.rsrch, fld=bleach(check.dfld), ttl=bleach(check.dttl), 
+                    fyl=check.med, pdt=check.pdt, dt=check.dt
+                )
             return make_response({'status': 'successful'}, 201)
             
         except Exception as e:
@@ -75,15 +78,16 @@ class Story(Resource):
         )
 
         try:
-            db._model.in_stry(
-                db, usr=usr, ttl=bleach(check.title), sumry=bleach(check.sumry), dt=check.dt
-            )
+            with self._db.get_db() as con:
+                self.db._model.in_stry(
+                    con, usr=usr, ttl=bleach(check.title), sumry=bleach(check.sumry), dt=check.dt
+                )
             return make_response({'status': 'successful'}, 201)
             
         except Exception as e:
             return make_response({'status': 'successful', 'error': f'{e}'}, 201)
 
-class versn(Resource):
+class Versn(Resource):
     """get all events with get request and insert event with post request"""
 
     @authenticate
@@ -97,10 +101,11 @@ class versn(Resource):
         )
 
         try:
-            db._model.in_vasn(
-                db, usr=usr, stry=check.stry, trib=check.adding, ttl=bleach(check.title),
-                vasn=bleach(check.vason), vasndt=check.refdt, dt=check.dt
-            )
+            with self._db.get_db() as con:
+                self.db._model.in_vasn(
+                    con, usr=usr, stry=check.stry, trib=check.adding, ttl=bleach(check.title),
+                    vasn=bleach(check.vason), vasndt=check.refdt, dt=check.dt
+                )
             return make_response({'status': 'successful'}, 201)   
         except Exception as e:
             return make_response({'status': 'successful', 'error': f'{e}'}, 201)
@@ -118,9 +123,10 @@ class Quote(Resource):
         )
 
         try:
-            db._model.in_qot(
-                db, usr=usr, vason=check.vasn, qot=bleach(check.qot), dt=check.dt
-            )
+            with self._db.get_db() as con:
+                self.db._model.in_qot(
+                    con, usr=usr, vason=check.vasn, qot=bleach(check.qot), dt=check.dt
+                )
             return make_response({'status': 'successful'}, 201)
             
         except Exception as e:

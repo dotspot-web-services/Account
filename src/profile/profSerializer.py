@@ -18,17 +18,20 @@ class Usr(BaseModel):
             raise ValueError('must contain a space')
         return name.title()
 
-class Basic(BaseModel):
+class Basics(BaseModel):
     """check login data"""
 
-    arena: int
+    arena: Optional[int]
     dspln: str
     place: str
     strtd: datetime.date
     endd: datetime.date
+    acad: bool
 
-class Acads(Basic):
+class Acads(Basics):
+    base: int
     ttl: str
+    acad: Optional[bool]
 
 class Resrch(BaseModel):
     """Create a spotlight either from external source or internal source"""
@@ -72,3 +75,4 @@ class SerializedProf(Usr):
         super().__init__(**data)
     class Config:
         extra = 'forbid'
+        arbitrary_types_allowed = True

@@ -41,12 +41,12 @@ class RegCheck(LogCheck):
     pwd2: str
     cntyp: bool
     sex: bool
-    ip: str
+    ip: Optional[str]
     dt = Field(default=datetime.datetime.now())
 
     @validator('pwd2')
     def check_pwd(cls, v, values):
-        if 'pwd' in values and v != values['pwd1']:
+        if 'pwd' in values and v != values['pwd']:
             raise ValueError('passwords do no match')
         return v
 
