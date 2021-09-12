@@ -1,1 +1,0 @@
-web: python -m ptvsd  --port 300 --host 0.0.0.0 src/accounts.py
