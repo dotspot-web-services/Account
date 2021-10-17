@@ -1,0 +1,44 @@
+
+{% from 'components/inputs.html' import radio, button, select with context %}
+
+<form method="{{ form_attr.get('method') }}" action="{{ form_attr.get('action') }}" {% if form_attr.get("class") %} class="{{ form_attr.get('class') }}" {% endif %} enctype="multipart/form-data">
+    {% for label, attrs in inputs.items() %}
+    {% if attrs.get('labels') %}
+    <div>
+        <fieldset>
+            <legend>
+                {{ label }}
+            </legend>
+            {{ radio( attrs.get('labels'), attrs.get('name')) }}
+            {% if note is defined %} <div class="{{ note.get('class') }}">{{ note.get(name) }}</div> {% endif %}
+        </fieldset>
+    </div>
+    
+    {% elif attrs.get('options') %}
+    <div>
+        <fieldset>
+            <legend>
+                accademic level by title
+            </legend>
+            {{ select(attrs.get('name'), attrs.get('options'), label) }}
+            {% if note is defined %} <div class="{{ note.get('class') }}">{{ note.get(name) }}</div> {% endif %}
+        </fieldset>
+    </div>
+    {% else %}
+    {% set name = attrs.get("name") %}
+    <fieldset>
+    <div class="form-group">
+        <div><label for="{{ attrs.get('name') }}">{{ label }}</label></div>
+        <input
+            type="{{ attrs.get('type') }}" name="{{ name }}" class="{{ attrs.get('class') }}" placeholder="{{ attrs.get('placeholder') }}"
+            {% if data is defined %} value="{{ data.get(name) }}" {% endif %}
+        />
+        {% if note is defined %} <div class="{{ note.get('class') }}">{{ note.get(name) }}</div> {% endif %}
+    </div>
+    {% endif %}
+    {% endfor %}
+    </fieldset>
+
+    {% set btn_attr = form_attr['button'] %}
+    {{ button(btn_attr) }}
+</form>

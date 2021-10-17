@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if request.user.is_authenticated %}
+    <div id='tweetme-2-feed'></div>
+{% else %}
+    <div id='tweetme-2'></div>
+{% endif %}
+
+{% endblock content %}
+
+{% extends 'base.html' %}
+
+{% block head_title %}
+Home
+{% endblock head_title%}
+
+
+{% block content %}
+
+<div class="col-lg-4 col-md-4 col-sm-12">
+    <form id="regForm" action="/Registry/reg" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <div><label for="fulName">Full Name</label></div>
+            <input id="fname" type="text" name="fname" class="form-control" placeholder="Enter full name. Eg: John mba" />
+            <div class="err"></div>
+        </div>
+        <div class="form-group">
+            <div><label for="cont">Contact</label></div>
+            <input id="cont" type="email" name="cont" class="form-control" placeholder="Enter phone number or Email address" />
+            <input type="hidden" name="typ" value="true">
+            <div class="err"></div>
+        </div>
+        <div class="form-group">
+            <div><label for="paswd">Password</label></div>
+            <input type="password" id="paswd" name="pwd" class="form-control" placeholder="Enter your password" />
+            <div class="err"></div>
+        </div>
+        <div class="form-group">
+            <div><label for="vpaswd">Confirm password</label></div>
+            <input id="vpaswd" type="password" name="vpwd" class="form-control" placeholder="Re-enter your password" />
+            <div class="err"></div>
+        </div>
+        <button type="submit" class="btn btn-block btn-success">Register</button>
+    </form>
+</div>
+    
+<div class="col-lg-6 col-md-8 col-sm-12" id='arena'>
+    <div class='row text-center'>
+        <div class='rol'>
+            {% include "components/limlit.html" %}
+        </div>
+    </div>
+    <div id="moto">
+        Reasoning is the classification
+    </div>
+    <div class='row text-center'>
+        {% include "components/srch.html" %}
+    </div>
+</div>
+
+{% endblock content %}

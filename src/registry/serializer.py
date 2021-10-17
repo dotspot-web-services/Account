@@ -37,10 +37,10 @@ class RegCheck(LogCheck):
     """Create a spotlight either from external source or internal source"""
 
     fullname: str
-    dob: datetime.date
+    dob: Optional[datetime.date]
     pwd2: str
     cntyp: bool
-    sex: bool
+    sex: Optional[bool]
     ip: Optional[str]
     dt = Field(default=datetime.datetime.now())
 

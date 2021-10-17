@@ -1,5 +1,5 @@
 
-POST http://127.0.0.1:5000/Registry/reg
+OPTIONS  http://127.0.0.1:5000/Registry/reg
 content-type: application/json
 
 {

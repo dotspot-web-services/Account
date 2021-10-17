@@ -3,16 +3,22 @@ import bcrypt
 from bleach import clean
 
 from flask_restful import Resource
-from flask import make_response, request, jsonify
+
+from setting.decs import Auth as authenticate
+from flask.views import MethodView
+from flask import (
+    make_response, request, jsonify, render_template, 
+    redirect, url_for, session, 
+)
 
 
-from registry.registrySerializer import  (
+from ..serializer import  (
     RegCheck, LogCheck
 )
 from setting.decs import Auth, Cors as corsify
 from setting.dbcon import DbSet
 
-class Register(Resource):
+class Register(MethodView):
     """
     User Registration Resource
     """
@@ -20,91 +26,131 @@ class Register(Resource):
         self._db = DbSet()
 
     def __hash_pwd(self,pwd):
-        return bcrypt.hashpw(bytes(pwd, encoding='utf-8'), bcrypt.gensalt(self._db._oda.log_rod)
+        return bcrypt.hashpw(
+            bytes(pwd, encoding='utf-8'), bcrypt.gensalt(self._db._oda.log_rod)
         )
 
-    @corsify
     def post(self):
-        # get the post data
-        reg_data = request.get_json()
+
+        reg_data = request.form
+        #reg_data = reg_data.get('content')
         
         check = RegCheck(
-            fullname=reg_data.get('fname'), cnt=reg_data.get('cont'), dob=reg_data.get('dob'),
-            pwd=reg_data.get('pwd'), pwd2=reg_data.get('pwd2'), cntyp=reg_data.get('typ'),
-            sex=reg_data.get('sx')
+            fullname=reg_data.get('fname'), cnt=reg_data.get('cont'),
+            pwd=reg_data.get('pwd'), pwd2=reg_data.get('vpwd'), cntyp=reg_data.get('typ')
         )
-        user = self._db._model.in_acc(
-            self._db.get_db(), fname=clean(check.fullname), bday=check.dob, mel=check.sex, 
-            pwd=self.__hash_pwd(pwd=check.pwd).decode('utf8'), cnt=check.cnt, emel=check.cntyp
+        with self._db.get_db() as con:
+            user = self._db._model.in_acc(
+                con, fname=clean(check.fullname), pwd=self.__hash_pwd(pwd=check.pwd).decode('utf8'), 
+                cnt=check.cnt, emel=check.cntyp
             )
 
         if not user:
             return make_response(jsonify({'status': 'failed', 'message': 'user already exist'}), 401)
         try:
             # generate the auth token
-            responseObject = {
+            token = Auth(func=user).encode_auth()
+            resp = {
                 'status': 'success',
                 'message': 'Successfully registered.',
-                'auth_token': Auth(func=user).encode_auth()
+                'auth_token': token
             }
-            return make_response(
-                jsonify(responseObject), 201
-            )
+            status_code = 201
         except Exception as e:
-            responseObject = {
+            resp = {
                 'status': 'fail',
                 'message': f'Some error occurred {e}. Please try again.'
             }
-            return make_response(
-                jsonify(responseObject), 401
-            )
+            status_code = 401
+        finally:
+            resp = make_response(jsonify(resp), status_code)
+            resp.set_cookie("same-site-cookie", "session", samesite="Lax")
+            if not request.is_json:
+                session['token'] = token
+                return resp
+            return redirect(url_for('.register'))
 
-    @corsify
     def get(self):
-        "this is a get request, it's reachable", 201
+        return "this page is loading..."
+
+    def put(self):
+        # get the post data
+        reg_data = request.form
         
+        check = RegCheck(
+            fullname=reg_data.get('fname'), cnt=reg_data.get('cont'), dob=reg_data.get('dob'),
+            cntyp=reg_data.get('typ'), sex=reg_data.get('sx')
+        )
+
+        if self._db._model.in_acc(
+                self._db.get_db(), fname=clean(check.fullname), bday=check.dob, mel=check.sex, 
+                cnt=check.cnt, emel=check.cntyp
+            ):
+            return make_response(jsonify({'status': 'successful', 'message': 'update done succeesfully'}), 201)
+        else:
+            return make_response(jsonify({'status': 'failed', 'message': 'user already exist'}), 401)
+
+    def options(self):
+        return {'Allow' : ['POST', 'GET']}, 200, \
+        {
+            'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods' : '*',
+            'Access-Control-Allow-Headers': '*'
+        }
 
 class Login(Register):
     """
     User Login Resource
     """
 
-    @corsify
     def post(self):
         # get the post data
 
-        auth = request.authorization
-        if not auth or not auth.username or not auth.password:
+        auth = request.authorization or request.form
+
+        contact = auth.get('usrCont') or auth.username
+        password = auth.get('usrPwd') or auth.password
+    
+        if not contact or not password:
             return make_response(
                 jsonify({'WWW.Authenticate': 'Basic realm="login required"'}), 401
             )
+            
         check = LogCheck(
-                cnt=auth.username, pwd=auth.password
+                cnt=contact, pwd=password
             )
         usr = self._db._model.check_acc(self._db.get_db(dict=True), contact=check.cnt) # fetch user external id
         try:
-
             if not usr:              
                 return jsonify({'WWW.Authenticate': 'Basic realm="login required"'}), 401
             if not bcrypt.checkpw(password=check.pwd.encode('utf-8'), hashed_password=usr[0].get('pwd').encode('utf-8')):
                 return jsonify({'WWW.Authenticate': 'Basic realm="login required"'}), 401
 
             token = Auth(func=usr[0].get('usr')).encode_auth()
-            if token:
-                return jsonify({'token': f'{token}'})
+            return jsonify({'token': f'{token}'})
         except Exception as e:
             return jsonify({'message' : f'could not verify, Basic realm="encounted: {e}'}), 401
-
-    @corsify
-    def get(self):
-        return "this is a get request, it login is reachable", 201
-
+        finally:
+            if not request.authorization:
+                print('ok')
+                redirect("/Profiles/Basics")
 
 class Logout(Resource):
     """
     Logout Resource
     """
     db = DbSet()
+
+    def get(request, *args, **kwargs):
+        if request.method == "POST":
+            #logout(request)
+            return redirect("/login")
+        context = {
+            "form": None,
+            "description": "Are you sure you want to logout?",
+            "btn_label": "Click to Confirm",
+            "title": "Logout"
+        }
+        return render_template(request, "accounts/auth.html", context)
 
     @corsify
     def post(self):

@@ -27,11 +27,23 @@ SELECT cntid FROM contacts WHERE cont = :cnt;
 
 -- name: in_acc<!
 -- create a user contact
-INSERT INTO public.users(fullname, dob, gender, pwdlog, contact, email)
-VALUES(:fname, :bday, :mel, :pwd, :cnt, :emel)
-ON CONFLICT DO NOTHING
+INSERT INTO public.users(fullname, pwdlog, contact, email)
+VALUES(:fname, :pwd, :cnt, :emel)
+ON conflict do nothing
 RETURNING extid;
 
+-- name: complete_reg
+-- get a user
+SELECT fullname as fname, gender as sex, dob, contact as cont
+FROM public.users 
+WHERE ddot = :usr;
+
+-- name: update_acc<!
+-- create a user contact
+INSERT INTO public.users(fullname, dob, gender, pwdlog, contact, email)
+VALUES(:fname, :bday, :mel, :pwd, :cnt, :emel)
+ON CONFLICT DO UPDATE
+RETURNING extid;
 
 -- name: in_cont
 -- create a user contact
@@ -47,7 +59,21 @@ INSERT INTO basics (
 )
 VALUES (
    :usr, :acad, :plc, :dspln, :strtd, :endd
-) ON CONFLICT DO NOTHING RETURNING basid;
+) ON CONFLICT UPDATE RETURNING basid;
+
+-- name: basic_prof
+-- accademics differentiated user basic profile
+SELECT U.fullname as fnanme, M.med as pix, B.acad, B.place, B.dscp, B.strt, B.endt FROM public.basics B
+JOIN public.users U ON U.ddot = B.usrbs
+JOIN public.media M ON M.meid = U.ddot 
+WHERE B.usrbs = :usr;
+
+-- name: skil_prof
+-- general differentiated user basic profile
+SELECT U.fullname, M.med, S.acad, S.place, S.dscp, S.strt, S.endt FROM public.basics S
+JOIN public.users U  ON U.ddot = S.usrbs
+JOIN public.media M ON M.meid = U.ddot
+WHERE S.usrbs = :usr;
 
 -- name: acadqfn
 -- create user basic profile
@@ -62,6 +88,13 @@ INSERT INTO accademics (
 VALUES (
    :arena, :base, :ttl, :strt, :endt
 );
+
+-- name: acads_prof
+SELECT U.fullname, M.med, B.acad, B.place, B.dscp, A.strt, A.endt, A.title FROM public.accademics A
+JOIN public.basics B ON B.usrbs = A.bacid
+JOIN  public.users U  ON U.ddot = B.usrbs
+JOIN public.media M ON M.meid = U.ddot
+WHERE B.usrbs = :usr;
 
 -- name: rsrchaqfn
 -- create user basic profile
@@ -87,6 +120,13 @@ BEGIN
    );
 END
 
+-- name: rsrch_prof
+SELECT U.fullname, M.med, C.cnt, R.typ, R.org, R.dscp, R.strt, R.endt, FROM public.users U
+JOIN public.basics S ON S.usrbs = U.ddot
+JOIN public.media M ON M.meid = U.ddot
+JOIN public.contacts C  ON C.cntid = R.cntres
+WHERE U.ddot = :usr;
+
 -- name: in_work<!
 -- create user basic profile
 INSERT INTO workplace (
@@ -95,6 +135,12 @@ INSERT INTO workplace (
 VALUES (
    :usr, :arena, :plc, :rol, :strtd, :endd, :dt
 );
+
+-- name: wk_prof
+SELECT U.fullname, M.med, W.place, W.job, W.strt, W.endt FROM public.users U
+JOIN public.media M ON M.meid = U.ddot
+JOIN public.workplace W ON W.usrwkp = U.ddot
+WHERE U.ddot = :usr;
 
 --! USER
 -- name: in_awd<!

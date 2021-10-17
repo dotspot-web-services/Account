@@ -32,15 +32,11 @@ class DbSet(object):
 
     # cursor_factory=extras.RealDictCursor        
 
-    def get_db(self, dict=False):
+    def get_db(self):
         db = getattr(g, '_database', None)
         if db is None:
             db = g._database = connect(Settings().dict().get('pg_dsn'))
-        if dict is False:
-            #db.autocommit = True
-            db = g._database = connect(Settings().dict().get('pg_dsn'))
-        else:
-            db.cursor_factory = extras.RealDictCursor
+        db.cursor_factory = extras.NamedTupleCursor
         return db
 
     #@app.teardown_appcontext

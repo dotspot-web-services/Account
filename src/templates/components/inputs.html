@@ -1,0 +1,32 @@
+
+{% macro select(values, name) -%}
+
+    <select name="{{ name }}" required>
+
+            {% for option in i %}
+            <option value="{{ option.index }}"> {{ option }} </option>
+            {% endfor %}
+
+    </select>
+
+{%- endmacro %}
+
+{% macro radio(radios, name) -%}
+
+    {% for label, input in radios.items() %}
+        <label for=" {{ name }} "> {label}
+        <input type="radio" name="{{ name }}" value="{{ input.get('value') }}">
+        </label>
+    {% endfor %}
+
+{%- endmacro %}
+
+{% macro button(btn_attr) -%}
+
+    {% if btn_attr.get('value') %}
+    <input type="submit" class="{{ btn_attr.get('class') }}" value="{{ btn_attr.get('value') }}"/>
+    {% else %}
+    <button type="submit" class="{{ btn_attr.get('class') }}">{{ btn_attr.get('label') }}</button>
+    {% endif %}
+
+{%- endmacro %}

@@ -3,10 +3,6 @@
 FROM python:3.9
 
 
-WORKDIR /app
-
-COPY . .
-
 # Set the working directory to /app
 WORKDIR /app
 

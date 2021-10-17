@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block head_title %}
+Profile
+{% endblock %}
+
+{% block content %}
+
+<div class="rol">
+    <div class="prof-pix-edit">
+        <div class="prof-pix">
+            {% if data %}
+            <img src="{{ data.get('pix') }}" alt="" srcset="">
+            else:
+            <img src="/src/static/icon/avatar.png" alt="" srcset="">
+            {% endif %}
+        </div>
+        <div class="edit-pix d-none ">
+            <form action="/Profiles/Basics" enctype="multipart/form-data">
+                <input type="file" name="med" id="med">
+                <button type="submit">upload</button>
+            </form>
+            <div></div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-md-8 col-sd-12">
+
+        <h1>Update your profile</h1>
+    
+        <p>{{ desc }}</p>
+        
+        {% if data %}
+        {% for row in data %}
+
+        {% include "components/form.html"%}
+
+        {% endfor %}
+
+        {% else %}
+
+        {% include "components/form.html"%}
+        
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

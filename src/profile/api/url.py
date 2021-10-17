@@ -2,10 +2,10 @@
 from flask_restful import Api
 from flask import Blueprint
 
-from profile.prof import Basic, Accademics,  Resacher, Works
+from .prof import Basic, Accademics,  Resacher, Works
 
 
-profBp = Blueprint('Accounts', __name__)
+profBp = Blueprint('Profiler', __name__)
 profAp = Api(app=profBp)
 
 profAp.add_resource(Basic, '/Basics')

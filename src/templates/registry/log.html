@@ -1,0 +1,24 @@
+{% from 'components/inputs.html' import button with context %}
+
+{% if standalone %}{% extends 'base.html' %}{% endif -%}
+
+{% block content %}
+
+<div class="row">
+  <form id="loga" method="post" action="/Registry/login" class="{{ form_cls }}">
+    <div class="inp-wrap">
+      <div><label for="cont">Contact</label></div>
+      <input type="text" name="usrCont" class="form-control mr-2" placeholder="Enter phone number or Email address">
+    </div>
+    <div class="inp-wrap">
+        <div><label for="paswd">Password</label></div>
+        <input type="password" name="usrPwd" class="form-control uiButton uiBtnColor smlbtn" placeholder="Enter your password">
+        <div class="info"><a href="/Accounts/reset">Reset password</a></div>
+    </div>
+    <input type="submit" class="btn btn-success mr-sm-2" value="Login">
+  </form>
+</div>
+
+{% endblock %}
+
+{% include 'components/logBtn.html' %}

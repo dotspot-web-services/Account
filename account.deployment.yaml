@@ -72,12 +72,7 @@ spec:
         volumeMounts:
           - mountPath: /accounts
             name: accounts
-        resources:
-          limits:
-            cpu: "0.35"
-            memory: 212Mi
-          requests:
-            cpu: "0.3"
+        resources: {}
         env:
           - name: PGDB_URI
             valueFrom:
@@ -118,12 +113,7 @@ spec:
         imagePullPolicy: "IfNotPresent"
         ports:
         - containerPort: 8000
-        resources:
-          limits:
-            cpu: "0.35"
-            memory: 212Mi
-          requests:
-            cpu: "0.3"
+        resources: {}
       restartPolicy: Always
 status: {}
 

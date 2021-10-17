@@ -9,14 +9,21 @@ from setting.dbcon import DbSet as db
 class Usr(BaseModel):
     """Create a spotlight either from external source or internal source"""
 
-    name: str
-    avatar: FilePath
+    fullname: Optional[str]
+    avatar: Optional[FilePath]
 
-    @validator('name')
-    def check_name(cls, name):
-        if ' ' not in name:
+    @validator('fullname')
+    def check_name(cls, fullname):
+        if ' ' not in fullname:
             raise ValueError('must contain a space')
-        return name.title()
+        return fullname.title()
+
+class SerializedBasics(Usr):
+    """serialize user registeration data for update"""
+
+    cnt: bool
+    dob: datetime.date
+    sex: bool
 
 class Basics(BaseModel):
     """check login data"""
@@ -37,7 +44,6 @@ class Resrch(BaseModel):
     """Create a spotlight either from external source or internal source"""
 
     acad: int
-    pwd2: str
     typ: bool
     org: str
     displn: str

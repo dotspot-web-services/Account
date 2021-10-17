@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block head_title %}
+Home
+{% endblock %}
+
+{% block extra %}
+    {% include "registry/log.html" %}
+{% endblock %}
+
+{% block content %}
+
+<div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
+    <div class='row text-center'>
+        <div class=''>
+            {% include "components/limlit.html" %}
+        </div>
+    </div>
+    <div class="row text-center" id="moto">
+        <div>
+            Reasoning is the classification
+        </div>
+       <div>
+        In the journey the future is always better but today was and is the bedrock of the future.
+       </div>
+    </div>
+    <div class='row text-center'>
+        {% include "components/form.html"%}
+    </div>
+</div>
+
+{% endblock %}

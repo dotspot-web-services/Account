@@ -1,13 +1,13 @@
 
 from flask_restful import Resource
-from flask import make_response, request
+from flask import make_response, request, render_template
 from bleach import clean
 
-from profile.profSerializer import  (
-    Basics, Acads,  Resrch,
-    Workplace
+from profile.profSerializer import (
+    Basics, Acads, Resrch,
+    Workplace, SerializedBasics
 )
-from setting.decs import Auth as authenticate, Cors as corsify
+from setting.decs import Auth as authenticate
 from setting.dbcon import DbSet
 
 
@@ -19,7 +19,6 @@ class Basic(Resource):
     def __init__(self):
         self._db = DbSet()
 
-    @corsify
     @authenticate
     def post(self, usr):
         # get the post data
@@ -30,8 +29,6 @@ class Basic(Resource):
             strtd=bsic_data.get('strt'), endd=bsic_data.get('end'), acad=bsic_data.get('acad')
         )
 
-        if isinstance(usr, tuple):
-            return usr
         usr = usr[0].get('usr')
         with self._db.get_db() as con:
             data = self._db._model.in_basic(
@@ -48,11 +45,41 @@ class Basic(Resource):
             return make_response({'status': 'successful'}, 201)
             
         except Exception as e:
-            return make_response({'status': 'failed', 'error': f'{data}'}, 401)
+            return make_response({'status': 'failed', 'error': f'{e}'}, 401)
     
-    @corsify
-    def get(self):
-        return make_response("this is a get request, it's reachable", 201)
+    @authenticate
+    def get(self, usr):
+        
+        try:
+            basic = SerializedBasics(self._db._model.basic_prof(
+            self._db.get_db(dict=True), contact=usr
+            ))
+        except KeyError as err:
+            return err, 501
+        soc = self._db._model.basic_prof(
+            self._db.get_db(dict=True), contact=usr
+        ) # data will be fetched in aliase to form field name
+
+        form_attr = {
+                "method": "POST", "action": "/src", "class": "form-inline my-2 my-lg-0",
+                "button": { "class": "btn btn-outline-success my-2 my-sm-0", "label": "Search"}
+            }
+        inputs = {
+            'discipline': {'placeholder': 'Field of knowledge', "type": "text", "name": "dspln"}, 
+            'place': {'placeholder': 'name of the place', "type": "text", "name": "plc"}, 'Skilled': {'value': 0},
+            'started': {'type': 'number', 'name': 'strt'}, 'Ended': {'type': 'number', 'name': 'endd'}
+        }
+        
+        if soc :
+            return render_template('pages/profile.html', inputs=inputs, form_attr=form_attr, data=soc)
+        else:
+            return render_template('pages/profile.html', inputs=inputs, form_attr=form_attr)   
+
+    def options(self):
+        return {'Allow' : ['POST', 'GET']}, 200, \
+        {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods' : '*',
+        'Access-Control-Allow-Headers': '*', 'cross-site-cookies': 'session', 
+        'samesite': 'Lax'}
 
 
 class Accademics(Basic):
@@ -60,7 +87,7 @@ class Accademics(Basic):
     User Login Resource
     """
 
-    @corsify
+    #@corsify
     @authenticate
     def post(self, usr):
         # get the post data
@@ -85,15 +112,25 @@ class Accademics(Basic):
         except Exception as e:
             return make_response({'status': 'successful', 'error': f'{e}'}, 201)
 
-    def get():
+    @authenticate
+    def get(self, usr):
         """reset password"""
+        acad = SerializedBasics(self._db._model.basic_prof(
+            self._db.get_db(dict=True), contact=usr
+        ))
+        if acad:
+            form = {
+                'discipline': {'value': '', 'placeholder': 'Enter Course of study'}, 'place': {'value': '', 'placeholder': 'Enter Institution name'}, 
+                'title': {"options": ['B.Sc', 'B.Engr' 'M.Sc', 'Ph.Dr'], "type": "select", "name": "ttl"}, 'started': {'placeholder': 'year'}, 'Ended': {'placeholder': 'year'}
+            }
+        return render_template('pages/home.html', form=form)
 
 class Resacher(Accademics):
     """
     Logout Resource
     """
     
-    @corsify
+    #@corsify
     @authenticate
     def post(self, usr):
         # get the post data
@@ -118,12 +155,25 @@ class Resacher(Accademics):
         except Exception as e:
             return make_response({'status': 'successful', 'error': f'{e}'}, 201)
 
+    @authenticate
+    def get(self, usr):
+        """reset password"""
+        acad = SerializedBasics(self._db._model.basic_prof(
+            self._db.get_db(dict=True), contact=usr
+        ))
+        if acad:
+            form = {
+                'type': {'value': ''}, 'organisation': {'value': ''},
+                'started': {'type': 'date'}, 'Ended': {'value': 1}, 'email': {'value': 0}
+            }
+        return render_template('pages/home.html', form=form)
+
 class Works(Resacher):
     """
     basic education or acquired skill
     """
 
-    @corsify
+    #@corsify
     @authenticate
     def post(self, usr):
         # get the post data
@@ -144,3 +194,17 @@ class Works(Resacher):
             
         except Exception as e:
             return make_response({'status': 'successful', 'error': f'{e}'}, 201)
+
+    @authenticate
+    def get(self, usr):
+        """reset password"""
+        acad = SerializedBasics(self._db._model.basic_prof(
+            self._db.get_db(dict=True), contact=usr
+        ))
+
+        if acad:
+            form = {
+                'organisation': {'value': ''}, 'role': {'value': ''},
+                'started': {'type': 'date'}, 'Ended': {'value': 1}
+            }
+        return render_template('pages/home.html', form=form)

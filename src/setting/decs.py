@@ -3,12 +3,12 @@ import datetime
 from functools import update_wrapper, partial
 
 import jwt
-from flask import jsonify, request, make_response
+from flask import jsonify, request, make_response, session
 from pydantic.types import UUID1
 
 from .dbcon import DbSet
 
-class Auth(object):
+class Auths(object):
     """decode auth and check validity"""
 
     def __init__(self, func):
@@ -40,22 +40,28 @@ class Auth(object):
     
     def authenticate(self):
         token = None
-        token = request.headers.get('authorization', None)
+        token = request.headers.get('authorization') or session.get('token', None)
         
         if token is None:
-            return jsonify({'message': 'Token is missing'})
+            return jsonify({"message": "Token is missing"})
         try:
             data = jwt.decode(token, self.db._oda.secret, algorithms=["HS256"])
-            usr = self.db._model.get_usr(self.db.get_db(dict=True), usr=data['usr'])
+            usr = self.db._model.get_usr(self.db.get_db(), usr=data['usr'])
         except jwt.ExpiredSignatureError as err:
-            return jsonify({'message': f'Token is invalid {err}'}), 401
-        return usr
+            return jsonify({'message': f'Token is invalid {err}'})
+        return usr[0].usr
+
+    def __call__(self):
+        return self.func(self.authenticate())
+
+class Auth(Auths):
 
     def __get__(self, instance, owner):
         return partial(self, instance)
 
     def __call__(self, instance):
         return self.func(instance, self.authenticate())
+    pass
 
 class Cors(object):
 
@@ -72,8 +78,9 @@ class Cors(object):
             return decorator_f
         return inner
 
-    def _build_cors_prelight_response(self, resp):
+    def _build_cors_prelight_response(self, resp_obj):
         #resp = current_app.make_default_options_response()
+        resp = make_response(resp_obj)
         resp.headers.add("Access-Control-Allow-Origin", "*")
         resp.headers.add('Access-Control-Allow-Headers', "*")
         resp.headers.add('Access-Control-Allow-Methods', "*")
@@ -89,9 +96,9 @@ class Cors(object):
         if request.method == "POST":
             core = self._corsify_actual_response(resp_obj=resp)
         elif request.method == "OPTIONS":
-            core = self._build_cors_prelight_response(resp=resp)
+            core = self._build_cors_prelight_response(resp_obj=resp)
         else:
-            core = self._build_cors_prelight_response(resp=resp)
+            core = self._build_cors_prelight_response(resp_obj=resp)
         return core
 
     def __get__(self, instance, owner):

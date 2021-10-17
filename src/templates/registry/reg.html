@@ -1,0 +1,50 @@
+
+{% extends 'base.html' %}
+
+{% block head_title %}
+    Create Account
+{% endblock %}
+
+{% block extra %}
+    {% include 'components/logBtn.html' %}
+{% endblock extra %}
+
+
+{% block content %}
+
+<div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
+    <div>
+        <div>
+            Create account
+        </div>
+        <div>
+            Get going, the field is green
+        </div>
+    </div>
+    <form id="regForm" action="/Registry/reg" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <div><label for="fulName">Full Name</label></div>
+            <input id="fname" type="text" name="fname" class="form-control" placeholder="Enter full name. Eg: John mba" />
+            <div class="err"></div>
+        </div>
+        <div class="form-group">
+            <div><label for="cont">Contact</label></div>
+            <input id="cont" type="email" name="cont" class="form-control" placeholder="Enter phone number or Email address" />
+            <input type="hidden" name="typ" value="true">
+            <div class="err"></div>
+        </div>
+        <div class="form-group">
+            <div><label for="paswd">Password</label></div>
+            <input type="password" id="paswd" name="pwd" class="form-control" placeholder="Enter your password" />
+            <div class="err"></div>
+        </div>
+        <div class="form-group">
+            <div><label for="vpaswd">Confirm password</label></div>
+            <input id="vpaswd" type="password" name="vpwd" class="form-control" placeholder="Re-enter your password" />
+            <div class="err"></div>
+        </div>
+        <button type="submit" class="btn btn-block btn-success">Register</button>
+    </form>
+</div>
+    
+{% endblock content %}

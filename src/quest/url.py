@@ -1,0 +1,1 @@
+from ..registry.view import finish, reset, logOut
