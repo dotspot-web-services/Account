@@ -1,5 +1,5 @@
 
-from typing import Set, Optional
+from typing import Set, Optional, Tuple
 from pydantic import (
     BaseSettings,
     PyObject,
@@ -8,11 +8,14 @@ from pydantic import (
     Field
 )
 
-
 class CheckSet(BaseSettings):
     """set data up"""
     secret: Optional[str] = Field( env='ATUSEC')
     log_rod: Optional[int] = Field( env='LOG_H')
+    media_folder: str = Field(default="src/static/test", const=True)
+    allowed_extension: Tuple = Field(default=("MPG", "JPEG"), const=True)
+    file_size: int = Field(default= 16 * 1024 * 1024, const=True)
+    dormain: str = Field(default="questarenz.com", env="DORMAIN")
 
 class Settings(BaseSettings):
     """"connect to postgres and load data warehouse"""
@@ -21,7 +24,7 @@ class Settings(BaseSettings):
     api_key: Optional[str] = Field(env='my_api_key')
 
     redis_dsn: RedisDsn = 'redis://user:pass@localhost:6379/1'
-    pg_dsn: PostgresDsn = Field(..., env='PGDB_URI', alias="just_get")
+    pg_dsn: PostgresDsn = Field(..., env='DEV_URI', alias="just_get")
 
     special_function: PyObject = 'math.cos'
 

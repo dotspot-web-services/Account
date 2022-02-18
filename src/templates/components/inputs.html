@@ -1,11 +1,11 @@
 
-{% macro select(values, name) -%}
+{% macro select(options, name) -%}
 
     <select name="{{ name }}" required>
 
-            {% for option in i %}
-            <option value="{{ option.index }}"> {{ option }} </option>
-            {% endfor %}
+        {% for key, val in options.items() %}
+        <option value="{{ key }}"> {{ val }} </option>
+        {% endfor %}
 
     </select>
 
@@ -14,7 +14,7 @@
 {% macro radio(radios, name) -%}
 
     {% for label, input in radios.items() %}
-        <label for=" {{ name }} "> {label}
+        <label for=" {{ name }} "> <span> {{ label }} </span> 
         <input type="radio" name="{{ name }}" value="{{ input.get('value') }}">
         </label>
     {% endfor %}

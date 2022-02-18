@@ -1,3 +1,248 @@
-<!--
-    users general profile for view
--->
+{% extends 'base.html' %}
+
+{% block head_title %}
+Profile
+{% endblock %}
+
+{% block content %}
+
+<div class="rol">
+	<div id="abt" class="">
+		<div class="prof-pix-edit">
+			<div class="prof-pix-wrapa d-block">
+				<div class="prof-pix ">
+					{% if usr %}
+					{% set usr = usr["pix"] %}
+					{% endif %}
+					{% set pix = usr or "/static/icon/avatar.png" %}
+					<img src="{{ pix }}" alt="" srcset="">
+				</div>
+			</div>
+
+			{% if g["usr"] %}
+			<div class="edit-pix">
+				<form action="/Profiles/Profile" method="POST" enctype="multipart/form-data">
+					<input type="file" name="med" id="med" required>
+					<button type="submit">upload</button>
+				</form>
+				<div>i class="fa fa-pencil" aria-hidden="true"></i>Change</a></div>
+			</div>
+			{% endif %}
+		</div>
+
+		<div class="">
+			<div class="prof-sum">
+				<summary>
+					I'm {% if acad %} a graduate of {{acad["dspln"]}} {% endif %}
+					{% if acad["rsrch"] %} and a reseacher {% endif %}
+					{% if base %} skilled in {{base["doing"]}} {% endif %}
+					{% if wrk["strt"] %} working {%else if wrk["endd"] %} worked as {{wrk["wrk"]}} {% endif %}
+					{% if awd %} and have been recognized by {{awd["titl"]}} {% endif %}
+				</summary>
+			</div>
+
+			<div class="prof-tabs">
+				<div class="portfolio">
+					<div class="portfolio-menu">
+						<div class="menu-wrapper">
+							<div class="menu-item">
+								<a href="#">knowledge</a>
+							</div>
+							<div class="menu-item">
+								<a href="#">Work</a>
+							</div>
+							<div class="menu-item">
+								<a href="#">Awards</a>
+							</div>
+						</div>
+					</div>
+
+					<div class="slider-wrapper">
+						<div class="gradient">
+							<div>
+								<h4>Basics</h4>
+								{% for row in base %}
+								<div>
+									<div>
+										<div>{{row["plc"]}}</div>
+										<div>{{row["doing"]}}</div>
+										{% if row["acad"] is True %}
+										<div>From School</div>
+										{% else %}
+										<div>Outside School</div>
+										{% endif %}
+									</div>
+									<div class="float-right"><i class="fa fa-pencil" aria-hidden="true"></i>Change</a></div>
+								</div>
+								{% endfor %}
+							</div>
+							<div>
+								<h4>Advanced</h4>
+								{% for row in advcd %}
+								<div>
+									<div>
+										<div>
+											<div>{{row["plc"]}}</div>
+											<div>{{row["doing"]}}</div>
+											<div class="float-right"> {{row["stage"]}} </div>
+										</div>
+										{% if row["typ"] %}
+										<div>
+											<div>{{row["plc"]}}</div>
+											<div>{{row["doing"]}}</div>
+											<div>{{row["typ"]}}</div>
+										</div>
+										{% endif %}
+									</div>
+									<div class="float-right"><i class="fa fa-pencil" aria-hidden="true"></i>Change</a></div>
+								</div>
+								{% endfor %}
+							</div>
+						</div>
+
+						<div class="gradient">
+							<div>
+								{% for row in wrks %}
+								<div>
+									<div>
+										<div>{{ row["plc"] }}</div>
+										<div>{{ row["doing"] }}</div>
+										<div>{{ row["strt"] }}</div>
+										{% if row["endd"] %}
+										<div>{{ row["endd"] }}</div>
+										{%else%}
+										<div>Present</div>
+										{% endif %}
+									</div>
+									<div class="float-right"><i class="fa fa-pencil" aria-hidden="true"></i>Change</a></div>
+								</div>
+								{% endfor %}
+							</div>
+							<div>
+								{% if advcd %}<h4>Publications</h4> {% endif %}
+								{% if advcd[0]["titl"] %}
+									{% for row in advcd %}
+									<div>
+										<div>
+											<div>{{row["fld"]}}</div>
+											<div>{{row["titl"]}}</div>
+											<div>{{row["publsdt"]}}</div>
+										</div>
+										<div class="float-right"><i class="fa fa-pencil" aria-hidden="true"></i>Change</a></div>
+									</div>
+									{% endfor %}
+								{% else %}
+									<div>From School</div>
+									<div>Outside School</div>
+								{% endif %}
+							</div>
+							<div>
+								<h4>Social</h4>
+								{% if socs %}
+									{% for row in socs %}
+									<div>
+										<div>
+											<div>{{row["fld"]}}</div>
+											<div>{{row["titl"]}}</div>
+										</div>
+										<div class="float-right"><i class="fa fa-pencil" aria-hidden="true"></i>Change</a></div>
+									</div>
+									{% endfor %}
+								{% else %}
+									<div>From School</div>
+									<div>Outside School</div>
+								{% endif %}
+							</div>
+						</div>
+
+						<div class="gradient">
+							<div>
+								{% if award %}
+								{% for row in award %}
+								<div>
+									<div>
+										<div>{{ row["evnt"] }}</div>
+										<div>{{ row["titl"] }}</div>
+										<div>{{ row["awd"] }}</div>
+										<div>{{ row["awdt"] }}</div>
+									</div>
+									<div class="float-right"><i class="fa fa-pencil" aria-hidden="true"></i>Change</a></div>
+								</div>
+								{% endfor %}
+								{% else %}
+									<div>From School</div>
+									<div>Outside School</div>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+	</div>
+
+	</div>
+</div>
+
+<style>
+	#pgBackground{
+		padding: 2rem;
+		margin: 3rem;
+	}
+
+	.pix img{
+		width: 30rem;
+		height: 30rem;
+		border-radius: 50%;
+	}
+
+	#abt{
+		display: flex;
+	}
+
+.menu-wrapper > div {
+    margin-right: 20px;
+    font-size: 0.9em;
+    text-transform: uppercase;
+}
+
+#home-margin{
+    margin-right: 50px;
+}
+
+.menu-item{
+    height: 22px;
+    margin-top: 3px;
+    border-bottom: 1px solid transparent;
+    transition: border-bottom 0.5s;
+}
+
+.menu-item a{
+	color: #8a8a8a;
+	text-decoration: none;
+	transition: color 0.5s;
+}
+
+.menu-item:hover{
+	border-bottom: 1px solid black;
+}
+
+.menu-item a:hover{
+	color: black;
+}
+
+.active-link{
+	border-bottom: 1px solid black;
+}
+
+.active-link a{
+	color: black !important;
+}
+.menu-wrapper{
+	padding: 1.5rem;
+	padding-bottom: 0.2rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+</style>
+{% endblock %}

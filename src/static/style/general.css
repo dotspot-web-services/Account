@@ -24,13 +24,6 @@ img, video{
   height: inherit;
 }
 
-img{
-  border:0;
-  -ms-interpolation-mode:bicubic
-}
-svg:not(:root){
-  overflow:hidden
-}
 figure{
   margin:0
 }
@@ -75,7 +68,7 @@ margin:0;
 position:fixed;
 display: flex;
 justify-content: space-between;
-align-items: center;
+align-items:center;
 top:0;
 left:0;
 right:0;
@@ -86,7 +79,7 @@ background:url(/static/media/hdbckgr.jpg) #2ecc71;
 box-shadow:1px 0px 2px rgba(0,0,0,0.75);
 z-index:99;
 -webkit-font-smoothing:antialiased;
-min-height:50px;
+min-height:70px;
 max-height: 100px;
 }
 
@@ -109,10 +102,10 @@ text-transform: uppercase;
   color: #fff;
 }
 
-.logo-hom-wrapa{
+.center-img{
+  display: flex !important;
   justify-content: space-between;
   align-items: center;
-  display: flex;
 }
 
 .logo-hom-wrapa .nav-item{
@@ -122,10 +115,18 @@ text-transform: uppercase;
 .log-in-btn{
   height: 50px;
   width: 50px;
-  display:  none;
   border-radius: 50%;
   background-color: #fff;
   border: 2px bold green;
+}
+
+.log-in-btn .icon-wrap{
+  margin-bottom: 8px;
+}
+
+.log-in-btn .ico-txt{
+  margin-bottom: 9px;
+  color: #2ecc71;
 }
 
 .icon-wrap{
@@ -175,12 +176,25 @@ text-transform: uppercase;
   margin-left: 5px;
 }
 
+.motv8{
+  padding: 1.5rem;
+  color: #2ecc71;
+  position: relative;
+  right: 0px;
+  text-align: right;
+}
+
 .moto {
-  color: #0e385f;
+  padding: 1.5rem;
+  color: #2ecc71;
   font-size: 16px;
   font-weight: bold;
   line-height: 25px;
   word-spacing: -1px;
+}
+
+._5pxML{
+  margin-left: 5px;
 }
 
 
@@ -188,4 +202,54 @@ text-transform: uppercase;
 
 input:not([type="submit"]){
   text-align: center;
+}
+
+/* profiles */
+
+.prof-pix-wrapa{
+  height: 250px;
+  width: 250px;
+  border-radius: 50%;
+  background-color: #2ecc71;
+}
+
+.prof-pix-edit{
+  padding: 10px;
+  margin: 20px 10px;
+}
+
+.gap{
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  justify-items: center;
+  margin: 20px;
+  padding: 10px;
+}
+
+.left{
+  position: absolute;
+  left: 5px;
+}
+
+.left{
+  position: absolute;
+  right: 5px;
+}
+
+.prof-pix{
+  height: 88%;
+  width: 88%;
+  padding: 10px;
+  margin-left: 20px;
+}
+
+#leftbar{
+  background-color: #ebebeb;
+}
+
+#hider{
+  position: fixed;
+  height: 100vh;
+  width: 100vw;
 }

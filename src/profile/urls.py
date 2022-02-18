@@ -1,11 +1,13 @@
 
 from flask import Blueprint
 
-from .views import basics, acadas, resrcha, works
+from .views import prof
+from .api.url import profBp
 
-profs = Blueprint('profiles', __name__)
+profs = Blueprint('profs', __name__, "profile")
 
-profs.add_url_rule(rule="/", endpoint="knowledges", view_func=basics)
-profs.add_url_rule(rule="/accademics", endpoint="degrees", view_func=acadas)
-profs.add_url_rule(rule="/researchers", endpoint="searchers", view_func=resrcha)
-profs.add_url_rule(rule="/works", endpoint="working", view_func=works)
+
+
+profs.register_blueprint(profBp, url_prefix="/api")
+profs.register_blueprint(prof, url_prefix="/app")
+

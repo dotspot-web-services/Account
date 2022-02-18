@@ -1,10 +1,12 @@
 
+import asyncio
 import datetime
 from functools import update_wrapper, partial
 
 import jwt
-from flask import jsonify, request, make_response, session
+from flask import jsonify, redirect, request, make_response
 from pydantic.types import UUID1
+from werkzeug import Response
 
 from .dbcon import DbSet
 
@@ -22,37 +24,58 @@ class Auths(object):
             return self.func
         raise Exception('value error')
 
-    def encode_auth(self):
+    def encode_auth(self,  status=True):
         """
         Generates the Auth Token
         :return: string
         """
+        if status:
+            duratn = datetime.timedelta(days=3.0)
+            token_status = True
+        else:
+            duratn = datetime.timedelta()
+            token_status = False
         try:
             payload = {
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, minutes=100),
+                'exp': datetime.datetime.utcnow() + duratn,
                 'iat': datetime.datetime.utcnow(),
-                'usr': self.func
+                'usr': self.func,
+                'status': status,
+                'timed': token_status
             }
             return jwt.encode(payload, self.db._oda.secret, algorithm='HS256')
         except Exception as e:
             return e
 
-    
+    async def get_auth(self, data):
+        async with self.db.get_db() as conn:
+            async with self.db._model.get_usr(conn, usr=data['usr']) as cur:
+                print(cur.fetchone())
+                self.usr = cur.fetchone()
+        await asyncio.run(self.get_auth(data=data))
+
     def authenticate(self):
+
         token = None
-        token = request.headers.get('authorization') or session.get('token', None)
-        
+        token = request.headers.get('authorization') 
+
         if token is None:
             return jsonify({"message": "Token is missing"})
         try:
             data = jwt.decode(token, self.db._oda.secret, algorithms=["HS256"])
-            usr = self.db._model.get_usr(self.db.get_db(), usr=data['usr'])
-        except jwt.ExpiredSignatureError as err:
-            return jsonify({'message': f'Token is invalid {err}'})
-        return usr[0].usr
+            usr = self.db._model.get_usr(self.db.get_db(data_level=2), usr=data['usr'])
+        except jwt.ExpiredSignatureError or jwt.DecodeError:
+            return redirect(self.db._oda.dormain)
+        return usr, data['exp'], data['timed']
 
     def __call__(self):
-        return self.func(self.authenticate())
+        
+        if (auth := isinstance(self.authenticate(), Response)):
+            return auth
+        usr, status, timed_token = self.authenticate()
+        if timed_token is True:
+            return self.func(usr, status)
+        return self.func(usr.usr)
 
 class Auth(Auths):
 
@@ -60,8 +83,13 @@ class Auth(Auths):
         return partial(self, instance)
 
     def __call__(self, instance):
-        return self.func(instance, self.authenticate())
-    pass
+        if (auth := self.authenticate()) and isinstance(auth, Response):
+            return auth
+        usr, status, timed_token = self.authenticate()
+        if timed_token is True:
+            return self.func(instance, usr, status)
+        return self.func(instance, usr.usr, None)
+
 
 class Cors(object):
 
@@ -102,7 +130,7 @@ class Cors(object):
         return core
 
     def __get__(self, instance, owner):
-       return partial(self, instance)
+        return partial(self, instance)
 
     def __call__(self, instance):
         resp = self.func(instance)

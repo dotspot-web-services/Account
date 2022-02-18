@@ -1,0 +1,65 @@
+
+{% extends 'base.html' %}
+
+{% block head_title %}
+    Create Account
+{% endblock %}
+
+
+{% block content %}
+
+<div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
+    <div>
+        <div class="motv8">
+            Get going, the field is green
+        </div>
+        <p>
+            <div>
+                Fill up missing fields to complete registration
+            </div>
+            <div>
+                you can read more about <a href='' class='link'>birthday</a> and 
+                <a href='' class='link'> gender </a> data collection
+            </div>
+        </p>
+    </div>
+    <form id="regForm" action="{{url_for('accs.regs.finalize')}}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <div class="form-group">
+            <div><label for="fulName">Full Name</label></div>
+            <input id="fname" type="text" name="fname" class="form-control" value="{{data.get('fname')}}" required onchange="checkName" />
+            <div class="err"></div>
+        </div>
+        <div class="form-group">
+            <div><label for="cont">Contact</label></div>
+            {% if data.get('typ') is false %} {% set phone = data.get('typ') %} {% endif %}
+            {% if phone %} <fieldset disabled="disabled"> <span>{{country_flag}}</span> <span>{{country_code}}</span> </fieldset>{% endif %} 
+            <input id="cont" {% if phone %} type="number" {% else %} type="email" {% endif %}   name="cont" class="form-control" value="{{data.get('cont')}}" required oninput="checkContact"/>
+            <input type="hidden" name="typ" value="{{data.get('typ')}}">
+            <div class="err"></div>
+        </div>
+        <div class="form-group">
+            <div><label for="paswd">Birthday</label></div>
+            <input type="date" name="dob" class="form-control" placeholder="Enter your password" required onchange="checkPwd"/>
+            <div class="err"></div>
+        </div>
+        <div class="form-group">
+            <fieldset>
+                <legend>
+                    Gender
+                </legend>
+                <label><span>Male</span>
+                    <input type="radio" name="sx" class="" required value="0"/>
+                </label>
+
+                <label><span>Female</span>
+                    <input type="radio" name="sx" class="" required value="1"/>
+                </label>
+            </fieldset>
+            <div class="err"></div>
+        </div>
+        <button type="submit" class="btn btn-block btn-success">Complete</button>
+    </form>
+</div>
+    
+{% endblock content %}

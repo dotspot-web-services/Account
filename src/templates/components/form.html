@@ -1,7 +1,8 @@
 
 {% from 'components/inputs.html' import radio, button, select with context %}
 
-<form method="{{ form_attr.get('method') }}" action="{{ form_attr.get('action') }}" {% if form_attr.get("class") %} class="{{ form_attr.get('class') }}" {% endif %} enctype="multipart/form-data">
+<form method="{{ form_attr.get('method') }}" action="{{ form_attr.get('action') }}" {% if form_attr.get("class") %} class="{{ form_attr.get('class') }}" {% endif %} {% if form_attr.get("id") %} id="{{ form_attr.get('id') }}" {% endif %} enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     {% for label, attrs in inputs.items() %}
     {% if attrs.get('labels') %}
     <div>
@@ -10,7 +11,7 @@
                 {{ label }}
             </legend>
             {{ radio( attrs.get('labels'), attrs.get('name')) }}
-            {% if note is defined %} <div class="{{ note.get('class') }}">{{ note.get(name) }}</div> {% endif %}
+            {% if note is defined and note.get(name) %} <div class="{{ note.get('class') }}">{{ note.get(name) | safe }}</div> {% endif %}
         </fieldset>
     </div>
     
@@ -18,22 +19,23 @@
     <div>
         <fieldset>
             <legend>
-                accademic level by title
+                Academic qualification
             </legend>
-            {{ select(attrs.get('name'), attrs.get('options'), label) }}
-            {% if note is defined %} <div class="{{ note.get('class') }}">{{ note.get(name) }}</div> {% endif %}
+            {{ select(attrs.get('options'), attrs.get('name')) }}
+            {% if note is defined and note.get(name) %} <div class="{{ note.get('class') }}">{{ note.get(name) | safe }}</div> {% endif %}
         </fieldset>
     </div>
     {% else %}
     {% set name = attrs.get("name") %}
     <fieldset>
     <div class="form-group">
-        <div><label for="{{ attrs.get('name') }}">{{ label }}</label></div>
+        <div><label for="{{ name }}">{{ label }}</label></div>
         <input
             type="{{ attrs.get('type') }}" name="{{ name }}" class="{{ attrs.get('class') }}" placeholder="{{ attrs.get('placeholder') }}"
-            {% if data is defined %} value="{{ data.get(name) }}" {% endif %}
+            {% if data is defined %} value="{{ data[name] }}" {% endif %} required
         />
-        {% if note is defined %} <div class="{{ note.get('class') }}">{{ note.get(name) }}</div> {% endif %}
+        <div class="alert-danger"></div>
+        {% if note is defined and note.get(name) %} <div class="{{ note.get('class') }}">{{ note.get(name) | safe }}</div> {% endif %}
     </div>
     {% endif %}
     {% endfor %}

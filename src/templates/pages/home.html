@@ -4,29 +4,44 @@
 Home
 {% endblock %}
 
-{% block extra %}
-    {% include "registry/log.html" %}
+{% block navBar %}
+    {% include "components/nav.html" %}
 {% endblock %}
 
 {% block content %}
 
-<div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
-    <div class='row text-center'>
-        <div class=''>
+<div class="col-lg-6 offset-lg-2 col-md-8 offset-md-2" id="limesrch">
+    <div class='d-block'>
+        <div id="toggler" class='row d-flex justify-content-center text-center'>
+            <i class="fa fa-arrow-circle-o-down" aria-hidden="true"></i><span>Limelight</span> 
+        </div>									
+        <div id="limlit">
             {% include "components/limlit.html" %}
         </div>
     </div>
-    <div class="row text-center" id="moto">
-        <div>
-            Reasoning is the classification
+    <div class="srch">
+        <div class="collapsed" data-bs-toggle="collapse" data-bs-target="#srch-result">
+            <form class="d-flex" id="srcha">
+                <div class="input-group">                    
+                    <input type="text" name="srch-inp" class="form-control" placeholder="Search" >
+                    <button type="submit" class="btn btn-secondary"><span class="fa fa-search"></span> Search</button>
+                </div>
+            </form>
         </div>
-       <div>
-        In the journey the future is always better but today was and is the bedrock of the future.
-       </div>
-    </div>
-    <div class='row text-center'>
-        {% include "components/form.html"%}
+        <div id="srch-result accordion-collapse collapse show" data-bs-parent="#limesrch">
+
+        </div>
     </div>
 </div>
+
+<div class="col-lg-3 offset-lg-0 col-md-8 offset-md-2">
+    {% include "components/quote.html"%}
+</div>
+
+<style>
+    .srch{
+        margin-top: 50px;
+    }
+</style>
 
 {% endblock %}

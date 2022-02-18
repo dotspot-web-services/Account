@@ -1,9 +1,24 @@
 
-<div class="log-in-btn {{ hide_btn }}">
-    <a href=" {{ btn_href }} " class="nav-link">
-        <div class="icon-wrap">
-          <img src="/static/icon/avatar.png" class="logbtn"/>
-        </div> 
-        <div class="ico-txt">Login</div> 
-    </a>
-  </div>
+<div class="row _5pxML">
+  <form id="loga" method="post" action="url_for('accs.regs.signIn')" class="form-inline">
+    <div class="inp-wrap">
+      <div><label for="cont">Contact</label></div>
+      <input type="text" name="usrCont" class="form-control mr-2" placeholder="Enter phone number or Email address">
+    </div>
+    <div class="inp-wrap">
+        <div><label for="paswd">Password</label></div>
+        <input type="password" name="usrPwd" class="form-control uiButton uiBtnColor smlbtn" placeholder="Enter your password">
+        <div class="info"><a href="/accounts/app/reset">Reset password</a></div>
+    </div>
+    <input type="submit" class="btn btn-success mr-sm-2" value="Login">
+  </form>
+</div>
+
+<div class="log-in-btn">
+  <a href="/accounts/app/reset" class="nav-link d-block">
+      <div class="icon-wrap">
+        <img src="/static/icon/avatar.png" class="logbtn"/>
+      </div> 
+      <div class="ico-txt">Login</div> 
+  </a>
+</div>

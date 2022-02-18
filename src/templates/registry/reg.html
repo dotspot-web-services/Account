@@ -5,43 +5,46 @@
     Create Account
 {% endblock %}
 
-{% block extra %}
-    {% include 'components/logBtn.html' %}
-{% endblock extra %}
+{% block navBar %}
+    {% include 'components/nav.html' %}
+{% endblock %}
 
 
 {% block content %}
 
 <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
-    <div>
-        <div>
-            Create account
-        </div>
-        <div>
-            Get going, the field is green
-        </div>
+    <div class="motv8">
+        Get going, the field is green
     </div>
-    <form id="regForm" action="/Registry/reg" method="post" enctype="multipart/form-data">
+    <form id="regForm" action="{{url_for('accs.regs.register')}}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="form-group">
             <div><label for="fulName">Full Name</label></div>
-            <input id="fname" type="text" name="fname" class="form-control" placeholder="Enter full name. Eg: John mba" />
-            <div class="err"></div>
+            <input id="fname" type="text" name="fname" class="form-control" placeholder="Enter full name. Eg: John mba" required onchange="checkName" />
+            <div class="alert-danger"></div>
         </div>
         <div class="form-group">
             <div><label for="cont">Contact</label></div>
-            <input id="cont" type="email" name="cont" class="form-control" placeholder="Enter phone number or Email address" />
+            <input id="cont" type="email" name="cont" class="form-control" placeholder="Enter phone number or Email address" required oninput="checkContact"/>
             <input type="hidden" name="typ" value="true">
-            <div class="err"></div>
+            <div class="alert-danger"></div>
         </div>
         <div class="form-group">
             <div><label for="paswd">Password</label></div>
-            <input type="password" id="paswd" name="pwd" class="form-control" placeholder="Enter your password" />
-            <div class="err"></div>
+            <input type="password" id="paswd" name="pwd" class="form-control" placeholder="Enter your password" required onchange="checkPwd"/>
+            <div class="alert-danger"></div>
         </div>
         <div class="form-group">
             <div><label for="vpaswd">Confirm password</label></div>
-            <input id="vpaswd" type="password" name="vpwd" class="form-control" placeholder="Re-enter your password" />
-            <div class="err"></div>
+            <input id="vpaswd" type="password" name="vpwd" class="form-control" placeholder="Re-enter your password" required onchange="checkPwdMatch"/>
+            <div class="alert-danger"></div>
+        </div>
+        <div class="form-group">
+            <input type="checkbox" name="tnc" required />
+            <span class="">
+                I accept the <a href="tnc.html" class="ico-txt">Terms</a>, <a href="tnc.html" class="ico-txt">Conditions</a> 
+                and <a href="tnc.html" class="ico-txt">privacy policy</a> of this site.
+            </span>
         </div>
         <button type="submit" class="btn btn-block btn-success">Register</button>
     </form>

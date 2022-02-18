@@ -6,16 +6,19 @@ Profile
 
 {% block content %}
 
-<div class="rol">
+<div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
     <div class="prof-pix-edit">
-        <div class="prof-pix">
-            {% if data %}
-            <img src="{{ data.get('pix') }}" alt="" srcset="">
-            else:
-            <img src="/src/static/icon/avatar.png" alt="" srcset="">
-            {% endif %}
+        <div class="prof-pix-wrapa d-block">
+            <div class="prof-pix ">
+                {% if data %}
+                {% set usr = data["pix"] %}
+                {% endif %}
+                {% set pix = usr or "/static/icon/avatar.png" %}
+                <img src="{{ pix }}" alt="" srcset="">
+            </div>
         </div>
-        <div class="edit-pix d-none ">
+        
+        <div class="edit-pix ">
             <form action="/Profiles/Basics" enctype="multipart/form-data">
                 <input type="file" name="med" id="med">
                 <button type="submit">upload</button>
@@ -23,26 +26,36 @@ Profile
             <div></div>
         </div>
     </div>
-    <div class="col-lg-6 col-md-8 col-sd-12">
-
-        <h1>Update your profile</h1>
+    <div class="">
     
-        <p>{{ desc }}</p>
+        <p>{{ desc | safe }}</p>
         
         {% if data %}
-        {% for row in data %}
-
+        <div class="prof-form">
         {% include "components/form.html"%}
-
-        {% endfor %}
+        </div>
 
         {% else %}
 
+        <div class="prof-form">
         {% include "components/form.html"%}
+        </div>
         
         {% endif %}
 
     </div>
+</div>
+<div id="nav-btn" class="gap">
+    {% if left_btn_ref %}
+    <a href="{{left_btn_ref}}" class="nav-link float-left" id="left-btn">
+        <button class="btn btn-outline-success my-2 my-sm-0">Back</button>
+    </a>
+    {% endif %}
+    {% if right_btn_ref %}
+    <a href="{{right_btn_ref}}" class="nav-link float-right" id="right-btn">
+        <button class="btn btn-outline-success my-2 my-sm-0">Skip</button>
+    </a>
+    {% endif %}
 </div>
 
 {% endblock %}

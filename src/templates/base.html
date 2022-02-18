@@ -8,53 +8,46 @@
     <meta name="theme-color" content="#000000"/>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="../static/style/general.css">
+    <link rel="stylesheet" href="../static/style/mediaCss.css">
 
     <title>QUESTARENZ {% block head_title %}{% endblock head_title%}</title>
 
-    <style>
-      .overlay{
-        position: absolute;
-        min-height: 100%;
-        min-width: 100%;
-        left: 0;
-        top: 0;
-        background: rgba(0, 0, 0, 0.6);
-      };
-    </style>
   </head>
   <body>
-      <header>
-        <div id="pgHeader" class="container-fluid">
-          <div class="logo-hom-wrapa">
-            <div id="logo">
-              <a class="navbar-brand" href="/">QUESTARENZ</a>
-            </div>
-            {% if home_nav is defined %}
-            <div class="nav-item">
-              <a href="/" class="nav-link">{{ home_nav }}</a>
-            </div>
-            {% endif %} 
+    <div id="hider"></div>
+    <header>
+      <div id="pgHeader" class="container-fluid">
+        <div class="logo-hom-wrapa">
+          <div id="logo">
+            <a class="navbar-brand" href="/">QUESTARENZ</a>
           </div>
-          
-          <div id="head-account">
-            <div class="nav-item">
-              <a href="/Accounts/regUsr" class="nav-link">Create Account</a>
-            </div>
-  
-            {% block extra %}
-            {% endblock extra %}
+          {% if home_nav is defined %}
+          <div class="nav-item">
+            <a href="/" class="nav-link">{{ home_nav }}</a>
           </div>
-
+          {% endif %} 
         </div>
-      </header>
-      <main>
-        <div class='container-fluid'>
-            {% block content %}
-            {% endblock content %}
-          </div>
-      </main>
-      <script src="../static/js/registry.js">
-      </script>
+          {% block navBar %}
+          {% endblock navBar %}
+        </div>
+
+      </div>
+    </header>
+    <main>
+      <div class='container-fluid d-lg-inline-flex d-md-block d-sm-block'>
+          {% block content %}
+          {% endblock content %}
+        </div>
+    </main>
+    
+    <script src="../static/js/gen.js">
+    </script>
+    <script src="../static/js/registry.js">
+    </script>
   </body>
 </html>

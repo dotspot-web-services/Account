@@ -1,46 +1,110 @@
 
-from flask import render_template, redirect, wrappers
+import json
 
-from setting.decs import Auths as authenticate
-from setting.dbcon import DbSet
+from flask import render_template, url_for, redirect, Blueprint, request, session
+
+from setting.helper import ReqApi, form_dict
 
 
-@authenticate
-def finish(usr):
-    db = DbSet()
+regs = Blueprint('regs', __name__, url_prefix="/registry")
 
-    if isinstance(usr, wrappers.Response):
-        return usr
-    with db.get_db() as con:
-        data = db._model.complete_reg(
-            con, usr=usr
-        )
+@regs.get("/finalize")
+def finalPage():
+    
+    data = ReqApi(req_typ="get", req_url="/accounts/api/reg")
+    data = data()
 
-    form_attr = {
-        "method": "POST", "action": "/src", "class": "form-inline my-2 my-lg-0",
-    "button": { "class": "btn btn-outline-success my-2 my-sm-0", "label": "Submit"}
-    }
-    inputs = {
-        'Full name': {"type": "text", "name": "dspln", "class": "form-control"}, 'Contact': {"type": "text", "name": "plc", "class": "form-control"}, 
-        'Birthday': {'type': 'date', "class": "form-control"}, 'Gender': {"labels":{'Male': {'value': 1}, 'female': {'value': 0}}, "type": "radio"}
-    }
-    return render_template('profiles/profile.html', inputs=inputs, form_attr=form_attr, data=data)
+    if data.is_redirect:
+        return data
+    if not data.ok:
+        return data
+    data = data.json()
+    print(data)
+    return render_template('registry/finalReg.html', data=data.get("row_to_json"))
 
-def reset():
-    form_attr = {
-        "method": "POST", "action": "/src", "class": "form-inline my-2 my-lg-0",
-    "button": { "class": "btn btn-outline-success my-2 my-sm-0", "label": "Submit"}
-    }
-    inputs = {'Contact': {"type": "text", "name": "plc", "class": "form-control"}}
+@regs.post("/finalize")
+def finalize():
+
+    post_data = json.dumps(request.form)
+    data = ReqApi(req_typ="put", req_url="/accounts/api/reg", post_data=post_data)
+    data = data()
+
+    if data.is_redirect:
+        return data
+    if not data.ok:
+        return data
+    return redirect(url_for('grocs.groc.pixs'))
+
+@regs.post("/register")
+def register():
+
+    post_data = json.dumps(request.form)
+    data = ReqApi(req_typ="post", req_url="/accounts/api/reg", post_data=post_data)
+    data = data()
+
+    if not data.ok:
+        return data
+    data = data.json()
+
+    if data:
+        session["token"] = data
+        return redirect(url_for('accs.regs.finalize'))
+    return redirect(request.url)
+
+@regs.get("/register")
+def regPage():
+    return render_template('/registry/reg.html', hide_btn="d-block", btn_href="/")
+
+@regs.get("/reset")
+def resetPage():
+    
+    form_attr, inputs = form_dict(endpt="accs.regs.reset", fields=["Contact"])
+
     return render_template('registry/recovery.html', inputs=inputs, form_attr=form_attr, hide_btn="d-block", btn_href="/")
 
-def regPage():
-    return render_template('registry/reg.html', hide_btn="d-block", btn_href="/")
+@regs.post("/reset")
+def reset():
 
-def signIn():
+    post_data = json.dumps(request.form)
+    data = ReqApi(req_typ="put", req_url="rega.login", post_data=post_data)
+
+    data = data()
+
+    if not data.ok:
+        return data
+    elif data.ok:
+        redirect(url_for('accounts.accs.regs'))
+    redirect(url_for('profiler.basics'))
+
+@regs.get("/signIn")
+def signInPage():
     return render_template('registry/log.html', hide_btn="d-block", btn_href="/Accounts/logIn")
 
-def logOut(request, *args, **kwargs):
+@regs.post("/signIn")
+def signIn():
+
+    post_data = request.form
+    auth = (post_data['usrCont'], post_data['usrPwd'])
+    data = ReqApi(req_typ="post", req_url=url_for('rega.login'), post_data=auth)
+    data = data()
+
+    if not data.ok:
+        return data
+    data = data.json()
+    
+    if data.get("token_status") is True:
+        "api insert request to other tieters"
+        return redirect(url_for('localhost:3000'))
+    session["token"] = data["token"]
+    if data.get("user_status") is False:
+        return redirect(url_for('accs.regs.finalize'))
+    elif data.get("user_status") is True:
+        return redirect(url_for('localhost:3000'))
+    return redirect(url_for('accs.regs.regPage'))
+
+@regs.get("/logOut")
+def confLogOut():
+    
     if request.method == "POST":
         #logout(request)
         return redirect("/login")
@@ -51,3 +115,16 @@ def logOut(request, *args, **kwargs):
         "title": "Logout"
     }
     return render_template(request, "accounts/auth.html", context)
+
+@regs.post("/logOut")
+def logOut():
+    if request.method == "POST":
+        #logout(request)
+        return redirect("/login")
+    context = {
+        "form": None,
+        "description": "Are you sure you want to logout?",
+        "btn_label": "Click to Confirm",
+        "title": "Logout"
+    }
+    return render_template("accounts/auth.html", context)

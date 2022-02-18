@@ -1,27 +1,21 @@
 
 import bcrypt
-from bleach import clean
 
+from flask import jsonify, make_response, request, render_template, redirect, url_for
 from flask_restful import Resource
+from bleach import clean
+from werkzeug import Response
 
+from ..serializer import RegCheck, LogCheck, finalCheck, PwdCheck, Ip, Globe
 from setting.decs import Auth as authenticate
-from flask.views import MethodView
-from flask import (
-    make_response, request, jsonify, render_template, 
-    redirect, url_for, session, 
-)
-
-
-from ..serializer import  (
-    RegCheck, LogCheck
-)
-from setting.decs import Auth, Cors as corsify
+from setting.helper import ApiResp
 from setting.dbcon import DbSet
 
-class Register(MethodView):
+class Register(Resource):
     """
     User Registration Resource
     """
+    
     def __init__(self):
         self._db = DbSet()
 
@@ -32,66 +26,67 @@ class Register(MethodView):
 
     def post(self):
 
-        reg_data = request.form
-        #reg_data = reg_data.get('content')
-        
-        check = RegCheck(
-            fullname=reg_data.get('fname'), cnt=reg_data.get('cont'),
-            pwd=reg_data.get('pwd'), pwd2=reg_data.get('vpwd'), cntyp=reg_data.get('typ')
-        )
-        with self._db.get_db() as con:
-            user = self._db._model.in_acc(
+        reg_data = request.get_json()
+        print(reg_data)
+        if not (check := RegCheck(
+                fullname=reg_data.get('fname'), cnt=reg_data.get('cont'),
+                pwd=reg_data.get('pwd'), pwd2=reg_data.get('vpwd'), cntyp=reg_data.get('typ')
+            )):
+            return ApiResp(status_code=401)
+
+        with self._db.get_db(data_level=2) as con:
+            if self._db._model.check_acc(con, self._db.get_db(), contact=check.cnt):     
+                return ApiResp(status_code=401)
+            if usr := self._db._model.cr8_acc(
                 con, fname=clean(check.fullname), pwd=self.__hash_pwd(pwd=check.pwd).decode('utf8'), 
-                cnt=check.cnt, emel=check.cntyp
-            )
-
-        if not user:
-            return make_response(jsonify({'status': 'failed', 'message': 'user already exist'}), 401)
-        try:
-            # generate the auth token
-            token = Auth(func=user).encode_auth()
-            resp = {
-                'status': 'success',
-                'message': 'Successfully registered.',
-                'auth_token': token
-            }
-            status_code = 201
-        except Exception as e:
-            resp = {
-                'status': 'fail',
-                'message': f'Some error occurred {e}. Please try again.'
-            }
-            status_code = 401
-        finally:
-            resp = make_response(jsonify(resp), status_code)
-            resp.set_cookie("same-site-cookie", "session", samesite="Lax")
-            if not request.is_json:
-                session['token'] = token
-                return resp
-            return redirect(url_for('.register'))
-
-    def get(self):
-        return "this page is loading..."
-
-    def put(self):
-        # get the post data
-        reg_data = request.form
-        
-        check = RegCheck(
-            fullname=reg_data.get('fname'), cnt=reg_data.get('cont'), dob=reg_data.get('dob'),
-            cntyp=reg_data.get('typ'), sex=reg_data.get('sx')
-        )
-
-        if self._db._model.in_acc(
-                self._db.get_db(), fname=clean(check.fullname), bday=check.dob, mel=check.sex, 
-                cnt=check.cnt, emel=check.cntyp
+                cnt=check.cnt
             ):
-            return make_response(jsonify({'status': 'successful', 'message': 'update done succeesfully'}), 201)
-        else:
-            return make_response(jsonify({'status': 'failed', 'message': 'user already exist'}), 401)
+                token = authenticate(func=usr).encode_auth()
+                return ApiResp(status_code=201, data=token)
+
+    @authenticate
+    def put(self, usr, token_status):
+
+        if isinstance(usr, tuple):
+            usr = usr.usr
+        elif isinstance(token_status, Response):
+            return usr
+
+        reg_data = request.get_json()
+
+        if not (check := finalCheck(
+                fullname=reg_data.get('fname'), cnt=reg_data.get('cont'), dob=reg_data.get('dob'),
+                cntyp=reg_data.get('typ'), sex=reg_data.get('sx')
+            )):
+            return ApiResp(status_code=401)
+        with self._db.get_db() as con:
+            if not self._db._model.upd8_acc(
+                con, usr=usr, fname=clean(check.fullname),cnt=check.cnt, emel=check.cntyp,
+                bday=check.dob, mel=check.sex, actv=True, verfd= True
+            ):
+                return ApiResp(status_code=201)
+            else:
+                return ApiResp(status_code=401)
+
+    @authenticate
+    def get(self, usr, token_status):
+        """check if a user already exists"""
+
+        if isinstance(usr, tuple):
+            usr = usr.usr
+        elif isinstance(token_status, Response):
+            return usr
+
+        with self._db.get_db(data_level=1) as con:
+            if data := self._db._model.usr_reg(
+                con, usr=usr
+            ):
+                return ApiResp(status_code=201, data=data)
+            else:
+                return ApiResp(status_code=401)
 
     def options(self):
-        return {'Allow' : ['POST', 'GET']}, 200, \
+        return {'Allow' : ['POST', 'PUT', 'GET']}, 200, \
         {
             'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods' : '*',
             'Access-Control-Allow-Headers': '*'
@@ -105,42 +100,101 @@ class Login(Register):
     def post(self):
         # get the post data
 
-        auth = request.authorization or request.form
-
-        contact = auth.get('usrCont') or auth.username
-        password = auth.get('usrPwd') or auth.password
+        auth = request.authorization
+        contact = auth.username
+        password = auth.password
     
         if not contact or not password:
-            return make_response(
-                jsonify({'WWW.Authenticate': 'Basic realm="login required"'}), 401
-            )
+            return ApiResp(status_code=401)
             
-        check = LogCheck(
+        if not (check := LogCheck(
                 cnt=contact, pwd=password
-            )
-        usr = self._db._model.check_acc(self._db.get_db(dict=True), contact=check.cnt) # fetch user external id
-        try:
-            if not usr:              
-                return jsonify({'WWW.Authenticate': 'Basic realm="login required"'}), 401
-            if not bcrypt.checkpw(password=check.pwd.encode('utf-8'), hashed_password=usr[0].get('pwd').encode('utf-8')):
-                return jsonify({'WWW.Authenticate': 'Basic realm="login required"'}), 401
+            )):
+            return ApiResp(status_code=401)
 
-            token = Auth(func=usr[0].get('usr')).encode_auth()
-            return jsonify({'token': f'{token}'})
-        except Exception as e:
-            return jsonify({'message' : f'could not verify, Basic realm="encounted: {e}'}), 401
-        finally:
-            if not request.authorization:
-                print('ok')
-                redirect("/Profiles/Basics")
+        with self._db.get_db(data_level=2) as con:
+            if not (usr := self._db._model.check_acc(con, contact=check.cnt)):
+                return ApiResp(status_code=401)
+        
+        if bcrypt.checkpw(password=check.pwd.encode('utf-8'), hashed_password=usr.pwd.encode('utf-8')):
+            with self._db.get_db(data_level=1) as con:   
+                if not (usr_data := self._db._model.usr_status(con, contact=check.cnt)):
+                    token = authenticate(func=usr.usr).encode_auth(status=False)
+                    usr_data["token"] = token
+                if usr_data["token_status"] is True:
+                    return ApiResp(status_code=401)
+                if usr_data["token"] is not None:
+                    self._db._model.del_tkn(con, tkn=usr_data["token"])
+            return make_response(jsonify(usr_data), 201)
+        return ApiResp(status_code=401)
+
+    def get(self):
+        """check if a user already exists"""
+
+        qs = request.values
+        contact = qs["contact"]
+
+        with self._db.get_db() as con:
+            if cont := self._db._model.get_cont(
+                con, cnt=contact
+            ):
+                return ApiResp(status_code=201, data=cont)
+            else:
+                return ApiResp(status_code=401)
+
+    @authenticate
+    def put(self, usr, token_status=None):
+        
+        if token_status:
+            redirect(url_for('accs.regs.finalize'))
+        reg_data = request.get_json()
+        
+        if not (check := PwdCheck(cnt=reg_data.get('cont'),
+                pwd=reg_data.get('pwd'), pwd2=reg_data.get('vpwd')
+            )):
+            return ApiResp(status_code=401)
+
+        with self._db.get_db() as con:
+            if not self._db._model.upd8_pwd(
+                con, usr=usr, pwd=self.__hash_pwd(pwd=check.pwd).decode('utf8')
+            ):
+                return ApiResp(status_code=201)
+            else:
+                return ApiResp(status_code=401)
 
 class Logout(Resource):
     """
     Logout Resource
     """
-    db = DbSet()
+    def __init__(self):
+        self._db = DbSet()
 
-    def get(request, *args, **kwargs):
+    @authenticate
+    def post(self, usr):
+        # get auth token
+        auth_header = request.headers.get('Authorization')
+        if auth_header:
+            auth_token = auth_header.split(" ")[1]
+        else:
+            auth_token = ''
+        if auth_token:
+            check_token = authenticate(func=auth_token).decode_auth()
+            if not isinstance(check_token, str):
+                with self._db.get_db() as con:
+                    self.db._model.in_tkn(con, tkn=auth_token, usr=usr)
+                    return ApiResp(status_code=201)
+            else:
+                return ApiResp(status_code=401)
+        else:
+            return ApiResp(status_code=403)
+
+    def get(self):
+        """check if a token is blacklisted
+
+        Returns:
+            [type]: [description]
+        """
+
         if request.method == "POST":
             #logout(request)
             return redirect("/login")
@@ -152,40 +206,48 @@ class Logout(Resource):
         }
         return render_template(request, "accounts/auth.html", context)
 
-    @corsify
-    def post(self):
-        # get auth token
-        auth_header = request.headers.get('Authorization')
-        if auth_header:
-            auth_token = auth_header.split(" ")[1]
-        else:
-            auth_token = ''
-        if auth_token:
-            resp = Auth(func=auth_token).decode_auth()
-            if not isinstance(resp, str):
-                try:
-                    self.db._model.in_tkn(self.db, tkn=auth_token)
-                    responseObject = {
-                        'status': 'success',
-                        'message': 'Successfully logged out.'
-                    }
-                    return make_response(jsonify(responseObject), 200)
-                except Exception as e:
-                    responseObject = {
-                        'status': 'fail',
-                        'message': e
-                    }
-                    return make_response(jsonify(responseObject), 200)
-            else:
-                responseObject = {
-                    'status': 'fail',
-                    'message': resp
-                }
-                return make_response(jsonify(responseObject), 401)
-        else:
-            responseObject = {
-                'status': 'fail',
-                'message': 'Provide a valid auth token.'
+    def options(self):
+        return {'Allow' : ['POST', 'GET']}, 200, \
+        {
+            'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods' : '*',
+            'Access-Control-Allow-Headers': '*'
+        }
+
+class Geodata(Logout):
+    """
+    basic education or acquired skill
+    """
+
+    @authenticate
+    def post(self, usr):
+        # get the post data
+        prof_data = request.get_json() or request.form
+        print(prof_data)
+        if not (check:= Globe(
+                    dspln=prof_data.get('dspln'), place=prof_data.get('plc'),
+                    strtd=prof_data.get('strt'), endd=prof_data.get('end')
+                )):
+            return ApiResp(status_code=401)
+        try:
+            with self._db.get_db() as con:
+                self._db._model.in_work(
+                    con, usr=usr, dspln=clean(check.dspln), plc=clean(check.place),
+                    strtd=check.strtd, endd=check.endd,
+                )
+            return ApiResp(status_code=201)
+        except Exception:
+            return ApiResp(status_code=401)
+
+    @authenticate
+    def get(self, usr):
+        """reset password"""
+        acad = Ip(self._db._model.basic_prof(
+            self._db.get_db(dict=True), contact=usr
+        ))
+
+        if acad:
+            form = {
+                'organisation': {'value': ''}, 'role': {'value': ''},
+                'started': {'type': 'date'}, 'Ended': {'value': 1}
             }
-            return make_response(jsonify(responseObject), 403)
-            
+        return render_template('pages/home.html', form=form)

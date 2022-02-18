@@ -1,23 +1,9 @@
 
 import datetime
-from pydantic import BaseModel, validator, FilePath, Field, PositiveInt, EmailStr
-from typing import Union, Optional
+from itsdangerous import json
+from pydantic import BaseModel, validator, Field, PositiveInt, EmailStr
+from typing import Optional, Union
 
-from setting.dbcon import DbSet as db
-
-
-class Usr(BaseModel):
-    """Create a spotlight either from external source or internal source"""
-
-    id: PositiveInt
-    name: str
-    avatar: FilePath
-
-    @validator('name')
-    def checkName(cls, name):
-        if ' ' not in name:
-            raise ValueError('must contain a space')
-        return name.title()
 
 class Phone():
     number: str
@@ -33,16 +19,10 @@ class LogCheck(BaseModel):
     cnt: Union[EmailStr, PositiveInt]
     pwd: str
 
-class RegCheck(LogCheck):
+class PwdCheck(LogCheck):
     """Create a spotlight either from external source or internal source"""
 
-    fullname: str
-    dob: Optional[datetime.date]
     pwd2: str
-    cntyp: bool
-    sex: Optional[bool]
-    ip: Optional[str]
-    dt = Field(default=datetime.datetime.now())
 
     @validator('pwd2')
     def check_pwd(cls, v, values):
@@ -50,28 +30,37 @@ class RegCheck(LogCheck):
             raise ValueError('passwords do no match')
         return v
 
+class RegCheck(LogCheck):
+    """Create a spotlight either from external source or internal source"""
+
+    fullname: str
+    cntyp: bool
+    dt = Field(default=datetime.datetime.now())
+
     @validator('fullname')
     def check_name(cls, fullname):
         if len(fullname.split(' ')) < 2 > 3:
             raise ValueError('this is not a full name')
         return fullname.title()
 
-class SerializedLimelight(Usr):
+class finalCheck(RegCheck):
+    dob: datetime.date
+    pwd: Optional[str]
+    pwd2: Optional[str]
+    sex: bool
+
+class Ip(BaseModel):
+    ip: int
+    loc: int
+
+class Globe(BaseModel):
     """serialize notification of events from arenas and voice of people of interest"""
 
-    objid: PositiveInt
-    src: Usr
+    country: str
+    region: str
     title: str
-    files: Union[FilePath, list]
-    descn: Optional[str]
-    timestamp = Field(default=datetime.datetime.now())
-
-    def __init__(__pydantic_self__, **data: int) -> None:
-        soc_count = db._model.soc_count(db.get_db, data.get('objid'))
-        if soc_count:
-            data["ctn"] = soc_count.get('ctns')
-            data["vce"] = soc_count.get('vces')
-            data['rxn'] = soc_count.get('rxns')
-        super().__init__(**data)
-    class Config:
-        extra = 'forbid'
+    city: str
+    postal: str
+    locatn: str
+    metro: str
+    area: str

@@ -1,6 +1,47 @@
-
-<section>
-    <div>
-        limelight to display here
+<div class="d-flex limlit">
+    <nav class="column">
+        <div class="clearview ">
+            <div class="usr_nav">
+                <div class="limelitImg _15pMR">
+                    <a class="limelitImg" href="#"><img src="static/media/mypix.JPEG" ></a>
+                </div>
+                <div class="socials">
+                    <a href="#"> <!-- user name of the voicer or name of the arena where the news is posted -->
+                        <strong class="fsb fwb brkwd">user&nbsp;name</strong>
+                    </a>
+                    <span>discription about a user</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="spot">
+        {% include "components/spotlit.html" %}
     </div>
-</section>
+</div>
+
+<style>
+    .limlit{
+        height: 350px;
+        max-width: 600px;
+        min-width: 500px;
+        margin: 5px;
+        padding: 5px;
+        background-color: #ebebeb;
+    }
+    nav{
+        box-sizing: border-box;
+        width: 30%;
+        margin-left: 5px;
+        padding: 10px;
+
+    }
+    .spot{
+        width: 70%;
+        padding: 10px;
+    }
+    .limelitImg{
+        height: 150px;
+        width: 100%;
+        border-radius: 100%;
+    }
+</style>

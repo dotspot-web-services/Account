@@ -8,7 +8,7 @@ accounts
 {% block content %}
 
 <div class="col-lg-4 col-md-4 col-sm-12">
-    <form id="checkCont" action="/Registry/login" method="put" enctype="multipart/form-data">
+    <form id="checkCont" action="url_for('accs.regs.signIn')" method="put" enctype="multipart/form-data">
         <div class="form-group">
             <div><label for="cont">Contact</label></div>
             <input id="cont" type="email" name="cont" class="form-control" placeholder="Enter phone number or Email address" />

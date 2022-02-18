@@ -1,11 +1,15 @@
-{% from 'components/inputs.html' import button with context %}
 
-{% if standalone %}{% extends 'base.html' %}{% endif -%}
+{% if not standalone %}{% extends 'base.html' %}
+{% endif %}
+
+{% block navBar %}
+    {% include "components/nav.html" %}
+{% endblock %}
 
 {% block content %}
-
-<div class="row">
-  <form id="loga" method="post" action="/Registry/login" class="{{ form_cls }}">
+<div class="col-lg-6 offset-lg-2 col-md-6 offset-md-3">
+  <form id="logForm" method="post" action="{{url_for('accs.regs.signIn')}}" class="d-block">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <div class="inp-wrap">
       <div><label for="cont">Contact</label></div>
       <input type="text" name="usrCont" class="form-control mr-2" placeholder="Enter phone number or Email address">
@@ -15,10 +19,16 @@
         <input type="password" name="usrPwd" class="form-control uiButton uiBtnColor smlbtn" placeholder="Enter your password">
         <div class="info"><a href="/Accounts/reset">Reset password</a></div>
     </div>
-    <input type="submit" class="btn btn-success mr-sm-2" value="Login">
+    <input type="submit" class="btn btn-block btn-success" value="Login">
   </form>
 </div>
-
 {% endblock %}
 
-{% include 'components/logBtn.html' %}
+<div class="log-in-btn">
+  <a href="/accounts/app/signIn" class="nav-link d-block">
+      <div class="icon-wrap">
+        <img src="/static/icon/avatar.png" class="logbtn"/>
+      </div> 
+      <div class="ico-txt">Login</div> 
+  </a>
+</div>
