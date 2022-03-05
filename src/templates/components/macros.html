@@ -14,7 +14,7 @@
 {% macro radio(radios, name) -%}
 
     {% for label, input in radios.items() %}
-        <label for=" {{ name }} "> <span> {{ label }} </span> 
+        <label> <span> {{ label }} </span> 
         <input type="radio" name="{{ name }}" value="{{ input.get('value') }}">
         </label>
     {% endfor %}
@@ -27,6 +27,32 @@
     <input type="submit" class="{{ btn_attr.get('class') }}" value="{{ btn_attr.get('value') }}"/>
     {% else %}
     <button type="submit" class="{{ btn_attr.get('class') }}">{{ btn_attr.get('label') }}</button>
+    {% endif %}
+
+{%- endmacro %}
+
+{% macro profiler(item) -%}
+    {% for row in item %}
+    <div>
+        <div>
+            <div>{{ row["plc"] }}</div>
+            <div>{{ row["dspln"] }}</div>
+            <div>{{ row["strt"] }}</div>
+            <div>{{ row.get("endt", "Present") }}</div>
+        </div>
+    {% else %}
+    <div></div>
+    {% endfor %}
+    {% if session.get('usr') %}
+    <div class="float-right">
+        <a href="http://"><i class="fa fa-pencil" aria-hidden="true"></i>Edit</a>
+    </div>
+    </div>
+        <button type="button" name="" id="" class="btn btn-primary mbtn-lg btn-block">
+            <a href="http://">Add research institution</a>
+        </button>
+    {% else %}
+    </div>
     {% endif %}
 
 {%- endmacro %}

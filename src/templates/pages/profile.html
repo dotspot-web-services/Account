@@ -1,3 +1,5 @@
+{% from 'components/macros.html' import profiler with context %}
+
 {% extends 'base.html' %}
 
 {% block head_title %}
@@ -6,180 +8,124 @@ Profile
 
 {% block content %}
 
-<div class="rol">
-	<div id="abt" class="">
-		<div class="prof-pix-edit">
-			<div class="prof-pix-wrapa d-block">
-				<div class="prof-pix ">
-					{% if usr %}
-					{% set usr = usr["pix"] %}
-					{% endif %}
-					{% set pix = usr or "/static/icon/avatar.png" %}
-					<img src="{{ pix }}" alt="" srcset="">
-				</div>
+<div class="container-fluid">
+	<div class="container">
+		<div class="prof-pix-wrapa d-block">
+			<div class="prof-pix ">
+				{% if data.get('pix') %}
+				{% set usr = data.get('pix') %}
+				{% endif %}
+				{% set pix = usr or "/static/icon/avatar.png" %}
+				<img src="{{ pix }}" alt="" srcset="">
 			</div>
-
-			{% if g["usr"] %}
-			<div class="edit-pix">
-				<form action="/Profiles/Profile" method="POST" enctype="multipart/form-data">
-					<input type="file" name="med" id="med" required>
-					<button type="submit">upload</button>
-				</form>
-				<div>i class="fa fa-pencil" aria-hidden="true"></i>Change</a></div>
-			</div>
-			{% endif %}
 		</div>
 
-		<div class="">
-			<div class="prof-sum">
-				<summary>
-					I'm {% if acad %} a graduate of {{acad["dspln"]}} {% endif %}
-					{% if acad["rsrch"] %} and a reseacher {% endif %}
-					{% if base %} skilled in {{base["doing"]}} {% endif %}
-					{% if wrk["strt"] %} working {%else if wrk["endd"] %} worked as {{wrk["wrk"]}} {% endif %}
-					{% if awd %} and have been recognized by {{awd["titl"]}} {% endif %}
-				</summary>
-			</div>
-
-			<div class="prof-tabs">
-				<div class="portfolio">
-					<div class="portfolio-menu">
-						<div class="menu-wrapper">
-							<div class="menu-item">
-								<a href="#">knowledge</a>
-							</div>
-							<div class="menu-item">
-								<a href="#">Work</a>
-							</div>
-							<div class="menu-item">
-								<a href="#">Awards</a>
-							</div>
-						</div>
-					</div>
-
-					<div class="slider-wrapper">
-						<div class="gradient">
-							<div>
-								<h4>Basics</h4>
-								{% for row in base %}
-								<div>
-									<div>
-										<div>{{row["plc"]}}</div>
-										<div>{{row["doing"]}}</div>
-										{% if row["acad"] is True %}
-										<div>From School</div>
-										{% else %}
-										<div>Outside School</div>
-										{% endif %}
-									</div>
-									<div class="float-right"><i class="fa fa-pencil" aria-hidden="true"></i>Change</a></div>
-								</div>
-								{% endfor %}
-							</div>
-							<div>
-								<h4>Advanced</h4>
-								{% for row in advcd %}
-								<div>
-									<div>
-										<div>
-											<div>{{row["plc"]}}</div>
-											<div>{{row["doing"]}}</div>
-											<div class="float-right"> {{row["stage"]}} </div>
-										</div>
-										{% if row["typ"] %}
-										<div>
-											<div>{{row["plc"]}}</div>
-											<div>{{row["doing"]}}</div>
-											<div>{{row["typ"]}}</div>
-										</div>
-										{% endif %}
-									</div>
-									<div class="float-right"><i class="fa fa-pencil" aria-hidden="true"></i>Change</a></div>
-								</div>
-								{% endfor %}
-							</div>
-						</div>
-
-						<div class="gradient">
-							<div>
-								{% for row in wrks %}
-								<div>
-									<div>
-										<div>{{ row["plc"] }}</div>
-										<div>{{ row["doing"] }}</div>
-										<div>{{ row["strt"] }}</div>
-										{% if row["endd"] %}
-										<div>{{ row["endd"] }}</div>
-										{%else%}
-										<div>Present</div>
-										{% endif %}
-									</div>
-									<div class="float-right"><i class="fa fa-pencil" aria-hidden="true"></i>Change</a></div>
-								</div>
-								{% endfor %}
-							</div>
-							<div>
-								{% if advcd %}<h4>Publications</h4> {% endif %}
-								{% if advcd[0]["titl"] %}
-									{% for row in advcd %}
-									<div>
-										<div>
-											<div>{{row["fld"]}}</div>
-											<div>{{row["titl"]}}</div>
-											<div>{{row["publsdt"]}}</div>
-										</div>
-										<div class="float-right"><i class="fa fa-pencil" aria-hidden="true"></i>Change</a></div>
-									</div>
-									{% endfor %}
-								{% else %}
-									<div>From School</div>
-									<div>Outside School</div>
-								{% endif %}
-							</div>
-							<div>
-								<h4>Social</h4>
-								{% if socs %}
-									{% for row in socs %}
-									<div>
-										<div>
-											<div>{{row["fld"]}}</div>
-											<div>{{row["titl"]}}</div>
-										</div>
-										<div class="float-right"><i class="fa fa-pencil" aria-hidden="true"></i>Change</a></div>
-									</div>
-									{% endfor %}
-								{% else %}
-									<div>From School</div>
-									<div>Outside School</div>
-								{% endif %}
-							</div>
-						</div>
-
-						<div class="gradient">
-							<div>
-								{% if award %}
-								{% for row in award %}
-								<div>
-									<div>
-										<div>{{ row["evnt"] }}</div>
-										<div>{{ row["titl"] }}</div>
-										<div>{{ row["awd"] }}</div>
-										<div>{{ row["awdt"] }}</div>
-									</div>
-									<div class="float-right"><i class="fa fa-pencil" aria-hidden="true"></i>Change</a></div>
-								</div>
-								{% endfor %}
-								{% else %}
-									<div>From School</div>
-									<div>Outside School</div>
-								{% endif %}
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+		{% if g["usr"] %}
+		<div class="edit-pix">
+			<form action="/Profiles/Profile" method="POST" enctype="multipart/form-data">
+				<input type="file" name="med" id="med" required>
+				<button type="submit">upload</button>
+			</form>
+			<div><i class="fa fa-pencil" aria-hidden="true"></i>Edit</a></div>
+		</div>
+		{% endif %}
 	</div>
 
+	<div class="content-fluid">
+		<div class="content-fluid">
+			<summary>
+				{% set totals = data.get('totals') %}
+				{% if data.get('summary') %}
+				{% set sumry = data.get('summary') %}
+				{{sumry.get('name')}} optained high school education at {{sumry.get('plc')}} in line of
+				{{sumry.get('dspln')}}. Advanced the knowledge to acquire {{sumry.get('ttl')}}
+				in {{sumry.get('fld')}} at {{sumry.get('instn')}} and has worked at {{sumry.get('at')}}
+				as {{sumry.get('wrk')}}. {{sumry.get('name')}} has a total of {{totals.get('pubno')}}
+				publications with {{totals.get('awdno')}} awards
+				{% endif %}
+			</summary>
+		</div>
+
+		<div class="container-fluid">
+			<div class="portfolio">
+				<div class="menu-wrapper">
+					<div class="menu-item">
+						<a href="#">About</a>
+					</div>
+					<div class="menu-item">
+						<a href="#">Arena</a>
+					</div>
+					<div class="menu-item">
+						<a href="#">Awards</a>
+					</div>
+				</div>
+
+				<div class="slider-wrapper">
+					<div class="container">
+						{% set base = data.base %}
+						{% if base %}
+						<div>
+							<h4>Basics knowledge</h4>
+							<div>
+								<div>{{ base.plc }}</div>
+								<div>{{ base.dspln }}</div>
+								<div>{{ base.strt }}</div>
+								<div>{{ base.get("endt", "Present") }}</div>
+							</div>
+						</div>
+						{% else %}
+							<button type="button" name="" id="" class="btn btn-primary mbtn-lg btn-block">
+								<a href="http://">Create basic knowledge</a>
+							</button>
+						{% endif %}
+						{% set acads = data.academic %}
+						{% if acads[0] %}
+						<div>
+							<h4>Advanced knowledge</h4>
+							{{profiler(item=acads)}}
+						</div>
+						{% set instns = data.reseacher %}
+						{% if instns[0] %}
+						<div>
+							<h4>Institutions of research</h4>
+								{{profiler(item=instns)}}
+						</div>
+						{% endif %}
+						{% set pubs = data.publications %}
+						{% if pubs[0] %}
+						<div>
+							<h4>Publications</h4> 
+								{{profiler(bubs)}}
+						</div>
+						{% endif %}
+					{% endif %}
+					</div>
+					{% set skill = data.skill %}
+					{% if skill %}
+					<div>
+						<h4>Acquired skills</h4>
+							{{profiler(skill)}}
+					</div>
+					{% endif %}
+
+					{% set award = data.awards %}
+					{% if award[0] %}
+					<div>
+						<h4>Recognitions</h4>
+							{{profiler(award)}}
+					</div>
+					{% endif %}
+
+					{% set socs = data.socials %}
+					{% if socs[0] %}
+					<div>
+						<h4>Social life</h4>
+							{{profiler(socs)}}
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 

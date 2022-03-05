@@ -4,9 +4,8 @@ import datetime
 from functools import update_wrapper, partial
 
 import jwt
-from flask import jsonify, redirect, request, make_response
+from flask import request, make_response
 from pydantic.types import UUID1
-from werkzeug import Response
 
 from .dbcon import DbSet
 
@@ -44,8 +43,8 @@ class Auths(object):
                 'timed': token_status
             }
             return jwt.encode(payload, self.db._oda.secret, algorithm='HS256')
-        except Exception as e:
-            return e
+        except Exception:
+            return 401, "Invalid token"
 
     async def get_auth(self, data):
         async with self.db.get_db() as conn:
@@ -60,19 +59,21 @@ class Auths(object):
         token = request.headers.get('authorization') 
 
         if token is None:
-            return jsonify({"message": "Token is missing"})
+            return 401, "Token is missing"
         try:
             data = jwt.decode(token, self.db._oda.secret, algorithms=["HS256"])
             usr = self.db._model.get_usr(self.db.get_db(data_level=2), usr=data['usr'])
         except jwt.ExpiredSignatureError or jwt.DecodeError:
-            return redirect(self.db._oda.dormain)
+            return 401, "invalid or an expired token"
         return usr, data['exp'], data['timed']
 
     def __call__(self):
-        
-        if (auth := isinstance(self.authenticate(), Response)):
-            return auth
-        usr, status, timed_token = self.authenticate()
+        (auth := self.authenticate())
+        if len(auth) == 2:
+            usr, status = self.authenticate()
+            return self.func(usr, status)
+        elif len(auth) == 3:
+            usr, status, timed_token = self.authenticate()
         if timed_token is True:
             return self.func(usr, status)
         return self.func(usr.usr)
@@ -83,12 +84,93 @@ class Auth(Auths):
         return partial(self, instance)
 
     def __call__(self, instance):
-        if (auth := self.authenticate()) and isinstance(auth, Response):
-            return auth
-        usr, status, timed_token = self.authenticate()
+
+        (auth := self.authenticate())
+
+        if len(auth) == 2:
+            usr, status = self.authenticate()
+            return self.func(instance, usr, status)
+        elif len(auth) == 3:
+            usr, status, timed_token = self.authenticate()
         if timed_token is True:
             return self.func(instance, usr, status)
         return self.func(instance, usr.usr, None)
+
+class Responder(object):
+
+    def __init__(self, func) -> None:
+        """decorator for examining and returning appropriate response
+
+        Args:
+            status_code (int): http status response code
+            data (dict or string, optional): dict if data is feched but string when reporting an error. Defaults to None.
+        """
+        update_wrapper(self, func)
+        self.func = func
+        self.status = None
+        self.data = None
+        
+        if not callable(self.func):
+            raise Exception(f"error:{type(self.func)} cannot be decorated")
+        
+
+    def message(self):
+        """return an http response code determined message
+
+        Returns:
+            dict: dictionary response message
+        """
+        msg = {"message": "operation is successful"}
+        
+        if self.status > 199 <= 203 and isinstance(self.data, (dict, list, str)):
+            msg = self.data
+        elif self.status > 199 <= 203 :
+            pass
+        elif self.status > 399 <= 403 and self.data is None:
+            msg["message"] = "invalid data submision"
+        elif self.status == 404:
+            msg["message"] = "Item is not found in resource"
+        elif self.status > 399 <= 403 and self.data is not None:
+            msg["message"] = self.data
+        return msg
+
+    def response(self):
+        """return an http response code and data or message as determined data
+
+        Returns:
+            dict: dictionary response message or data
+        """
+        if msg := self.message():
+            return self.status, msg
+
+    def __call__(self):
+
+        (func := self.func())
+
+        if isinstance(func, tuple):
+            self.status, self.data = func
+        else:
+            self.status = func
+        if resp := self.response():
+            status, data = resp
+        return data, status
+        
+
+class Responders(Responder):
+
+    def __get__(self, instance, owner):
+        return partial(self, instance)
+
+    def __call__(self, instance):
+
+        (func := self.func(instance))
+        if isinstance(func, tuple):
+            self.status, self.data = func
+        else:
+            self.status = func
+        if resp := self.response():
+            status, data = resp
+        return data, status
 
 
 class Cors(object):

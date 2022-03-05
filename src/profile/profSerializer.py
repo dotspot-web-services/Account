@@ -33,7 +33,7 @@ class Acads(Place):
 class Resrch(Place):
     """Create a spotlight either from external source or internal source"""
 
-    typ: PositiveInt
-    email = EmailStr
+    typ: bool
+    emel: EmailStr
     dt = Field(default=datetime.datetime.now())
 

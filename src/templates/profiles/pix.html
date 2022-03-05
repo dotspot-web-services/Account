@@ -8,9 +8,14 @@ Profile pix
 {% block content %}
 
     <style>
+      form{
+        border-style: none;
+        padding: 0px;
+      }
       .center {
         height: 100%;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
       }
@@ -18,21 +23,19 @@ Profile pix
         width: 350px;
         padding: 20px;
         background: #fff;
-        box-shadow: -3px -3px 7px rgba(94, 104, 121, 0.377),
-          3px 3px 7px rgba(94, 104, 121, 0.377);
+        
       }
       .form-input input {
         display: none;
       }
-      .form-input label {
+      .form-input label, button[type="submit"] {
         display: block;
         width: 45%;
         height: 45px;
         margin-left: 25%;
         line-height: 50px;
         text-align: center;
-        background: #1172c2;
-
+        background: hsl(147, 84%, 41%);
         color: #fff;
         font-size: 15px;
         font-family: "Open Sans", sans-serif;
@@ -42,46 +45,102 @@ Profile pix
         cursor: pointer;
       }
 
-      .form-input img {
-        width: 100%;
-        display: none;
-
+      .prof-pix {
+        max-width: 400px;
+        max-height: 350px;
+        border-radius: 100%;
+      }
+      .prof-pix img{
+        display: block;
+        max-width: 100%;
+        max-height: 100%;
+        border-radius: 100%;
         margin-bottom: 30px;
+        box-shadow: -3px -3px 7px rgba(94, 104, 121, 0.377),
+          3px 3px 7px rgba(94, 104, 121, 0.377);
       }
     </style>
     <div class="center">
       <div class="prof-pix-wrapa d-block">
           <div class="prof-pix ">
             {% set pix = usr_pix or "/static/icon/avatar.png" %}
-            <img src="{{ pix }}" alt="" srcset="">
+            <img id="avatar" src="{{ pix }}" alt="" srcset="">
           </div>
       </div>
       
-      <div class="center">
         <div class="form-input">
-          <div class="preview">
-            <img id="file-ip-1-preview" />
-          </div>
-          <form method="post" action="{{url_for('grocs.groc.cr8pix')}}" enctype="multipart/form-data">
+          <form id="avatar" method="post" action="{{url_for('grocs.groc.cr8pix')}}" enctype="multipart/form-data">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <label for="file-ip-1">Upload Image</label>
             <input type="file" name="file" id="file-ip-1" accept="image/*" onchange="showPreview(event);" />
-              <button type="submit">upload</button>
+              <button type="submit">Submit</button>
           </form>
-          <div></div>
-        </div>
-      </div>
+          
+      </div>   
+  </div>
+  <div>
+    <a href="/profiles/app/basics" class="nav-link float-right" id="right-btn">
+      <button class="btn btn-outline-success my-2 my-sm-0">Skip</button>
+  </a>
   </div>
 
   <script type="text/javascript">
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+              console.log(i)
+                var cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
       function showPreview(event) {
           if (event.target.files.length > 0) {
               var src = URL.createObjectURL(event.target.files[0]);
-              var preview = document.getElementById("file-ip-1-preview");
+              var preview = document.getElementById("avatar");
               preview.src = src;
               preview.style.display = "block";
           }
       }
+      document.getElementById("avatar").addEventListener("submit", (event)=>{
+        event.preventDefault();
+        const data = event.target
+        const avatar = new FormData(data)
+        const url = "/users/api/pictures"
+        const method = data.getAttribute("method")
+        const xhr = new XMLHttpRequest()
+        const responseType = "json"
+        const token = getCookie("token")
+        console.log(token)
+        xhr.responseType = responseType
+        xhr.open(method, url)
+        xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest")
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest")
+        xhr.setRequestHeader("X-CSRFToken", token)
+        xhr.withCredentials = true
+        xhr.onload = function() {
+          if (status === 201){
+              window.location.href = "/profiles/app/basics"
+          }else if(status >= 400 && status < 502){
+              window.location.href = "/users/app/pix"
+          }else{
+              console.log(xhr.response)
+              alert("Internal server error. Try again later")
+          }
+        }
+        xhr.onerror = function() {
+          return 500
+        }
+        xhr.send(avatar)
+        return xhr.onload()
+      })
   </script>
 
 {% endblock %}

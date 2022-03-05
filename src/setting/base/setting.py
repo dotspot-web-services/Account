@@ -1,19 +1,18 @@
 
-from typing import Set, Optional, Tuple
+from typing import Set, Optional
 from pydantic import (
     BaseSettings,
     PyObject,
     RedisDsn,
     PostgresDsn,
-    Field
-)
+    Field)
 
 class CheckSet(BaseSettings):
     """set data up"""
     secret: Optional[str] = Field( env='ATUSEC')
     log_rod: Optional[int] = Field( env='LOG_H')
-    media_folder: str = Field(default="src/static/test", const=True)
-    allowed_extension: Tuple = Field(default=("MPG", "JPEG"), const=True)
+    media_folder: str = Field(default="src/static/test_upload", const=True)
+    allowed_extension: tuple = Field(default=("MPG", "JPEG", "PNG"), const=True)
     file_size: int = Field(default= 16 * 1024 * 1024, const=True)
     dormain: str = Field(default="questarenz.com", env="DORMAIN")
 

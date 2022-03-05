@@ -1,31 +1,4 @@
 --! PROFILE
--- name: usr_prof
--- fetch user's profile data
-select array_to_json(array_agg(row_to_json(t)))
-   from (
-      SELECT U.fullname as fname, M.medadr as pix, C.cont as emel, 
-      P.place as plc, P.doing as dspln, I.strt, I.endt FROM public.basics B
-      JOIN public.places P ON P.plaid = B.baspl
-      JOIN public.users U ON U.ddot = C.contfrom
-      JOIN public.places P ON P.plaid = I.plain
-      JOIN public.institution I ON I.resin = R.resid
-      JOIN public.media M ON M.meid = U.ddot
-      WHERE U.ddot = :usr
-   ) t
-
--- name: pgsql
-DO $$
-   DECLARE 
-      plc INT;
-   Begin
-      INSERT INTO places (usrpl, place, doing)
-      VALUES (:usr, :plc, :dspln) RETURNING plaid INTO plc 
-      INSERT INTO basics (basid, typ, strt, endt)
-      VALUES (plc, :typ, :strtd, :endd,);
-      Return ;
-   End;
-$$ language plpgsql;
-
 -- name: cr8_base!
 -- create user basic profile
 INSERT INTO public.basics (usrba, place, doing, acad, strt, endt)
@@ -45,17 +18,25 @@ SELECT basid FROM public.basics WHERE basid = :base AND usrba = :usr;
 -- get a user
 DELETE FROM public.basics WHERE basid = :base AND usrba = :usr;
 
--- name: base
+-- name: usr_base^
 -- accademics differentiated user basic profile
-SELECT ARRAY_TO_JSON(ARRAY_AGG(row_to_json(base)))
+SELECT ROW_TO_JSON(base)
 FROM(
    SELECT B.acad as typ, B.place as plc, B.doing as dspln, B.strt, B.endt FROM public.basics B
    WHERE B.usrba = :usr
 )base
 
+-- name: base^
+-- accademics differentiated user basic profile
+SELECT ROW_TO_JSON(base)
+FROM(
+   SELECT B.acad as typ, B.place as plc, B.doing as dspln, B.strt, B.endt FROM public.basics B
+   WHERE B.basid = :base
+)base
+
 -- name: skil_prof
 -- general differentiated user basic profile
-SELECT ARRAY_TO_JSON(ARRAY_AGG(row_to_json(base)))
+SELECT ROW_TO_JSON(base)
 FROM(
    SELECT B.acad as typ, B.place as plc, B.doing as dspln, B.strt, B.endt FROM public.basics B
    WHERE B.usrba = :usr AND B.acad = TRUE
@@ -63,7 +44,7 @@ FROM(
 
 -- name: unskil_prof
 -- general differentiated user basic profile
-SELECT ARRAY_TO_JSON(ARRAY_AGG(row_to_json(base)))
+SELECT ROW_TO_JSON(base)
 FROM(
    SELECT B.acad as typ, B.place as plc, B.doing as dspln, B.strt, B.endt FROM public.basics B
    WHERE B.usrba = :usr AND B.acad = FALSE
@@ -92,23 +73,32 @@ SELECT acmid FROM public.academics WHERE acmid = :soc AND usrso = :usr;
 -- get a user
 DELETE FROM public.academics WHERE acmid = :soc AND usrso = :usr;
 
+-- name: usr_acada
+-- academics profile of a user
+SELECT ROW_TO_JSON(acadm)
+FROM(
+   SELECT B.acad as typ, A.place as plc, A.doing as dspln, A.strt, A.endt, A.stage as ttl FROM public.academics A
+   JOIN public.basics B ON B.basid = A.bacid
+   WHERE B.usrba = :usr
+)acadm
+
+-- name: acada^
+-- academics profile of a user
+SELECT ROW_TO_JSON(acadm)
+FROM(
+   SELECT B.acad as typ, A.place as plc, A.doing as dspln, A.strt, A.endt, A.stage as ttl FROM public.academics A
+   JOIN public.basics B ON B.basid = A.bacid
+   WHERE A.acmid = :acad
+)acadm
+
 -- name: acadas
 -- academics profile of a user
-SELECT ARRAY_TO_JSON(ARRAY_AGG(row_to_json(acadms)))
+SELECT ROW_TO_JSON(acadms)
 FROM(
-   SELECT B.acad as typ, A.place as plc, A.doing as dspln, A.strt, A.endt, A.stage as ttl FROM public.accademics A
+   SELECT B.acad as typ, A.place as plc, A.doing as dspln, A.strt, A.endt, A.stage as ttl FROM public.academics A
    JOIN public.basics B ON B.basid = A.bacid
-   WHERE U.ddot = :usr
-)acads
-
--- name: acada
--- academics profile of a user
-SELECT ARRAY_TO_JSON(ARRAY_AGG(row_to_json(acadm)))
-FROM(
-   SELECT B.acad as typ, A.place as plc, A.doing as dspln, A.strt, A.endt, A.stage as ttl FROM public.accademics A
-   JOIN public.basics B ON B.basid = A.bacid
-   WHERE U.ddot = :usr ORDER BY A.strt
-)acad
+   WHERE B.usrba = :usr ORDER BY A.strt
+)acadms
 
 -- name: rsrchaqfn$
 -- create user basic profile
@@ -118,21 +108,17 @@ WHERE B.usrba = :usr
 
 -- name: cr8_srcha!
 -- create user basic profile
-WITH contat AS(
+WITH cont AS(
    INSERT INTO public.contacts (usrcont, cont)
    VALUES (:usr, :cnt) ON CONFLICT DO NOTHING RETURNING cntid as emel
 ),
-base AS(
-   INSERT INTO public.base (basid)
-   VALUES (:base) ON CONFLICT DO NOTHING RETURNING acbas
-),
-rsrch AS(
-   INSERT INTO public.research (basre, cntres)
-   VALUES ((SELECT acbas FROM base), (SELECT emel FROM contat)) ON CONFLICT DO NOTHING RETURNING resid
+rsrch AS( 
+   INSERT INTO public.research (cntres, acres)
+   VALUES ((SELECT emel FROM cont), :base) ON CONFLICT DO NOTHING RETURNING resid
 )
 INSERT INTO public.institution(resin, place, doing, typ, strt, endt)
 VALUES((SELECT resid FROM rsrch), :org, :dspln, :typ, :strtd, :endd)
-ON conflict do nothing;
+ON CONFLICT DO NOTHING;
 
 -- name: upd8_srcha!
 -- create a user contact
@@ -150,43 +136,60 @@ SET verifd = :verfd WHERE acmid = :acad AND bacid = :base;
 
 -- name: srcha_rit$
 -- get a user
-SELECT socid FROM public.socials WHERE socid = :soc AND usrso = :usr;
+SELECT socid FROM public.contacts 
+JOIN public.research R ON C.contfro = R.contres
+JOIN public.institution I ON I.resin = R.resid
+WHERE I.resin = :instn AND usrso = :usr;
 
 -- name: del_srcha!
 -- get a user
-DELETE FROM public.socials WHERE socid = :soc AND usrso = :usr;
-
--- name: rsrchs
--- research profile of a user
-SELECT ARRAY_TO_JSON(ARRAY_AGG(row_to_json(srchs)))
-FROM(
-   SELECT C.cont as emel, I.place as plc, I.doing as dspln, I.strt, I.endt FROM public.research R
-   JOIN public.contacts C  ON C.cntid = R.cntres
-   JOIN public.institution I ON I.resin = R.resid
-   JOIN public.users U ON U.ddot = C.contfrom
-   WHERE U.ddot = :usr
-)srchs
+DELETE FROM public.contacts C
+JOIN public.research R ON C.contfro = R.contres
+JOIN public.institution I ON I.resin = R.resid
+WHERE I.resin = :instn AND usrso = :usr;
 
 -- name: rsrcha
 -- research profile of a user
-SELECT ARRAY_TO_JSON(ARRAY_AGG(row_to_json(srcha)))
+SELECT ROW_TO_JSON(rsrcha)
+FROM(
+   SELECT C.cont as emel, I.place as plc, I.doing as dspln, I.strt, I.endt FROM public.research R
+   JOIN public.contacts C  ON C.cntid = R.cntres
+   JOIN public.institution I ON I.resin = R.resid
+   JOIN public.users U ON U.ddot = C.usrcont
+   WHERE C.usrcont = :usr
+)rsrcha
+
+-- name: arsrcha
+-- research profile of a user
+SELECT ROW_TO_JSON(rsrcha)
 FROM(
    SELECT C.cont as emel, I.place as plc, I.doing as dspln, I.strt, I.endt FROM public.research R
    JOIN public.contacts C  ON C.cntid = R.cntres
    JOIN public.institution I ON I.resin = R.resid
    JOIN public.users U ON U.ddot = C.contfrom
-   WHERE U.ddot = :usr
-)srcha
+   WHERE C.usrcont = :usr
+)rsrcha
+
+-- name: srchas
+-- research profile of a user
+SELECT ROW_TO_JSON(srchas)
+FROM(
+   SELECT C.cont as emel, I.place as plc, I.doing as dspln, I.strt, I.endt FROM public.research R
+   JOIN public.contacts C  ON C.cntid = R.cntres
+   JOIN public.institution I ON I.resin = R.resid
+   JOIN public.users U ON U.ddot = C.contfrom
+   WHERE C.usrcont = :usr
+)srchas
 
 -- name: cr8_wrk!
 -- create user basic profile
 INSERT INTO public.workplace (usrwkp, place, doing, strt)
-VALUES (:usr, :plc, :dng, :strtd);
+VALUES (:usr, :plc, :dng, :strtd) ON CONFLICT DO NOTHING;
 
 -- name: cr8_Cwrk!
 -- create user basic profile
 INSERT INTO public.workplace (usrwkp, place, doing, strt, endt)
-VALUES (:usr, :plc, :dng, :strtd, :endd);
+VALUES (:usr, :plc, :dng, :strtd, :endd) ON CONFLICT DO NOTHING;
 
 -- name: upd8_wrk!
 -- create a user contact
@@ -202,18 +205,26 @@ SELECT wkpid FROM public.workplace WHERE wkpid = :wrk AND usrwkp = :usr;
 -- get a user
 DELETE FROM public.workplace WHERE wkpid = :wrk AND usrwkp = :usr;
 
--- name: wrk
+-- name: usr_wrk
 -- work profile of a user
-SELECT ARRAY_TO_JSON(ARRAY_AGG(row_to_json(wrk)))
+SELECT ROW_TO_JSON(wrk)
 FROM(
    SELECT W.place as plc,W.doing as dspln, W.strt, W.endt FROM public.workplace W
-   WHERE W.usrwkp = :usr;
+   WHERE W.usrwkp = :usr
+)wrk
+
+-- name: wrk
+-- work profile of a user
+SELECT ROW_TO_JSON(wrk)
+FROM(
+   SELECT W.place as plc,W.doing as dspln, W.strt, W.endt FROM public.workplace W
+   WHERE W.usrwkp = :work
 )wrk
 
 -- name: wrks
 -- work profile of a user
-SELECT ARRAY_TO_JSON(ARRAY_AGG(row_to_json(wrks)))
+SELECT ROW_TO_JSON(wrks)
 FROM(
    SELECT W.place as plc,W.doing as dspln, W.strt, W.endt FROM public.workplace W
-   WHERE W.usrwkp = :usr;
+   WHERE W.usrwkp = :usr
 )wrks

@@ -1,7 +1,7 @@
 
 import os
+from pickle import TRUE
 import requests
-import json
 
 from flask import redirect, flash, session
 from werkzeug.utils import secure_filename
@@ -27,7 +27,7 @@ def form_dict(endpt, fields) -> dict:
     allinput = {
         'Contact': {"type": "text", "name": "cont", "class": "form-control", "placeholder": "Enter your contact"},
         'Email': {'placeholder': 'organisation or institution email', "type": "email", "name": "emel"},
-        'Discipline': {'placeholder': 'Enter Course of study', "type": "text", "name": "dspln"}, 
+        'Discipline': {'placeholder': 'Enter Course of study', "type": "text", "name": "displn"}, 
         'Institution': {'value': '', 'placeholder': 'Enter Institution name', "type": "text", "name": "plc"},
         'Organisation': {'placeholder': 'Organisation or institution', "type": "text", "name": "plc"},
         'Class': {'placeholder': 'Field of knowledge. eg: fashion, sciences, football, arts', "type": "text", "name": "dspln"}, 
@@ -35,7 +35,7 @@ def form_dict(endpt, fields) -> dict:
         'Role': {'placeholder': 'name of the place', "type": "text", "name": "dspln"},
         'Knowledge': {"labels":{'Unskilled': {'value': 0}, 'Skilled': {'value': 1}}, "type": "radio", "name": 'typ'},
         'Field': {'placeholder': 'Area of Research', "type": "text", "name": "dspln"},
-        'Type of Research': {"labels":{'Organisation': {'value': True}, 'Accademic': {'value': False}}, "type": "typ", "name": 'radio'},
+        'Type of Research': {"labels":{'Organisation': {'value': 1}, 'Accademic': {'value': 0}}, "type": "radio", "name": 'typ'},
         'Title': {"options": {'degree':'First Degree', 'certified': 'Certification', 'masters':'Masters Degree', 'doctor':'Doctorate Degree', 'NCE':'NCE', 'OND':'OND', 'HND':'HND'}, "type": "select", "name": "ttl"},
         'Start': {'placeholder': 'year', "name": "strt", "type": "number",}, 'End': {'placeholder': 'year', "name": "end", "type": "number",},
     }
@@ -43,6 +43,49 @@ def form_dict(endpt, fields) -> dict:
     inputs = {key: allinput[key] for key in fields  if key in allinput.keys()}
     
     return form_attr, inputs
+
+class Responder(object):
+
+    def __init__(self, status_code, data=None) -> None:
+        """decorator for examining and returning appropriate response
+
+        Args:
+            status_code (int): http status response code
+            data (dict or string, optional): dict if data is feched but string when reporting an error. Defaults to None.
+        """
+        self.status = status_code
+        self.data = data
+
+    def message(self):
+        """return an http response code determined message
+
+        Returns:
+            dict: dictionary response message
+        """
+        msg = {"message": "operation is successful"}
+        
+        if self.status >= 200 < 250 and isinstance(self.data):
+            return
+        elif self.status >= 200 < 250:
+            msg["message"] = "operation is successful"
+            return msg
+        elif self.status >= 400 < 500 and self.data is None:
+            msg["message"] = "invalid data submision"
+            return msg
+        elif self.status >= 400 < 500 and self.data is not None:
+            msg["message"] = "operation is successful"
+            return msg
+
+    def response(self):
+        """return an http response code and data or message as determined data
+
+        Returns:
+            dict: dictionary response message or data
+        """
+        if msg := self.message() is None :
+            return self.status, self.data
+        elif self.data is None:
+            return self.status, msg
 
 def ApiResp(status_code, data=None):
     """data and status_code determine the response message
@@ -59,7 +102,7 @@ def ApiResp(status_code, data=None):
 class ReqApi:
     """generate a request header based on the type of request
     """
-    def __init__(self, req_typ, req_url, post_data=None, file=None) -> None:
+    def __init__(self, req_typ, req_url, post_data=None, file=None, auth=TRUE) -> None:
         """[summary]
 
         Args:
@@ -71,9 +114,24 @@ class ReqApi:
         self.reqst = req_typ
         self.data = post_data
         self.file = file
+        self.aut = auth
         self.__dmain = CheckSet().dormain
-        self.header = {"Content-type": "application/json; charset=UTF-8", "Authorization": session.get('token', None)}
+        self.header = self.setheader()
+
+    def setheader(self):
+        if self.file is None:
+            cntyp = "application/json"
+        else:
+            cntyp = "multipart/form-data"
+        if session and self.aut:
+            return {
+                "Content-type": f"{cntyp}; charset=UTF-8", "Authorization": session.get("token", None)
+            }
+        return {
+                "Content-type": f"{cntyp}"
+            }
         
+
     def auth(self):
         if isinstance(self.data, tuple):
             auth = self.data
@@ -89,9 +147,9 @@ class ReqApi:
                 elif self.file and self.data is not None:
                     req = requests.post(url=self.__dmain+self.addr, data=self.data, files=self.file, headers=self.header)
                 elif self.file is not None:
-                    print("its working...")
                     print(self.file)
-                    req = requests.post(url=self.__dmain+self.addr, files=self.file, headers=self.header)
+                    req = requests.post(url=self.__dmain+self.addr, data=self.file, headers=self.header, verify=True)
+                    print(req.text)
                 elif self.data is not None:
                     req = requests.post(url=self.__dmain+self.addr, data=self.data, headers=self.header)
             case "get":
@@ -140,6 +198,7 @@ class FileUp:
     """do file checks, save and return filepath.
     """
     def __init__(self, file) -> None:
+        self.setup = CheckSet()
         self.file = file
         self.filename = self.file.filename
 
@@ -148,7 +207,7 @@ class FileUp:
         """
         if not "." in self.filename:
             return False
-        if not self.filename.rsplit(".", 1)[1] in CheckSet.allowed_extension:
+        if not self.filename.rsplit(".", 1)[1] in self.setup.allowed_extension:
             return False
         return secure_filename(self.filename)
 
@@ -157,11 +216,13 @@ class FileUp:
         """
         if not (checked := self.allowed_type()):
             return
-        return self.file.save(os.path.join(CheckSet.media_folder), checked)
+        return self.file.save(os.path.join(self.setup.media_folder), checked)
 
     def __call__(self, *args: int) -> str:
         if self.filename == "" and self.allowed_type():
             return "invalid file"
+        print(self.save_file())
+        return self.save_file()
 
 
 if __name__ == "__main__":

@@ -1,14 +1,12 @@
 
 import bcrypt
 
-from flask import jsonify, make_response, request, render_template, redirect, url_for
+from flask import jsonify, request, render_template, redirect, url_for
 from flask_restful import Resource
 from bleach import clean
-from werkzeug import Response
 
 from ..serializer import RegCheck, LogCheck, finalCheck, PwdCheck, Ip, Globe
-from setting.decs import Auth as authenticate
-from setting.helper import ApiResp
+from setting.decs import Auth as authenticate, Responders as response
 from setting.dbcon import DbSet
 
 class Register(Resource):
@@ -18,39 +16,43 @@ class Register(Resource):
     
     def __init__(self):
         self._db = DbSet()
+        self._failed_rits = "Account already exist"
+        self._unknown_req = "Unknown API request"
 
     def __hash_pwd(self,pwd):
         return bcrypt.hashpw(
             bytes(pwd, encoding='utf-8'), bcrypt.gensalt(self._db._oda.log_rod)
         )
 
+    @response
     def post(self):
 
         reg_data = request.get_json()
-        print(reg_data)
+
         if not (check := RegCheck(
                 fullname=reg_data.get('fname'), cnt=reg_data.get('cont'),
                 pwd=reg_data.get('pwd'), pwd2=reg_data.get('vpwd'), cntyp=reg_data.get('typ')
             )):
-            return ApiResp(status_code=401)
+            return 401
 
         with self._db.get_db(data_level=2) as con:
-            if self._db._model.check_acc(con, self._db.get_db(), contact=check.cnt):     
-                return ApiResp(status_code=401)
+            if self._db._model.check_acc(con, contact=check.cnt):     
+                return 401, self._failed_rits
             if usr := self._db._model.cr8_acc(
                 con, fname=clean(check.fullname), pwd=self.__hash_pwd(pwd=check.pwd).decode('utf8'), 
                 cnt=check.cnt
             ):
                 token = authenticate(func=usr).encode_auth()
-                return ApiResp(status_code=201, data=token)
+                return 201, token
 
+    @response
     @authenticate
     def put(self, usr, token_status):
 
-        if isinstance(usr, tuple):
+        if isinstance(usr, tuple) and usr.usr != 401:
             usr = usr.usr
-        elif isinstance(token_status, Response):
-            return usr
+        else:
+            return usr, token_status
 
         reg_data = request.get_json()
 
@@ -58,32 +60,33 @@ class Register(Resource):
                 fullname=reg_data.get('fname'), cnt=reg_data.get('cont'), dob=reg_data.get('dob'),
                 cntyp=reg_data.get('typ'), sex=reg_data.get('sx')
             )):
-            return ApiResp(status_code=401)
+            return 401
         with self._db.get_db() as con:
             if not self._db._model.upd8_acc(
                 con, usr=usr, fname=clean(check.fullname),cnt=check.cnt, emel=check.cntyp,
                 bday=check.dob, mel=check.sex, actv=True, verfd= True
             ):
-                return ApiResp(status_code=201)
+                return 201
             else:
-                return ApiResp(status_code=401)
+                return 401, self._unknown_req
 
+    @response
     @authenticate
     def get(self, usr, token_status):
         """check if a user already exists"""
 
-        if isinstance(usr, tuple):
+        if isinstance(usr, tuple) and usr.usr != 401:
             usr = usr.usr
-        elif isinstance(token_status, Response):
-            return usr
+        else:
+            return usr, token_status
 
         with self._db.get_db(data_level=1) as con:
             if data := self._db._model.usr_reg(
                 con, usr=usr
             ):
-                return ApiResp(status_code=201, data=data)
+                return 201, data
             else:
-                return ApiResp(status_code=401)
+                return 401, self._unknown_req
 
     def options(self):
         return {'Allow' : ['POST', 'PUT', 'GET']}, 200, \
@@ -97,37 +100,36 @@ class Login(Register):
     User Login Resource
     """
 
+    @response
     def post(self):
         # get the post data
-
-        auth = request.authorization
+    
+        if not (auth := request.authorization):
+            return 401
         contact = auth.username
         password = auth.password
-    
-        if not contact or not password:
-            return ApiResp(status_code=401)
             
         if not (check := LogCheck(
                 cnt=contact, pwd=password
             )):
-            return ApiResp(status_code=401)
+            return 401
 
         with self._db.get_db(data_level=2) as con:
             if not (usr := self._db._model.check_acc(con, contact=check.cnt)):
-                return ApiResp(status_code=401)
+                401, self._failed_rits
         
-        if bcrypt.checkpw(password=check.pwd.encode('utf-8'), hashed_password=usr.pwd.encode('utf-8')):
-            with self._db.get_db(data_level=1) as con:   
+            if bcrypt.checkpw(password=check.pwd.encode('utf-8'), hashed_password=usr.pwd.encode('utf-8')):   
                 if not (usr_data := self._db._model.usr_status(con, contact=check.cnt)):
                     token = authenticate(func=usr.usr).encode_auth(status=False)
                     usr_data["token"] = token
                 if usr_data["token_status"] is True:
-                    return ApiResp(status_code=401)
+                    401, "Account is not activated yet"
                 if usr_data["token"] is not None:
                     self._db._model.del_tkn(con, tkn=usr_data["token"])
-            return make_response(jsonify(usr_data), 201)
-        return ApiResp(status_code=401)
+                return 201, jsonify(usr_data)
+        return 401
 
+    @response
     def get(self):
         """check if a user already exists"""
 
@@ -138,12 +140,19 @@ class Login(Register):
             if cont := self._db._model.get_cont(
                 con, cnt=contact
             ):
-                return ApiResp(status_code=201, data=cont)
-            else:
-                return ApiResp(status_code=401)
+                return 201, cont
+            elif not cont:
+                return 404, "Not found in resource"
+        return 401, self._unknown_req
 
+    @response
     @authenticate
     def put(self, usr, token_status=None):
+
+        if isinstance(usr, tuple) and usr.usr != 401:
+            usr = usr.usr
+        else:
+            return usr, token_status
         
         if token_status:
             redirect(url_for('accs.regs.finalize'))
@@ -152,15 +161,15 @@ class Login(Register):
         if not (check := PwdCheck(cnt=reg_data.get('cont'),
                 pwd=reg_data.get('pwd'), pwd2=reg_data.get('vpwd')
             )):
-            return ApiResp(status_code=401)
+            return 401
 
         with self._db.get_db() as con:
             if not self._db._model.upd8_pwd(
                 con, usr=usr, pwd=self.__hash_pwd(pwd=check.pwd).decode('utf8')
             ):
-                return ApiResp(status_code=201)
+                return 201
             else:
-                return ApiResp(status_code=401)
+                return 401, self._unknown_req
 
 class Logout(Resource):
     """
@@ -169,10 +178,17 @@ class Logout(Resource):
     def __init__(self):
         self._db = DbSet()
 
+    @response
     @authenticate
-    def post(self, usr):
+    def post(self, usr, token_status):
         # get auth token
+        if isinstance(usr, tuple) and usr.usr != 401:
+            usr = usr.usr
+        else:
+            return usr, token_status
+        
         auth_header = request.headers.get('Authorization')
+
         if auth_header:
             auth_token = auth_header.split(" ")[1]
         else:
@@ -182,12 +198,13 @@ class Logout(Resource):
             if not isinstance(check_token, str):
                 with self._db.get_db() as con:
                     self.db._model.in_tkn(con, tkn=auth_token, usr=usr)
-                    return ApiResp(status_code=201)
+                    return 201
             else:
-                return ApiResp(status_code=401)
+                return 401
         else:
-            return ApiResp(status_code=403)
+            return 403
 
+    @response
     def get(self):
         """check if a token is blacklisted
 
@@ -218,6 +235,7 @@ class Geodata(Logout):
     basic education or acquired skill
     """
 
+    @response
     @authenticate
     def post(self, usr):
         # get the post data
@@ -227,17 +245,18 @@ class Geodata(Logout):
                     dspln=prof_data.get('dspln'), place=prof_data.get('plc'),
                     strtd=prof_data.get('strt'), endd=prof_data.get('end')
                 )):
-            return ApiResp(status_code=401)
+            return 401
         try:
             with self._db.get_db() as con:
                 self._db._model.in_work(
                     con, usr=usr, dspln=clean(check.dspln), plc=clean(check.place),
                     strtd=check.strtd, endd=check.endd,
                 )
-            return ApiResp(status_code=201)
+            return 201
         except Exception:
-            return ApiResp(status_code=401)
+            return 401
 
+    @response
     @authenticate
     def get(self, usr):
         """reset password"""

@@ -90,19 +90,13 @@ CREATE TABLE academics(
 );
 CREATE INDEX acabs_idx ON academics USING btree(bacid);
 
-CREATE TABLE base(-- user academics background
-    basid INT UNIQUE ,
-    acbas serial PRIMARY key,
-    CONSTRAINT basac_ibfk FOREIGN KEY(basid) REFERENCES academics(acmid) ON DELETE CASCADE
-);
-CREATE INDEX basac_idx ON base USING btree(acbas);
-
 CREATE TABLE research(
     resid serial PRIMARY KEY,
-    basre INT NOT NULL UNIQUE,
+    acres INT NOT NULL,
     cntres INT NOT NULL, -- organisation/institution email for verification
+    UNIQUE(acres, cntres),
     rscdt TIMESTAMP with TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT resacs_ibfk FOREIGN KEY(basre) REFERENCES base(acbas) ON DELETE CASCADE,
+    CONSTRAINT resacs_ibfk FOREIGN KEY(acres) REFERENCES academics(acmid) ON DELETE CASCADE,
     CONSTRAINT rescnt_ibfk FOREIGN KEY(cntres) REFERENCES contacts(cntid) ON DELETE CASCADE
 );
 CREATE INDEX rescnt_idx ON research USING btree(cntres);

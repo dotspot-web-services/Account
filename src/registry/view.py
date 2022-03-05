@@ -13,13 +13,13 @@ def finalPage():
     
     data = ReqApi(req_typ="get", req_url="/accounts/api/reg")
     data = data()
-
-    if data.is_redirect:
-        return data
+    print(data)
     if not data.ok:
         return data
+    elif data.status_code == 404:
+        return request.url
     data = data.json()
-    print(data)
+    
     return render_template('registry/finalReg.html', data=data.get("row_to_json"))
 
 @regs.post("/finalize")
@@ -28,22 +28,23 @@ def finalize():
     post_data = json.dumps(request.form)
     data = ReqApi(req_typ="put", req_url="/accounts/api/reg", post_data=post_data)
     data = data()
-
-    if data.is_redirect:
-        return data
     if not data.ok:
         return data
+    elif data.status_code == 404:
+        return request.url
     return redirect(url_for('grocs.groc.pixs'))
 
 @regs.post("/register")
 def register():
 
     post_data = json.dumps(request.form)
-    data = ReqApi(req_typ="post", req_url="/accounts/api/reg", post_data=post_data)
+    data = ReqApi(req_typ="post", req_url="/accounts/api/reg", post_data=post_data, auth=False)
     data = data()
 
     if not data.ok:
         return data
+    elif data.status_code == 404:
+        return request.url
     data = data.json()
 
     if data:
@@ -74,6 +75,8 @@ def reset():
         return data
     elif data.ok:
         redirect(url_for('accounts.accs.regs'))
+    elif data.status_code == 404:
+        return request.url
     redirect(url_for('profiler.basics'))
 
 @regs.get("/signIn")
@@ -90,6 +93,8 @@ def signIn():
 
     if not data.ok:
         return data
+    elif data.status_code == 404:
+        return request.url
     data = data.json()
     
     if data.get("token_status") is True:

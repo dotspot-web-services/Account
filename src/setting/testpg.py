@@ -101,9 +101,13 @@ class ReqApi(object):
             return self.failed(status=req.status_code)
         return req
 
+
 if __name__ == "__main__":
     form = {"fn": "john mba", "cont": "nwanjamba@gmail.com", "pwd": "nalkjiofcji98", "vpwd": "nalkjiofcji98"}
     pg = ReqApi(req_typ="get", req_url="/accounts/api/reg")
     flds = ['Knowledge', 'Class', 'Location', 'Started']
     gdf, fld = form_dict("/app/register", flds)
     print(gdf, fld)
+
+    dic = {}
+    print(type(dic))

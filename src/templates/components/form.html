@@ -1,5 +1,5 @@
 
-{% from 'components/inputs.html' import radio, button, select with context %}
+{% from 'components/macros.html' import radio, button, select with context %}
 
 <form method="{{ form_attr.get('method') }}" action="{{ form_attr.get('action') }}" {% if form_attr.get("class") %} class="{{ form_attr.get('class') }}" {% endif %} {% if form_attr.get("id") %} id="{{ form_attr.get('id') }}" {% endif %} enctype="multipart/form-data">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
