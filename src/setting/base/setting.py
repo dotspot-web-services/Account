@@ -5,16 +5,23 @@ from pydantic import (
     PyObject,
     RedisDsn,
     PostgresDsn,
+    DirectoryPath,
+    EmailStr,
+    NameEmail,
     Field)
 
 class CheckSet(BaseSettings):
     """set data up"""
-    secret: Optional[str] = Field( env='ATUSEC')
-    log_rod: Optional[int] = Field( env='LOG_H')
-    media_folder: str = Field(default="src/static/test_upload", const=True)
+    secret: str = Field(default=None, env='ATUSEC')
+    log_rod: int = Field(default=None, env='LOG_H')
+    media_folder: DirectoryPath = Field(default="src/static/test_upload")
     allowed_extension: tuple = Field(default=("MPG", "JPEG", "PNG"), const=True)
     file_size: int = Field(default= 16 * 1024 * 1024, const=True)
     dormain: str = Field(default="questarenz.com", env="DORMAIN")
+    quest_mailer: str = Field(default=None, env="FROMAILER")
+    quest_pass: str = Field(default=None, env="MAILER_PASSA")
+    geop: str = Field(default=None, env="LOCATELI")
+
 
 class Settings(BaseSettings):
     """"connect to postgres and load data warehouse"""
@@ -45,3 +52,6 @@ class Settings(BaseSettings):
                 'env': ['service_redis_dsn', 'redis_url']
             }
         }
+
+if __name__ == "__main__":
+    print(CheckSet().dict())

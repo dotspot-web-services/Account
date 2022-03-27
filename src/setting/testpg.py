@@ -3,6 +3,59 @@ import requests, json
 from flask import redirect, flash
 from base.setting import CheckSet
 
+
+import re
+import smtplib
+import dns.resolver
+
+# Address used for SMTP MAIL FROM command  
+fromAddress = 'corn@bt.com'
+
+# Simple Regex for syntax checking
+regex = '^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,})$'
+
+# Email address to verify
+inputAddress = input('Please enter the emailAddress to verify:')
+addressToVerify = str(inputAddress)
+
+# Syntax check
+match = re.match(regex, addressToVerify)
+if match == None:
+	print('Bad Syntax')
+	raise ValueError('Bad Syntax')
+
+# Get domain for DNS lookup
+splitAddress = addressToVerify.split('@')
+domain = str(splitAddress[1])
+print('Domain:', domain)
+
+# MX record lookup
+records = dns.resolver.resolve(domain, 'MX')
+print(records[0])
+mxRecord = records[0].exchange
+mxRecord = str(mxRecord)
+
+
+# SMTP lib setup (use debug level for full output)
+server = smtplib.SMTP()
+server.set_debuglevel(0)
+
+# SMTP Conversation
+server.connect(mxRecord)
+server.helo(server.local_hostname) ### server.local_hostname(Get local server hostname)
+server.mail(fromAddress)
+code, message = server.rcpt(str(addressToVerify))
+server.quit()
+
+print(code)
+print(message)
+
+# Assume SMTP response 250 is success
+if code == 250:
+	print('Success')
+else:
+	print('Bad')
+
 def form_dict(endpt, fields) -> dict:
     """[summary]
 
@@ -101,13 +154,33 @@ class ReqApi(object):
             return self.failed(status=req.status_code)
         return req
 
+def iscontact(self, contact):
+        """check if the contact is valid"""
+
+        phonechecker = re.compile(r'''((\d{3}|\(\d{3}\))? (\s|-|\.)? (\d{3}) (\s|-|\.)? (\d{4}) (\s*(ext|x|ext.)\s*(\d{2,5}))?)''', re.VERBOSE )
+        emailchecker = re.compile(r'''(([a-zA-Z0–9_\-\.]) + @ + [a-zA-Z0–9_\-\.] (\.[a-zA-Z]{2,5}))''', re.VERBOSE )
+        try:
+            if phonechecker.match(contact):
+                print(phonechecker.match(contact))
+                return True, contact
+            elif emailchecker.match(contact):
+                print(emailchecker.match(contact))
+                return True, contact
+            else:
+                error = "this is not an email or mobile phone number"
+        except KeyboardInterrupt:
+            error = "The field can't be empty"
+        return error
+
 
 if __name__ == "__main__":
+    def anonym(**data):
+        _, d1 = data
+        print(d1)
     form = {"fn": "john mba", "cont": "nwanjamba@gmail.com", "pwd": "nalkjiofcji98", "vpwd": "nalkjiofcji98"}
     pg = ReqApi(req_typ="get", req_url="/accounts/api/reg")
     flds = ['Knowledge', 'Class', 'Location', 'Started']
     gdf, fld = form_dict("/app/register", flds)
     print(gdf, fld)
 
-    dic = {}
-    print(type(dic))
+    ok = anonym({"befo": "nower"})

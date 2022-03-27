@@ -23,24 +23,19 @@ class Auths(object):
             return self.func
         raise Exception('value error')
 
-    def encode_auth(self,  status=True):
+    def encode_auth(self, status=True, **duration):
         """
         Generates the Auth Token
         :return: string
         """
-        if status:
-            duratn = datetime.timedelta(days=3.0)
-            token_status = True
-        else:
-            duratn = datetime.timedelta()
-            token_status = False
+        duratn = datetime.timedelta("=".join(key, val) for key, val in duration.items())
+        
         try:
             payload = {
                 'exp': datetime.datetime.utcnow() + duratn,
                 'iat': datetime.datetime.utcnow(),
                 'usr': self.func,
                 'status': status,
-                'timed': token_status
             }
             return jwt.encode(payload, self.db._oda.secret, algorithm='HS256')
         except Exception:

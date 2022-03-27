@@ -1,6 +1,8 @@
 
 import os
-from pickle import TRUE
+import smtplib
+from dns.resolver import query
+import shutil
 import requests
 
 from flask import redirect, flash, session
@@ -8,7 +10,44 @@ from werkzeug.utils import secure_filename
 
 from .base.setting import CheckSet
 
+def verifymail(dormain, host, mail):
+        
+    server = smtplib.SMTP()
+    records = query(dormain, 'MX')
+    mxRecord = records[0].exchange
+    if mxRecord:
+        return
+    mxRecord = str(mxRecord)
+    # SMTP lib setup (use debug level for full output)
+    server.set_debuglevel(0)
+    # SMTP Conversation
+    server.connect(mxRecord)
+    server.helo(server.local_hostname) ### server.local_hostname(Get local server hostname)
+    server.mail(host)
+    code, message = server.rcpt(str(mail))
+    server.quit()
+    if code == 250: # Assume SMTP response 250 is success
+        print('Success')
+    else:
+        print("Bad")
+        print(code)
+        print(message)
 
+def downloader(url, directory, fname=None):
+    """_summary_
+
+    Args:
+        url (_type_): _description_
+        directory (_type_): _description_
+        fname (_type_, optional): _description_. Defaults to None.
+    """
+    if fname == None:
+        fname = os.path.basename(url)
+    dl_path = os.path.join(directory, fname)
+    with requests.get(url, stream=True) as r:
+        with open(dl_path, "wb") as f:
+            shutil.copy(src=r.raw, dst=f)
+    return dl_path
 
 def form_dict(endpt, fields) -> dict:
     """[summary]
@@ -102,7 +141,7 @@ def ApiResp(status_code, data=None):
 class ReqApi:
     """generate a request header based on the type of request
     """
-    def __init__(self, req_typ, req_url, post_data=None, file=None, auth=TRUE) -> None:
+    def __init__(self, req_typ, req_url, post_data=None, file=None, auth=True) -> None:
         """[summary]
 
         Args:

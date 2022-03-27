@@ -1,7 +1,7 @@
 
 import json
 
-from flask import render_template, url_for, redirect, Blueprint, request, session
+from flask import flash, render_template, url_for, redirect, Blueprint, request, session
 
 from setting.helper import ReqApi, form_dict
 
@@ -13,13 +13,20 @@ def finalPage():
     
     data = ReqApi(req_typ="get", req_url="/accounts/api/reg")
     data = data()
-    print(data)
+    if data.get("status") is True:
+        "api insert request to other tieters"
+        return redirect(url_for('grocs.groc.pixs'))
     if not data.ok:
         return data
     elif data.status_code == 404:
         return request.url
     data = data.json()
-    
+    if data.get("status") is True and data.get("dob") is not None:
+        exp = session.get(exp, None)
+        flash(
+            message=f"This account is not yet activated, please verify your contact or or it will be deleted in{exp}",
+            category="warning"
+        )
     return render_template('registry/finalReg.html', data=data.get("row_to_json"))
 
 @regs.post("/finalize")
@@ -32,7 +39,7 @@ def finalize():
         return data
     elif data.status_code == 404:
         return request.url
-    return redirect(url_for('grocs.groc.pixs'))
+    return redirect(url_for('accs.regs.finalize'))
 
 @regs.post("/register")
 def register():
@@ -97,14 +104,14 @@ def signIn():
         return request.url
     data = data.json()
     
-    if data.get("token_status") is True:
-        "api insert request to other tieters"
-        return redirect(url_for('localhost:3000'))
-    session["token"] = data["token"]
     if data.get("user_status") is False:
         return redirect(url_for('accs.regs.finalize'))
     elif data.get("user_status") is True:
-        return redirect(url_for('localhost:3000'))
+        session["token"] = data["token"]
+        print(session)
+        return redirect(url_for('http://127.0.0.1:5000'))
+    elif data.get("token_status") is True and data.get("usr_status") is True:
+        flash(message=f"This account is compromised", category="warning")
     return redirect(url_for('accs.regs.regPage'))
 
 @regs.get("/logOut")

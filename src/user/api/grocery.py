@@ -5,7 +5,7 @@ from bleach import clean
 
 from user.grocerySerializer import Object, CreateAward, CreatePub, CreateSoc
 from setting.decs import Auth as authenticate, Responders as response
-from setting.dbcon import DbSet
+from setting.dbcon import DbSet as __DBSET
 from setting.helper import FileUp
 
 
@@ -13,8 +13,9 @@ class Awards(Resource):
     """
     User Resource
     """
+
     def __init__(self) -> None:
-        self._db = DbSet(sql_filename="groce.pgsql")
+        self._db = __DBSET(sql_filename="groce.pgsql")
         self._failed_rits = "You are not qualified for this operation"
         self._unknown_req = "Unknown API request"
         self.notfnd = "Item not found in resource"
@@ -412,6 +413,10 @@ class Profiles(Socs):
         with self._db.get_db(data_level=1) as con:
             if usr_data:
                 data = self._db._model.usr_prof(con, usr=usr)
+                return 201, data
+            elif srch := qs["init"]:
+                con = self._db.get_db()
+                data = self._db._model.prof_arenz(con, usr=usr)
                 return 201, data
             elif srch := qs["srch"]:
                 data = self._db._model.profs(con, usr=usr, pg=srch)

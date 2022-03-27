@@ -53,15 +53,27 @@ SELECT JSON_BUILD_OBJECT(
       WHERE A.usraw = :usr OR P.usrpb = :usr
    )totl))
    );
--- name: init_arena
+
+-- name: prof_arenz
 -- fetch user's profile data that grants arena rights
-SELECT ROW_TO_JSON(init)
-   FROM(
-      SELECT DISTINCT B.place as plc, B.doing as dspln, A.place as instn, 
-      A.doing as fld, A.stage as ttl W.place as at, W.doing as wrk FROM public.basics B
-      JOIN public.users U ON U.ddot = B.usrba JOIN public.academics A ON B.usrba = A.basid
-      JOIN public.workplace W ON W.usrwkp = U.ddot WHERE usraw = :usr
-   )init
+JSON_BUILD_OBJECT(
+   "locations", (
+      SELECT DISTINCT B.place as plc, A.place as skul, W.place as wrkpl, I.place as instuted, D.place as evnt
+      FROM public.users U JOIN public.basics B ON B.usrba = U.ddot
+      JOIN PUBLIC.awards D ON A.usraw = U.ddot JOIN public.contacts C  ON C.usrcont = U.ddot 
+      JOIN public.research R ON R.cntid = R.cntres JOIN public.institution I ON I.resin = R.resid
+      JOIN public.academics A ON B.usrba = A.basid JOIN public.workplace W ON W.usrwkp = U.ddot 
+      WHERE ddot = :usr
+   ),
+   "services", (
+      SELECT DISTINCT B.doing as dspln, A.doing as fld, W.doing as wrk, D.doing as awd, I.doing as area, S.titl, S.typ
+      FROM public.users U JOIN public.basics B ON B.usrba = U.ddot JOIN PUBLIC.socials S ON S.usrso = U.ddot
+      JOIN PUBLIC.awards D ON A.usraw = U.ddot JOIN public.contacts C  ON C.usrcont = U.ddot 
+      JOIN public.research R ON R.cntid = R.cntres JOIN public.institution I ON I.resin = R.resid
+      JOIN public.academics A ON B.usrba = A.basid JOIN public.workplace W ON W.usrwkp = U.ddot 
+      WHERE ddot = :usr
+   )
+)
 
 -- name: pix!
 -- insert address of user's profile picture

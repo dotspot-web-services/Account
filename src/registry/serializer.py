@@ -1,22 +1,32 @@
 
+import re
 import datetime
-from itsdangerous import json
-from pydantic import BaseModel, validator, Field, PositiveInt, EmailStr
+from pydantic import BaseModel, FilePath, validator, Field, NameEmail
 from typing import Optional, Union
 
 
-class Phone():
-    number: str
+class Phone(BaseModel):
+    numb:str
 
-    @validator('phone')
-    def checkName(cls, phone):
-        if ' ' not in phone:
-            raise ValueError('must contain a space')
-        return phone.title()
+    @validator('numb')
+    def checkcont(cls, numb):
+        phone = re.compile(r'''((\d{3}|\(\d{3}\))? (\s|-|\.)? (\d{3}) (\s|-|\.)? (\d{4}) (\s*(ext|x|ext.)\s*(\d{2,5}))?)''', re.VERBOSE )
+        if isinstance(numb, list):
+            for cone in numb:
+                if phone.match(cone):
+                    return numb.title()
+        elif phone.match(numb):
+            return numb.title()
+        raise ValueError('this is not a phone number')
 
-class LogCheck(BaseModel):
+class Contact(BaseModel):
     """check login data"""
-    cnt: Union[EmailStr, PositiveInt]
+    
+    cnt: Union[NameEmail, Phone]
+
+class LogCheck(Contact):
+    """check login data"""
+
     pwd: str
 
 class PwdCheck(LogCheck):
@@ -49,18 +59,9 @@ class finalCheck(RegCheck):
     pwd2: Optional[str]
     sex: bool
 
-class Ip(BaseModel):
-    ip: int
-    loc: int
-
-class Globe(BaseModel):
+class Mailer(BaseModel):
     """serialize notification of events from arenas and voice of people of interest"""
 
-    country: str
-    region: str
-    title: str
-    city: str
-    postal: str
-    locatn: str
-    metro: str
-    area: str
+    subject: str
+    content: str
+    file: FilePath

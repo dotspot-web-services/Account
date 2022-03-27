@@ -10,6 +10,11 @@ from setting.helper import ReqApi, form_dict
 grocs = Blueprint('groc', __name__, url_prefix="/user")
 
 
+@grocs.get("welcome")
+def wlcm():
+    
+    return render_template('pages/wlc.html')
+
 @grocs.post("award")
 def cr8award():
     post_data = json.dumps(request.form)

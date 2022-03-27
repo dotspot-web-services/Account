@@ -5,9 +5,11 @@ from flask import jsonify, request, render_template, redirect, url_for
 from flask_restful import Resource
 from bleach import clean
 
-from ..serializer import RegCheck, LogCheck, finalCheck, PwdCheck, Ip, Globe
+from ..serializer import RegCheck, LogCheck, finalCheck, PwdCheck, Mailer
 from setting.decs import Auth as authenticate, Responders as response
-from setting.dbcon import DbSet
+from setting.dbcon import DbSet as _DBSET
+from setting.helper import ReqApi
+from ..msg import SendMsg as _messenger
 
 class Register(Resource):
     """
@@ -15,7 +17,7 @@ class Register(Resource):
     """
     
     def __init__(self):
-        self._db = DbSet()
+        self._db = _DBSET()
         self._failed_rits = "Account already exist"
         self._unknown_req = "Unknown API request"
 
@@ -47,7 +49,7 @@ class Register(Resource):
 
     @response
     @authenticate
-    def put(self, usr, token_status):
+    async def put(self, usr, token_status):
 
         if isinstance(usr, tuple) and usr.usr != 401:
             usr = usr.usr
@@ -176,7 +178,7 @@ class Logout(Resource):
     Logout Resource
     """
     def __init__(self):
-        self._db = DbSet()
+        self._db = _DBSET()
 
     @response
     @authenticate
@@ -197,7 +199,7 @@ class Logout(Resource):
             check_token = authenticate(func=auth_token).decode_auth()
             if not isinstance(check_token, str):
                 with self._db.get_db() as con:
-                    self.db._model.in_tkn(con, tkn=auth_token, usr=usr)
+                    self._db._model.in_tkn(con, tkn=auth_token, usr=usr)
                     return 201
             else:
                 return 401
@@ -230,43 +232,59 @@ class Logout(Resource):
             'Access-Control-Allow-Headers': '*'
         }
 
-class Geodata(Logout):
+class Message(Logout):
     """
-    basic education or acquired skill
+    Logout Resource
     """
 
     @response
     @authenticate
     def post(self, usr):
-        # get the post data
-        prof_data = request.get_json() or request.form
-        print(prof_data)
-        if not (check:= Globe(
-                    dspln=prof_data.get('dspln'), place=prof_data.get('plc'),
-                    strtd=prof_data.get('strt'), endd=prof_data.get('end')
-                )):
+
+        mail = request.get_json()
+
+        if not (check := Mailer(
+                subject=mail.get('fname'), content=mail.get('cont'),
+                pwd=mail.get('pwd'), pwd2=mail.get('vpwd'), cntyp=mail.get('typ')
+            )):
             return 401
-        try:
-            with self._db.get_db() as con:
-                self._db._model.in_work(
-                    con, usr=usr, dspln=clean(check.dspln), plc=clean(check.place),
-                    strtd=check.strtd, endd=check.endd,
-                )
+        mailer = _messenger(contact=mail.get("conts"))
+        if mailer is True:
             return 201
-        except Exception:
-            return 401
+
+        with self._db.get_db(data_level=2) as con:
+            if self._db._model.check_acc(con, contact=check.cnt):     
+                return 401, self._failed_rits
+            if usr := self._db._model.cr8_acc(
+                con, fname=clean(check.fullname), pwd=self.__hash_pwd(pwd=check.pwd).decode('utf8'), 
+                cnt=check.cnt
+            ):
+                token = authenticate(func=usr).encode_auth()
+                return 201, token
+
 
     @response
-    @authenticate
-    def get(self, usr):
-        """reset password"""
-        acad = Ip(self._db._model.basic_prof(
-            self._db.get_db(dict=True), contact=usr
-        ))
+    def get(self):
+        """check if a token is blacklisted
 
-        if acad:
-            form = {
-                'organisation': {'value': ''}, 'role': {'value': ''},
-                'started': {'type': 'date'}, 'Ended': {'value': 1}
-            }
-        return render_template('pages/home.html', form=form)
+        Returns:
+            [type]: [description]
+        """
+
+        qs = request.values
+        contact = qs["contact"]
+        device = request.user_agent.string
+
+        with self._db.get_db(data_level=2) as con:
+            if mailto := self._db._model.check_acc(con, contact=contact):     
+                mailer = _messenger(contact=mailto)
+        if mailer is True:
+            return 201
+
+    def options(self):
+        return {'Allow' : ['POST', 'GET']}, 200, \
+        {
+            'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods' : '*',
+            'Access-Control-Allow-Headers': '*'
+        }
+
