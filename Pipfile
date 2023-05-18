@@ -8,19 +8,17 @@ flask = "*"
 pydantic = {extras = ["email"], version = "*"}
 bleach = "*"
 flask-restful = "*"
-psycopg2 = "*"
 pyjwt = "*"
 uwsgi = "*"
-aiosql = "*"
 bcrypt = "*"
 ptvsd = "*"
-flask-wtf = "*"
+aiosql = "*"
+psycopg2 = "*"
 
 [dev-packages]
 pre-commit = "*"
 python-dotenv = "*"
 safety = "*"
-"python.env" = "*"
 
 [requires]
-python_version = "3.10"
+python_version = "3.11"
