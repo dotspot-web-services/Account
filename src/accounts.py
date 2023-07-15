@@ -23,7 +23,7 @@ if __name__ == "__main__":
             and sum(c.isdigit() for c in password) >= 3): 
             break
     #print(accounts.url_map)
-    accounts.run(debug=True, port=3000, threaded=True)
+    accounts.run(port=5000, threaded=True)
 
 
 def urlMap():

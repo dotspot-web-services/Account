@@ -1,23 +1,52 @@
 
-OPTIONS  http://127.0.0.1:5000/Registry/reg
+###
+POST http://127.0.0.1:5000/accounts/api/reg
 content-type: application/json
 
 {
     "fname" : "Nwanja mba", "cont": "nwanjamba@gmail.com", "dob": "1991-01-02",
     "pwd": "naJesus4me", "pwd2": "naJesus4me", "typ": true, "sx": true
 }
-
 ###
+PUT http://127.0.0.1:5000/accounts/api/reg
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
 
-POST http://127.0.0.1:5000/Registry/login
+{
+    "fname" : "Nwanja mba", "cont": "nwanjamba@gmail.com", "dob": "1991-01-02",
+    "pwd": "naJesus4me", "pwd2": "naJesus4me", "typ": true, "sx": true
+}
+###
+GET  http://127.0.0.1:5000/accounts/api/reg
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+###
+DELETE  http://127.0.0.1:5000/accounts/api/reg
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+###
+POST http://127.0.0.1:5000/accounts/api/login
+content-type: application/json
 Authorization: Basic nwanjamba@gmail.com:naJesus4me
-content-type: application/json
-
 ###
-
-POST http://127.0.0.1:5000/Profiles/Basics
+PUT http://127.0.0.1:5000/accounts/api/login
 content-type: application/json
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MzEwNDA2MjcsImlhdCI6MTYzMTAzNDYyNywidXNyIjoiYzAzZTAzYTgtMTY0Yy00NDBkLTkwYzMtNjMxODJlYmE4NDNhIn0.Qn_uMxjVO0454JNj7YGGySJcnVU_Pbgho4cBlGaPqB8
+###
+GET  http://127.0.0.1:5000/accounts/api/login?user=nwanjamba@gmail.com
+content-type: application/json
+####
+POST http://127.0.0.1:5000/accounts/api/logout
+content-type: application/json
+####
+GET  http://127.0.0.1:5000/accounts/api/logout
+content-type: application/json
+Authorization: Bearer
+
+# profile api tests
+###
+POST http://127.0.0.1:5000/profiles/api/Basics
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
 
 {
     "strt": "02", "displn": "science", "plc": "F.G.C.", 
@@ -25,12 +54,176 @@ Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MzEwNDA2MjcsImlh
 }
 
 ###
-
-POST http://127.0.0.1:5000/Profiles/Accademics
+PUT http://127.0.0.1:5000/profiles/api/Basics
 content-type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MzA4NTEzMDQsImlhdCI6MTYzMDg1MDcwNCwic3ViIjoiYzAzZTAzYTgtMTY0Yy00NDBkLTkwYzMtNjMxODJlYmE4NDNhIn0.aKnCin88APirh2N-ZKtpbpw0xDkkvf8a47U1RT8Dbbk
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
 {
-    "strt": "02", "arn" : 12, "displn": "science", "plc": "F.G.C.", 
+    "strt": "02", "displn": "science", "plc": "F.G.C.", 
     "strt": "2003-01-02", "end": "2009-01-02", "acad": true
 }
+###
+GET http://127.0.0.1:5000/profiles/api/Basics?usr=extid
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+###
+DELETE http://127.0.0.1:5000/profiles/api/Basics
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+###
+
+###
+POST http://127.0.0.1:5000/profiles/api/Accademics
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+{
+    "strt": "02", "displn": "science", "plc": "F.G.C.", 
+    "strt": "2003-01-02", "end": "2009-01-02", "acad": true
+}
+
+###
+PUT http://127.0.0.1:5000/profiles/api/Accademics
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+{
+    "strt": "02", "displn": "science", "plc": "F.G.C.", 
+    "strt": "2003-01-02", "end": "2009-01-02", "acad": true
+}
+###
+GET http://127.0.0.1:5000/profiles/api/Accademics?usr=extid
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+###
+DELETE http://127.0.0.1:5000/profiles/api/Accademics
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+
+###
+POST http://127.0.0.1:5000/profiles/api/Researcher
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+{
+    "displn": "science", "plc": "F.G.C.", "emel": "nwanjajohnmba@unn.edu.ng",
+    "strt": "2003-01-02", "end": "2009-01-02", "typ": true
+}
+###
+PUT http://127.0.0.1:5000/profiles/api/Researcher
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+{
+    "displn": "science", "plc": "F.G.C.", "emel": "nwanjajohnmba@unn.edu.ng",
+    "strt": "2003-01-02", "end": "2009-01-02", "typ": true
+}
+###
+GET  http://127.0.0.1:5000/profiles/api/Researcher
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+###
+DELETE  http://127.0.0.1:5000/profiles/api/Researcher
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+###
+POST http://127.0.0.1:5000/profiles/api/Works
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+###
+PUT  http://127.0.0.1:5000/profiles/api/Works
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+###
+GET  http://127.0.0.1:5000/profiles/api/Works
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+###
+DELETE http://127.0.0.1:5000/profiles/api/Works
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+##
+
+# users API tests
+###
+POST http://127.0.0.1:5000/users/api/publications
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+{
+    "org": "02", "fld": "science", "titl": "F.G.C.", 
+    "fyl": "2003-01-02", "pdt": "2009-01-02", 
+}
+###
+PUT http://127.0.0.1:5000/users/api/publications
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+{
+    "org": "02", "fld": "science", "titl": "F.G.C.", 
+    "fyl": "2003-01-02", "pdt": "2009-01-02", 
+}
+###
+GET  http://127.0.0.1:5000/users/api/publications
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+###
+DELETE  http://127.0.0.1:5000/users/api/publications
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+###
+POST http://127.0.0.1:5000/users/api/awards
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+{
+    "plc": "02", "orgsatn": "science", "ttl": "F.G.C.", 
+    "dt": "2003-01-02"
+}
+###
+PUT http://127.0.0.1:5000/users/api/awards
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+{
+    "plc": "02", "orgsatn": "science", "ttl": "F.G.C.", 
+    "dt": "2003-01-02"
+}
+###
+###
+POST http://127.0.0.1:5000/users/api/socials
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+{
+    "titl": "", "typ":""
+}
+###
+PUT http://127.0.0.1:5000/users/api/socials
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+{
+    "titl": "", "typ":""
+}
+###
+GET  http://127.0.0.1:5000/users/api/socials
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+###
+DELETE  http://127.0.0.1:5000/users/api/socials
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODgzODE4NzcsInVzciI6ImFhYjZlMzJmLWYyOWEtNDMwZC1iYzYyLWYxZWQyNjAzODgwNCIsImV4cCI6MTY4ODY0MTA3N30.4D2dv_jwl0QokB6WrX2vlaJ07i6exlUkEpfQ8EaWX2w
+###
+POST http://127.0.0.1:5000/users/api/pictures
+content-type: application/json
+###
+GET  http://127.0.0.1:5000/users/api/pictures
+content-type: application/json
+Authorization: Bearer
+###
+DELETE  http://127.0.0.1:5000/users/api/pictures
+content-type: application/json
+Authorization: Bearer
+###
+POST http://127.0.0.1:5000/users/api/profiles
+content-type: application/json
+
+# Messages Test 
+###
+POST http://127.0.0.1:5000/accounts/api/outreach
+content-type: application/json
+Authorization: Bearer
+###
+GET http://127.0.0.1:5000/accounts/api/outreach
+content-type: application/json
+Authorization: Bearer

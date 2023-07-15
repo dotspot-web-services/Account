@@ -60,7 +60,7 @@ Profile pix
           3px 3px 7px rgba(94, 104, 121, 0.377);
       }
     </style>
-    <div class="center">
+    <div class="center container bgPt rel__postn center__h">
       <div class="prof-pix-wrapa d-block">
           <div class="prof-pix ">
             {% set pix = usr_pix or "/static/icon/avatar.png" %}
@@ -69,13 +69,12 @@ Profile pix
       </div>
       
         <div class="form-input">
-          <form id="avatar" method="post" action="{{url_for('grocs.groc.cr8pix')}}" enctype="multipart/form-data">
+          <form id="avatar" method="post" action="{{url_for('grocs.groc.pix')}}" enctype="multipart/form-data">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <label for="file-ip-1">Upload Image</label>
-            <input type="file" name="file" id="file-ip-1" accept="image/*" onchange="showPreview(event);" />
+            <input type="file" name="file" id="file-ip-1" accept="image/*" onchange="showPreview(event)" />
               <button type="submit">Submit</button>
           </form>
-          
       </div>   
   </div>
   <div>

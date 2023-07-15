@@ -15,10 +15,10 @@ class Place(Object):
     """check login data"""
 
     arena: Optional[int]
-    dspln: str
-    place: str
-    strtd: datetime.date
-    endd: Optional[datetime.date]
+    fld: str
+    locatn: str
+    strt: datetime.date
+    end: Optional[datetime.date]
     dt = Field(default=datetime.datetime.now())
 
 class Basics(Place):

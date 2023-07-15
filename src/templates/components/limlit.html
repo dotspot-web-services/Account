@@ -1,47 +1,52 @@
-<div class="d-flex limlit">
-    <nav class="column">
-        <div class="clearview ">
-            <div class="usr_nav">
-                <div class="limelitImg _15pMR">
-                    <a class="limelitImg" href="#"><img src="static/media/mypix.JPEG" ></a>
+
+{% set lime_reports = ["misleading", "offensive"] %}
+<div class="carousel">
+    <ol class="abs__postn center__h dflex carousel-indicators">
+        <li data-target="#intro" data-slide-to="0" class="active" >
+            <a data-target="#intro" data-slide-to="0" class="carousel__btn" href="#intro">contact</a>
+        </li>
+        <li data-target="#aboutPnS" data-slide-to="1" href="#aboutPnS">
+            <a data-target="#aboutPnS" data-slide-to="1" class="carousel__btn" href="#aboutPnS">contact</a>
+        </li>
+        <li data-target="#contact" data-slide-to="2" href="#contact">
+            <a data-target="#contact" data-slide-to="2" class="carousel__btn" href="#contact">contact</a>
+        </li>
+    </ol>
+    <div name="carousel" class="carousel-inner" role="listbox" title="carousel display">
+        <div class="carousel__viewport slider-wrapper">
+            <div id="intro" class="carousel__viewport__slide carousel-item active" role="listitem">
+                <div class="carousel__snapper"></div>
+                {% for data in limelits %}
+                <div class="limlit clearfix abs__postn carousel-caption">
+                    <div class="usr_column clearview spotbg float__left">
+                        <nav class="">
+                            <div class="usr_nav">
+                                {% set usr = data["usr"]%}
+                                <div class="limelitImg _15pMR">
+                                    <a class="limelitImg" href="#"><img src="{{usr.pix}}" ></a>
+                                </div>
+                                <div class="socials">
+                                    <a href="#"> <!-- user name of the voicer or name of the arena where the news is posted -->
+                                        <strong class="fsb fwb brkwd"> {{usr.fname}} &nbsp; {{usr.lname}} </strong>
+                                    </a>
+                                    <span>discription about a user using the user profile in relation to the user's arena membership and previlleges</span>
+                                </div>
+                            </div>
+                        </nav>
+                    </div>
+                    <div class="spot float__left spotbg">
+                        {% set spot = data["spot"]%}
+                        {% include "components/spotlit.html" %} 
+                    </div>
+                    {% endfor %}
                 </div>
-                <div class="socials">
-                    <a href="#"> <!-- user name of the voicer or name of the arena where the news is posted -->
-                        <strong class="fsb fwb brkwd">user&nbsp;name</strong>
-                    </a>
-                    <span>discription about a user</span>
-                </div>
+                <a class="carousel__prev carousel__btn" href="#intro" role="button" data-slide="prev">
+                    Previous
+                </a>
+                <a class="carousel__next carousel__btn" href="#contact" role="button" data-slide="next">
+                    next
+                </a>
             </div>
         </div>
-    </nav>
-    <div class="spot">
-        {% include "components/spotlit.html" %}
-    </div>
+    </div>    
 </div>
-
-<style>
-    .limlit{
-        height: 350px;
-        max-width: 600px;
-        min-width: 500px;
-        margin: 5px;
-        padding: 5px;
-        background-color: #ebebeb;
-    }
-    nav{
-        box-sizing: border-box;
-        width: 30%;
-        margin-left: 5px;
-        padding: 10px;
-
-    }
-    .spot{
-        width: 70%;
-        padding: 10px;
-    }
-    .limelitImg{
-        height: 150px;
-        width: 100%;
-        border-radius: 100%;
-    }
-</style>

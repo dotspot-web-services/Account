@@ -6,15 +6,44 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="theme-color" content="#000000"/>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">
-    <!-- Font Awesome CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="../static/style/general.css">
-    <link rel="stylesheet" href="../static/style/mediaCss.css">
+    <!--Social media using open graph og-->
+    <meta name="og:title" content="Bluespring Investment Limited product and services">
+    <meta name="og:description" content="Bluespring Investment Limited is a Nigerian registered company
+    that renders services on Business building consultation, loans and International export of raw materials
+    and finished products">
+    <meta name="og:url" content="https://spectacular-longma-ea68ba.netlify.app/">
+    <meta name="og:site_name" content="Bluespring Investment Limited">
+    <meta name="og:image" content="https://spectacular-longma-ea68ba.netlify.app/build/icons/bluespring.jpg">
 
+    <meta name="twitter:title" content="Bluespring Investment Limited product and services">
+    <meta name="twitter:description" content="Bluespring Investment Limited is a Nigerian registered company
+    that renders services on Business building consultation, loans and International export of raw materials
+    and finished products">
+    <meta name="twitter:image" content="https://spectacular-longma-ea68ba.netlify.app/build/icons/bluespring.jpg">
+    <meta name="twitter:site" content="https://spectacular-longma-ea68ba.netlify.app">
+    <meta name="twitter:creator" content="@nwanjamba">
+
+    <!-- Alternative Social media using schema tags-->
+    <meta itemprop="name" content="Bluespring Investment Limited product and services">
+    <html itemscope itemtype="https://spectacular-longma-ea68ba.netlify.app/base.htm">
+    <meta itemprop="description" content="Bluespring Investment Limited is a Nigerian registered company
+    that renders services on Business building consultation, loans and International export of raw materials
+    and finished products">
+    <meta itemprop="image" content="https://spectacular-longma-ea68ba.netlify.app/build/images/mypixl.jpg">
+
+    <!-- Favicons -->
+    <link rel="shortcut icon" href="/build/icons/logo.ico">
+
+    <!-- Google and bootstrap cdns 
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700|Raleway:300,400,400i,500,500i,700,800,900" rel="stylesheet">
+    -->
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/style/general.css">
+    <link rel="stylesheet" href="/static/style/forms.css">
+    {% block extra_css %}{% endblock extra_css%}
+    <link rel="stylesheet" href="/static/style/mediaCss.css">
+    {{ fontawesome_html() }}
     <title>QUESTARENZ {% block head_title %}{% endblock head_title%}</title>
 
   </head>
@@ -35,19 +64,14 @@
           {% block navBar %}
           {% endblock navBar %}
         </div>
-
       </div>
     </header>
-    <main>
-      <div class='container-fluid d-lg-inline-flex d-md-block d-sm-block'>
-          {% block content %}
-          {% endblock content %}
-        </div>
-    </main>
+      <div class='container-fluid'>
+        {% block content %}
+        {% endblock content %}
+      </div>
     
-    <script src="../static/js/gen.js">
-    </script>
-    <script src="../static/js/registry.js">
-    </script>
+    <script src="../static/js/gen.js"></script>
+    <script src="../static/js/registry.js"></script>
   </body>
 </html>

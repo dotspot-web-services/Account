@@ -2,11 +2,12 @@
 from flask_restful import Resource
 from flask import request
 from bleach import clean
+from pydantic import ValidationError
 
-from user.grocerySerializer import Object, CreateAward, CreatePub, CreateSoc
+from user.grocerySerializer import Object, CreateAward, CreateSoc
 from setting.decs import Auth as authenticate, Responders as response
-from setting.dbcon import DbSet as __DBSET
-from setting.helper import FileUp
+from setting.dbcon import DbSet as _DBSET
+from setting.helper import FileUp, convert_errors
 
 
 class Awards(Resource):
@@ -15,43 +16,58 @@ class Awards(Resource):
     """
 
     def __init__(self) -> None:
-        self._db = __DBSET(sql_filename="groce.pgsql")
-        self._failed_rits = "You are not qualified for this operation"
-        self._unknown_req = "Unknown API request"
-        self.notfnd = "Item not found in resource"
+        self._db = _DBSET(sql_filename="groce.pgsql")
 
     @response
     @authenticate
-    def post(self, usr, token_status):
+    def post(self, usr):
+        """Register user's award profile as many as user have
 
-        if isinstance(usr, tuple) and usr != 401:
-            usr = usr.usr
-        else:
-            return usr, token_status
+        Args:
+            usr (int): the user from token authentication
+            token_status (Bool): The status of the token, if it is time bound
+
+        Returns:
+            response_code(int): The status code of the response
+            response_message(str): The response status message
+        """
+
+        if isinstance(usr, tuple):
+            return usr
 
         awd_data = request.get_json()
         
-        if not (check := CreateAward(plc=awd_data.get('plc'), act=awd_data.get('orgsatn'), titl=awd_data.get('ttl'),
-            awdt=awd_data.get('dt')
-        )):
-            return 401
+        try:
+           check = CreateAward(
+               plc=awd_data.get('plc'), act=awd_data.get('orgsatn'), ttl=awd_data.get('ttl'),
+                awdt=awd_data.get('awdt')
+            )
+        except ValidationError as err:
+            errors = convert_errors(err=err)
+            return 422, errors
 
         with self._db.get_db() as con:
             self._db._model.cr8_awd(
-                con, usr=usr, plc=clean(check.plc), acts=clean(check.acts), titl=clean(check.title), 
+                con, usr=usr, plc=clean(check.plc), acts=clean(check.acts), titl=clean(check.ttl), 
                 awdt=check.awdt
             )
         return 201
 
     @response
     @authenticate
-    def get(self, usr, token_status):
-        """reset password"""
+    def get(self, usr):
+        """Fetct a record of user's work profile
+        Args:
+            usr (int): the user from token authentication
+            token_status (Bool): The status of the token, if it is time bound
 
-        if isinstance(usr, tuple) and usr != 401:
-            usr = usr.usr
-        else:
-            return usr, token_status
+        Returns:
+            response_code(int): The status code of the response
+            response_message(str): The response status message
+        """
+
+        if isinstance(usr, tuple):
+            return usr
 
         if not (qs := request.values):
             usr_data = usr
@@ -66,46 +82,63 @@ class Awards(Resource):
             elif srch := qs["srch"]:
                 data = self._db._model.awds(con, usr=usr, pg=srch)
                 return 201, data
-        return 401, self._unknown_req
+        return 401
     
     @response
     @authenticate
-    def put(self, usr, token_status):
+    def put(self, usr):
+        """Update a record of user's work profile
+        Args:
+            usr (int): the user from token authentication
+            token_status (Bool): The status of the token, if it is time bound
+
+        Returns:
+            response_code(int): The status code of the response
+            response_message(str): The response status message
+        """
         # get the post data
 
-        if isinstance(usr, tuple) and usr != 401:
-            usr = usr.usr
-        else:
-            return usr, token_status
+        if isinstance(usr, tuple):
+            return usr
 
         awd_data = request.get_json()
+        
+        try:
+           check = CreateAward(
+                plc=awd_data.get('plc'), act=awd_data.get('orgsatn'), ttl=awd_data.get('ttl'),
+                awdt=awd_data.get('dt'), awd=awd_data.get('award')
+            )
+        except ValidationError as err:
+            errors = convert_errors(err=err)
+            return 422, errors
 
-        if not (check := CreateAward(plc=awd_data.get('plc'), act=awd_data.get('orgsatn'), titl=awd_data.get('ttl'),
-            awdt=awd_data.get('dt'), awd=awd_data.get('award')
-        )):
-            return 401
         with self._db.get_db() as con:
-            if self._db._model.awd_rit(
-                con, usr=usr, awd=check.obj
-            ):
-                return 401, self._failed_rits
+            if self._db._model.awd_rit(con, usr=usr, awd=check.obj):
+                return 401
             elif self._db._model.cr8_awd(
-                con, usr=usr, plc=clean(check.plc), acts=clean(check.acts), titl=clean(check.title), 
+                con, usr=usr, plc=clean(check.plc), acts=clean(check.acts), titl=clean(check.ttl), 
                 awdt=check.awdt
             ):
                 return 201
             else:
-                return 401, self._unknown_req
+                return 401
 
     @response
     @authenticate
-    def delete(self, usr, token_status):
-        """reset password"""
+    def delete(self, usr):
+        """Delete a record of user's work profile
 
-        if isinstance(usr, tuple) and usr != 401:
-            usr = usr.usr
-        else:
-            return usr, token_status
+        Args:
+            usr (int): the user from token authentication
+            token_status (Bool): The status of the token, if it is time bound
+
+        Returns:
+            response_code(int): The status code of the response
+            response_message(str): The response status message
+        """
+
+        if isinstance(usr, tuple):
+            return usr
         
         awd = request.values
 
@@ -113,11 +146,11 @@ class Awards(Resource):
             return 401
         with self._db.get_db() as con:
             if self._db._model.awd_rit(con, usr=usr, awd=check.obj):
-                return 401, self._failed_rits
+                return 401
             elif self._db._model.del_awd(con, usr=usr, awd=check.obj):
                 return 201
             else:
-                return 401, self._unknown_req
+                return 401
     
     def options(self):
         return {'Allow' : ['POST', 'GET']}, 200, \
@@ -125,137 +158,54 @@ class Awards(Resource):
         'Access-Control-Allow-Headers': '*', 'cross-site-cookies': 'session', 
         'samesite': 'Lax'}
 
-class Pubs(Awards):
-    """get all events with get request and insert event with post request"""
 
-    @response
-    @authenticate
-    def post(self, usr, token_status):
-
-        if isinstance(usr, tuple) and usr != 401:
-            usr = usr.usr
-        else:
-            return usr, token_status
-
-        pub_data = request.get_json()
-        
-        if not (check := CreatePub(rsrch=pub_data.get('org'), dfld=pub_data.get('fld'), dttl=pub_data.get('titl'),
-            fyl=pub_data.get('fyl'), pdt=pub_data.get('pdt')
-        )):
-            return 401
-
-        with self._db.get_db() as con:
-            self._db._model.cr8_pub(con, usr=usr, srch=check.instn, fld=clean(check.dfld), ttl=clean(check.dttl), 
-                fyl=check.med, pdt=check.pdt
-            )
-        return 201
-    
-    @response
-    @authenticate
-    def get(self, usr, token_status):
-        """reset password"""
-
-        if isinstance(usr, tuple) and usr != 401:
-            usr = usr.usr
-        else:
-            return usr, token_status
-
-        if not (qs := request.values):
-            usr_data = usr
-        
-        with self._db.get_db(data_level=1) as con:
-            if usr_data:
-                data = self._db._model.usr_pubs(con, usr=usr)
-                return 201, data
-            if id := qs.get("id"): 
-                data = self._db._model.pub(con, usr=usr, pub=id)
-                if data:
-                    return 201, data
-                return 404, self.notfnd
-            elif pg := qs["pg"]:
-                data = self._db._model.pubs(con, usr=usr, pg=pg)
-                if data:
-                    return 201, data
-                return 404, self.notfnd
-        return 401, self._unknown_req
-    
-    @response
-    @authenticate
-    def put(self, usr, token_status):
-        # get the post data
-
-        if isinstance(usr, tuple) and usr != 401:
-            usr = usr.usr
-        else:
-            return usr, token_status
-
-        pub_data = request.get_json()
-
-        if not (check := CreatePub(rsrch=pub_data.get('org'), dfld=pub_data.get('fld'), dttl=pub_data.get('titl'),
-            fyl=pub_data.get('fyl'), pdt=pub_data.get('pdt'), pub=pub_data.get('pub')
-        )):
-            return 401
-        with self._db.get_db() as con:
-            if self._db._model.pub_rit(con, usr=usr, awd=check.obj):
-                return 401, self._failed_rits
-            elif self._db._model.upd8_pub(con, usr=usr, srch=check.instn, fld=clean(check.dfld), ttl=clean(check.dttl), 
-                fyl=check.med, pdt=check.pdt
-            ):
-                return 201
-            else:
-                return 401, self._unknown_req
-
-    @response
-    @authenticate
-    def delete(self, usr, token_status):
-        """reset password"""
-
-        if isinstance(usr, tuple) and usr != 401:
-            usr = usr.usr
-        else:
-            return usr, token_status
-
-        pub = request.values
-
-        if not (check := Object(obj=pub.get('pub'))):
-            return 401
-        with self._db.get_db() as con:
-            if self._db._model.pub_rit(con, usr=usr, awd=check.obj):
-                return 401, self._failed_rits
-            elif self._db._model.del_pub(con, usr=usr, pub=check.obj):
-                return 201
-            else:
-                return 401, self._unknown_req
-
-class Socs(Pubs):
+class Socs(Awards):
     """API for all hubbies or interests outside studies"""
 
     @response
     @authenticate
-    def post(self, usr, token_status):
+    def post(self, usr):
+        """Register user's hubby profile
+        Args:
+            usr (int): the user from token authentication
+            token_status (Bool): The status of the token, if it is time bound
 
-        if isinstance(usr, tuple) and usr != 401:
-            usr = usr.usr
-        else:
-            return usr, token_status
+        Returns:
+            response_code(int): The status code of the response
+            response_message(str): The response status message
+        """
+
+        if isinstance(usr, tuple):
+            return usr
 
         soc_data = request.get_json()
         
-        if not (check := CreateSoc(titl=soc_data.get('titl'), typ=soc_data.get('typ'))):
-            return 401
+        try:
+           check = CreateSoc(titl=soc_data.get('titl'), typ=soc_data.get('typ'))
+        except ValidationError as err:
+            errors = convert_errors(err=err)
+            return 422, errors
+
         with self._db.get_db() as con:
             self._db._model.cr8_soc(con, usr=usr, typ=clean(check.typ), ttl=clean(check.title))
         return 201
 
     @response
     @authenticate
-    def get(self, usr, token_status):
-        """reset password"""
+    def get(self, usr):
+        """Fetch a user's hubby profile
+    
+        Args:
+            usr (int): the user from token authentication
+            token_status (Bool): The status of the token, if it is time bound
 
-        if isinstance(usr, tuple) and usr != 401:
-            usr = usr.usr
-        else:
-            return usr, token_status
+        Returns:
+            response_code(int): The status code of the response
+            response_message(str): The response status message
+        """
+
+        if isinstance(usr, tuple):
+            return usr
 
         if not (qs := request.values):
             usr_data = usr
@@ -271,40 +221,58 @@ class Socs(Pubs):
                 data = self._db._model.soc(con, usr=usr, id=id)
                 return 201, data
             
-        return 401, self._unknown_req
+        return 401
 
     @response
     @authenticate
-    def put(self, usr, token_status):
+    def put(self, usr):
+        """Update a user's hubby profile
+
+        Args:
+            usr (int): the user from token authentication
+            token_status (Bool): The status of the token, if it is time bound
+
+        Returns:
+            response_code(int): The status code of the response
+            response_message(str): The response status message
+        """
         # get the post data
 
-        if isinstance(usr, tuple) and usr != 401:
-            usr = usr.usr
-        else:
-            return usr, token_status
+        if isinstance(usr, tuple):
+            return usr
 
         soc_data = request.get_json()
-
-        if not (check := CreateSoc(titl=soc_data.get('titl'), typ=soc_data.get('typ'))):
-            return 401
+        
+        try:
+           check = CreateSoc(titl=soc_data.get('titl'), typ=soc_data.get('typ'))
+        except ValidationError as err:
+            errors = convert_errors(err=err)
+            return 422, errors
 
         with self._db.get_db() as con:
             if self._db._model.soc_rit(con, usr=usr, awd=check.obj):
-                return 401, self._failed_rits
+                return 401
             elif self._db._model.upd8_soc(con, usr=usr, typ=clean(check.typ), ttl=clean(check.title)):
                 return 201
             else:
-                return 401, self._unknown_req
+                return 401
 
     @response
     @authenticate
-    def delete(self, usr, token_status):
-        """reset password"""
+    def delete(self, usr):
+        """Delete a user's hubby profile
 
-        if isinstance(usr, tuple) and usr != 401:
-            usr = usr.usr
-        else:
-            return usr, token_status
+        Args:
+            usr (int): the user from token authentication
+            token_status (Bool): The status of the token, if it is time bound
+
+        Returns:
+            response_code(int): The status code of the response
+            response_message(str): The response status message
+        """
+
+        if isinstance(usr, tuple):
+            return usr
 
         soc = request.values
 
@@ -312,11 +280,11 @@ class Socs(Pubs):
             return 401
         with self._db.get_db() as con:
             if self._db._model.soc_rit(con, usr=usr, soc=check.obj):
-                return 401, self._failed_rits
+                return 401
             elif self._db._model.del_soc(con, usr=usr, soc=check.obj):
                 return 201
             else:
-                return 401, self._unknown_req
+                return 401
 
 
 class Avatars(Socs):
@@ -326,12 +294,20 @@ class Avatars(Socs):
 
     @response
     @authenticate
-    def post(self, usr, token_status):
+    def post(self, usr):
+        """Upload a user's profile picture
 
-        if isinstance(usr, tuple) and usr != 401:
-            usr = usr.usr
-        else:
-            return usr, token_status
+        Args:
+            usr (int): the user from token authentication
+            token_status (Bool): The status of the token, if it is time bound
+
+        Returns:
+            response_code(int): The status code of the response
+            response_message(str): The response status message
+        """
+
+        if isinstance(usr, tuple):
+            return usr
         
         file = request.files
         print(request.form)
@@ -347,13 +323,20 @@ class Avatars(Socs):
 
     @response
     @authenticate
-    def get(self, usr, token_status):
-        """reset password"""
+    def get(self, usr):
+        """Fetch a user's profile picture
 
-        if isinstance(usr, tuple) and usr != 401:
-            usr = usr.usr
-        else:
-            return usr, token_status
+        Args:
+            usr (int): the user from token authentication
+            token_status (Bool): The status of the token, if it is time bound
+
+        Returns:
+            response_code(int): The status code of the response
+            response_message(str): The response status message
+        """
+
+        if isinstance(usr, tuple):
+            return usr
 
         if not (qs := request.values):
             usr_data = usr
@@ -368,17 +351,24 @@ class Avatars(Socs):
             elif id := qs.get("id"): 
                 data = self._db._model.pixs(con, usr=usr, id=id)
                 return 201, data
-        return 401, self._unknown_req
+        return 401
 
     @response
     @authenticate
-    def delete(self, usr, token_status):
-        """reset password"""
+    def delete(self, usr):
+        """Delete a user's profile picture
 
-        if isinstance(usr, tuple) and usr != 401:
-            usr = usr.usr
-        else:
-            return usr, token_status
+        Args:
+            usr (int): the user from token authentication
+            token_status (Bool): The status of the token, if it is time bound
+
+        Returns:
+            response_code(int): The status code of the response
+            response_message(str): The response status message
+        """
+
+        if isinstance(usr, tuple):
+            return usr
 
         pix = request.values
 
@@ -386,11 +376,11 @@ class Avatars(Socs):
             return 401
         with self._db.get_db() as con:
             if self._db._model.pix_rit(con, usr=usr, pix=check.obj):
-                return 401, self._failed_rits
+                return 401
             elif self._db._model.del_pix(con, usr=usr, pix=check.obj):
                 return 201
             else:
-                return 401, self._unknown_req
+                return 401
 
 class Profiles(Socs):
     """
@@ -399,13 +389,20 @@ class Profiles(Socs):
 
     @response
     @authenticate
-    def get(self, usr, token_status):
-        """reset password"""
+    def get(self, usr):
+        """_summary_
 
-        if isinstance(usr, tuple) and usr != 401:
-            usr = usr.usr
-        else:
-            return usr, token_status
+        Args:
+            usr (int): the user from token authentication
+            token_status (Bool): The status of the token, if it is time bound
+
+        Returns:
+            response_code(int): The status code of the response
+            response_message(str): The response status message
+        """
+
+        if isinstance(usr, tuple):
+            return usr
 
         if not (qs := request.values):
             usr_data = usr
@@ -423,6 +420,6 @@ class Profiles(Socs):
                 return 201, data
             elif id := qs.get("id"): 
                 data = self._db._model.prof(con, usr=usr, id=id)
-                return 201, data
-            
-        return 401, self._unknown_req
+                return 201, data       
+        return 401
+    

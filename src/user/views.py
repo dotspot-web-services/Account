@@ -1,191 +1,101 @@
 
-import json
+from flask import flash, render_template, redirect, url_for, Blueprint, request, session
 
-from werkzeug.datastructures import ImmutableMultiDict
-from flask import flash, render_template, redirect, url_for, Blueprint, request
-
-from setting.helper import ReqApi, form_dict
+from .api.grocery import Awards, Socs, Avatars, Profiles
 
 
 grocs = Blueprint('groc', __name__, url_prefix="/user")
+__AWD = Awards() 
+__SOC = Socs() 
+__PROPIX = Avatars() 
+__PROF = Profiles()
 
 
-@grocs.get("welcome")
+@grocs.route("welcome", methods=["GET", "POST"])
 def wlcm():
     
-    return render_template('pages/wlc.html')
+    if request.method == "GET":
+        return render_template('pages/wlc.html')
+    if session["create_profile"]:
+        return redirect(url_for('profs.prof.basics'))
 
-@grocs.post("award")
-def cr8award():
-    post_data = json.dumps(request.form)
-    data = ReqApi(req_typ="post", req_url=url_for("groca.awards"), post_data=post_data)
-    data = data()
-    
-    if not data.ok:
-        return data
-    elif data.ok:
-        redirect(url_for('groca.profiles'))
-    elif data.status_code == 404:
-        return request.url
-    redirect(url_for('localhost:3000'))
-
-@grocs.get("award")
+@grocs.route("/award", methods=["GET", "POST"])
 def awards():
-    "user bsic knowledge profile"
-
-    data = ReqApi(req_typ="get", req_url=url_for("groca.awards")+"?usr=true")
-    awd_flds = ['Place', 'Job', 'Award Title', 'Award Date']
-    form_attr, inputs = form_dict(endpt=url_for("grocs.groc.cr8award"), fields=awd_flds)
+    desc = "fill work experience in other to share and mentor, you take what you give"
     
-    desc = ""
-    resp = data()
-
-    if not request.values :
+    if (status, data := __AWD.get()) and status == 401:
+        flash(message="You are not logged in")
+        return redirect("/")
+    if request.method == "GET":
         return render_template(
-            'profiles/profile.html', inputs=inputs, form_attr=form_attr, desc=desc
+            'profiles/profile.html', fields="awards", desc=desc, data=data
         )
-    elif resp.status_code == 404:
-        return request.url
-    elif (data := data.json()) and resp.ok:
+        
+    status, data = __AWD.post()
+    
+    if status == 200:
+        return redirect(url_for("grocs.groc.prof"))
+    if status == 422:
+       return render_template(
+            'profiles/profile.html', endpt=url_for('grocs.groc.awards'), fields="awards", desc=desc, data=data
+        )
+    if status == 409:
+        flash(message="Account already exists, please login", category="info")
+        return  redirect(request.url)
+
+@grocs.route("/social", methods=["GET", "POST"])
+def social():
+    
+    desc = "fill work experience in other to share and mentor, you take what you give"
+    
+    if (status, data := __SOC.post()) and status == 401:
+        flash(message="You are not logged in")
+        return redirect("/")
+    if request.method == "GET":
         return render_template(
-            'profiles/profile.html', inputs=inputs, form_attr=form_attr, data=data, desc=desc
+            'profiles/profile.html', endpt=url_for("grocs.groc.social"), fields="work", desc=desc, data=data
         )
-    return resp
+        
+    status, data = __SOC.post()
+    if status == 200:
+        return redirect(url_for("grocs.groc.prof"))
+    if status == 422:
+       return render_template(
+            'profiles/profile.html', endpt=url_for('grocs.groc.social'), fields="work", desc=desc, data=data
+        )
+    if status == 409:
+        flash(message="Account already exists, please login", category="info")
+        return  redirect(request.url)
 
-@grocs.post("pubs")
-def cr8pub():
-
-    post_data = json.dumps(request.form)
-    data = ReqApi(req_typ="post", req_url=url_for('groc.pubs'), post_data=post_data)
-    data = data()
-
-    if not data.ok:
-        return data
-    elif data.ok:
-        redirect(url_for('grocs.groc.pubs'))
-    elif data.status_code == 404:
-        return request.url
-    redirect(url_for('localhost:3000'))
-
-@grocs.get("pubs")
-def pubs():
-    """user universal accedemic profile"""
-    # Institution will be selection of institutions as a researcher
-    data = ReqApi(req_typ="get", req_url=url_for("groca.awards")+"?usr=true")
-    pub_flds = ['Institution', 'Field', 'Title', 'File', 'Publication Date']
-    form_attr, inputs = form_dict(endpt=url_for("grocs.groc.cr8pub"), fields=pub_flds)
-    resp = data()
-
-    if request.values:
-        return render_template('profiles/pubform.html', inputs=inputs, form_attr=form_attr)
-    elif resp.status_code == 404:
-        return request.url
-    if (data := resp.json()) and resp.ok:
-        return render_template('profiles/pubs.html', inputs=inputs, form_attr=form_attr, data=data)
-    return resp
-
-@grocs.post("social")
-def cr8hub():
-    post_data = json.dumps(request.form)
-    data = ReqApi(req_typ="post", req_url=url_for("groca.socs"), post_data=post_data)
-    data = data()
-
-    if not data.ok:
-        return data
-    elif data.ok:
-        redirect(url_for('groca.profiles'))
-    elif data.status_code == 404:
-        return request.url
-    redirect(url_for('localhost:3000'))
-
-@grocs.get("social")
-def hubs():
-    # this still needs proper review and development
-    data = ReqApi(req_typ="get", req_url=url_for("groca.socs"))
-    soc_flds = ['Hubby title', 'type of hubby']
-    form_attr, inputs = form_dict(endpt=url_for("grocs.groc.hubs"), fields=soc_flds)
-    resp = data()
-
-    if request.values:
-        return render_template('profiles/soc.html', inputs=inputs, form_attr=form_attr)
-    elif resp.status_code == 404:
-        return request.url
-    elif (data := resp.json()) and resp.ok:
-        return render_template('profiles/profile.html', inputs=inputs, form_attr=form_attr, data=data)
-    return data
     
-@grocs.post("pix")
-def cr8pix():
+@grocs.route("pix", methods=["GET", "POST"])
+def pix():
 
-    req_file = request.files
-    file = ImmutableMultiDict([("file", req_file.get("file"))])
-    data = ReqApi(req_typ="post", req_url=url_for("groca.avatars"), file=file)
-
-    data = data()
-
-    print(file)
-    if not data.ok:
-        return data
-    elif data.ok:
-        return redirect(url_for('grocs.groc.pixs'))
-    elif data.status_code == 404:
-        return request.url
-    return redirect(request.url)
-
-@grocs.get("pix")
-def pixs():
-
-    pix = ReqApi(req_typ="get", req_url=url_for("groca.avatars"))
-    resp = pix()
+    status, data = __PROPIX.get()
+    desc = "fill work experience in other to share and mentor, you take what you give"
     
-    if (pix := resp.json()) and resp.ok:
-        if not isinstance(pix, dict):
-            print("that is the pix")
-            return render_template('profiles/pix.html', usr_pix=pix)
-    return render_template('profiles/pix.html', usr_pix=None)
+    if request.method == "GET":
+        return render_template("profiles/pix.html", usr_pix=data, desc=desc)
+    
+    status, data = __PROPIX.post()
+    
+    if status == 200 and session["create_profile"]:
+        return redirect(url_for('grocs.groc.awards'))
+    if status == 200:
+        return render_template("profiles/pix.html", desc=desc )
+    if status == 422:
+       return render_template("profiles/pix.html", desc=desc, data=data)
+    if status == 409:
+        flash(message="Account already exists, please login", category="info")
+        return  redirect(request.url)
 
 @grocs.get("profile")
 def prof():
     
-    data = ReqApi(req_typ="get", req_url=url_for("groca.profiles"))
-    resp =data()
+    status, data = __PROF.get()
     
-    if resp.status_code == 404:
-        return request.url
-    if (data := resp.json()) and resp.ok:
-        return render_template('pages/profile.html', data=data.get("json_build_object"))
-    return resp
-
-
-# this is for spotlight and services
-@grocs.post("mindme")
-def cr8minda():
-
-    post_data = json.dumps(request.form)
-    data = ReqApi(req_typ="post", req_url=url_for("groca.awards"), post_data=post_data)
-    data = data()
-
-    if data.is_redirect:
-        return data
-    if not data.ok:
-        return data
-    elif data.ok:
-        flash(message="Reminder has been set successfully")
-        redirect(url_for('localhost:3000'))
-
-@grocs.get("mindme")
-def minda():
-
-    data = ReqApi(req_typ="get", req_url=url_for("groca.awards"))
-    rmind_flds = ['Location', 'Field', 'Knowledge', 'Start', 'End']
-    form_attr, inputs = form_dict(endpt="profs.prof.basics", fields=rmind_flds)
-    resp = data()
-
-    if request.values:
-        return render_template('profiles/profile.html', inputs=inputs, form_attr=form_attr)
-    elif resp.is_redirect:
-        return data
-    elif (data := resp.json()) and resp.ok:
-        return render_template('profiles/reminda.html', data=data)
-    return data
+    if status == 200:
+        return render_template(
+            'profiles/profile.html', data=data
+        )
 

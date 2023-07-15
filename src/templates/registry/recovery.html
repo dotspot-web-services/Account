@@ -1,19 +1,22 @@
 
 {% extends 'base.html' %}
 
-{% block navBar %}
-{% include 'components/nav.html' %}
-{% endblock %}
 
 {% block content %}
 
-<div class='col-lg-6 offset-lg-2 col-md-6 offset-md-3'>
-    <h1>Account Recovery</h1>
-    
+<div class='container bgPt rel__postn center__h'>
+
+    {% if fields == "contact" %}
+    <h1>Account Recovery</h1>   
     <p>To recover an account you have to fill the form below</p>
-
-    {% include "components/form.html" %}
-
+    {% elif fields == "recover" %}
+    <p>Fill in your new password</p>
+    {% elif note %}
+    <p> {{ note }} </p>
+    {% endif %}
+    {% with endpt=endpt, fields=fields %}
+        {% include 'components/form.html' %}
+    {% endwith %}
 </div>
 
 {% endblock %}

@@ -1,125 +1,130 @@
 
-import json
-
 from flask import flash, render_template, url_for, redirect, Blueprint, request, session
 
-from setting.helper import ReqApi, form_dict
+from .api.registry import Register, Login, Reset
 
 
 regs = Blueprint('regs', __name__, url_prefix="/registry")
 
-@regs.get("/finalize")
-def finalPage():
-    
-    data = ReqApi(req_typ="get", req_url="/accounts/api/reg")
-    data = data()
-    if data.get("status") is True:
-        "api insert request to other tieters"
-        return redirect(url_for('grocs.groc.pixs'))
-    if not data.ok:
-        return data
-    elif data.status_code == 404:
-        return request.url
-    data = data.json()
-    if data.get("status") is True and data.get("dob") is not None:
+__REG = Register()
+__LOG = Login()
+__RESET = Reset()
+ 
+
+@regs.route("/finalize", methods=["POST", "GET"])
+def finalize():
+
+    if (status, data := __REG.get()) and status == 401:
+        flash(message="You are not logged in")
+        return redirect("/")
+    elif data.get("status") is True and data.get("dob") is not None:
         exp = session.get(exp, None)
         flash(
             message=f"This account is not yet activated, please verify your contact or or it will be deleted in{exp}",
             category="warning"
         )
-    return render_template('registry/finalReg.html', data=data.get("row_to_json"))
+        return render_template('registry/finalReg.html', data=data)
+    
+    error, status = __REG.put()
+    
+    if status == 200:
+        session["create_profile"] = True
+        return redirect(url_for('grocs.groc.pix'))
+    if status == 401:
+        flash("You are not Logged in or account is deleted ")
+        return redirect("/")
+    if status == 422:
+        data = request.form
+        return render_template('registry/finalReg.html', data=data, error=error)
 
-@regs.post("/finalize")
-def finalize():
+@regs.route(rule="/register", methods=["GET", "POST"])
+def regPage():
+    
+    if request.method == "GET":
+        return render_template('/registry/reg.html', endpt=url_for('accs.regs.regPage'), fields="register")
 
-    post_data = json.dumps(request.form)
-    data = ReqApi(req_typ="put", req_url="/accounts/api/reg", post_data=post_data)
-    data = data()
-    if not data.ok:
-        return data
-    elif data.status_code == 404:
-        return request.url
-    return redirect(url_for('accs.regs.finalize'))
-
-@regs.post("/register")
-def register():
-
-    post_data = json.dumps(request.form)
-    data = ReqApi(req_typ="post", req_url="/accounts/api/reg", post_data=post_data, auth=False)
-    data = data()
-
-    if not data.ok:
-        return data
-    elif data.status_code == 404:
-        return request.url
-    data = data.json()
-
-    if data:
+    error, status = __REG.post()
+    if status == 201:
+        session["active"] = False
         session["token"] = data
         return redirect(url_for('accs.regs.finalize'))
-    return redirect(request.url)
+    if status == 422:
+        data = request.form
+        return render_template('/registry/reg.html', endpt=url_for('accs.regs.regPage'), fields="register", data=data, error=error)
+    if status == 409:
+        flash(message="Account already exists, please login", category="info")
+        data = request.form
+        error['form'] = error['message']
+        return render_template('/registry/reg.html', endpt=url_for('accs.regs.regPage'), fields="register", data=data, error=error)
+        #return  redirect(request.url)
 
-@regs.get("/register")
-def regPage():
-    return render_template('/registry/reg.html', hide_btn="d-block", btn_href="/")
+@regs.route(rule="/contact", methods=["GET", "POST"])
+def contactPage():
+    
+    if request.method == "GET":
+        return render_template('registry/recovery.html', endpt=url_for("accs.regs.contactPage"), fields="Contact")
 
-@regs.get("/reset")
+    error, status = __RESET.post()
+
+    if status == 200:
+        flash(
+            message="A reset link has been sent to your Email",
+            category="info"
+        )
+        return redirect(url_for('index'))
+    if status == 404:
+        data = request.form   
+        return render_template(
+            'registry/recovery.html', endpt=url_for("accs.regs.contactPage"), fields="Contact", data=data, error=error
+        )
+
+@regs.route(rule="/reset", methods=["GET", "POST"])
 def resetPage():
     
-    form_attr, inputs = form_dict(endpt="accs.regs.reset", fields=["Contact"])
+    if request.method == "GET":
+        return render_template(
+            'registry/recovery.html', endpt=url_for("accs.regs.resetPage"), fields="recover"
+        )
 
-    return render_template('registry/recovery.html', inputs=inputs, form_attr=form_attr, hide_btn="d-block", btn_href="/")
+    error, status = __LOG.put()
 
-@regs.post("/reset")
-def reset():
+    if status == 200:
+        flash(message="Password changed successfully", category="message")
+        return redirect("/")
+    elif status == 422:
+        data = request.form
+        return render_template(
+            'registry/recovery.html', endpt=url_for("accs.regs.resetPage"), fields="recover", data=data, error=error
+        )
 
-    post_data = json.dumps(request.form)
-    data = ReqApi(req_typ="put", req_url="rega.login", post_data=post_data)
-
-    data = data()
-
-    if not data.ok:
-        return data
-    elif data.ok:
-        redirect(url_for('accounts.accs.regs'))
-    elif data.status_code == 404:
-        return request.url
-    redirect(url_for('profiler.basics'))
-
-@regs.get("/signIn")
+@regs.route(rule="/signIn",  methods=["GET", "POST"])
 def signInPage():
-    return render_template('registry/log.html', hide_btn="d-block", btn_href="/Accounts/logIn")
-
-@regs.post("/signIn")
-def signIn():
-
-    post_data = request.form
-    auth = (post_data['usrCont'], post_data['usrPwd'])
-    data = ReqApi(req_typ="post", req_url=url_for('rega.login'), post_data=auth)
-    data = data()
-
-    if not data.ok:
-        return data
-    elif data.status_code == 404:
-        return request.url
-    data = data.json()
     
-    if data.get("user_status") is False:
-        return redirect(url_for('accs.regs.finalize'))
-    elif data.get("user_status") is True:
-        session["token"] = data["token"]
-        print(session)
-        return redirect(url_for('http://127.0.0.1:5000'))
-    elif data.get("token_status") is True and data.get("usr_status") is True:
-        flash(message=f"This account is compromised", category="warning")
-    return redirect(url_for('accs.regs.regPage'))
+    if request.method == "GET":
+        return render_template(
+            'registry/log.html', endpt=url_for('accs.regs.signInPage'), fields="login"
+        )
+    
+    err_data, status = __LOG.post()
 
-@regs.get("/logOut")
+    if status == 200:
+        session["token"] = err_data["token"]
+        session["create_profile"] = True
+        flash(message=f"Logged in successfully", category="message")
+        return redirect(url_for('grocs.groc.pix'))
+    elif status == 401:
+        data = request.form
+        flash(message=f"Log in not successfully", category="warning")
+        return render_template(
+            'registry/log.html', endpt=url_for('accs.regs.signInPage'), fields="login", data=data, error=err_data
+        )
+
+@regs.route(rule="/logOut", methods=["GET", "POST"])
 def confLogOut():
     
     if request.method == "POST":
-        #logout(request)
-        return redirect("/login")
+        session.clear()
+        return redirect("/")
     context = {
         "form": None,
         "description": "Are you sure you want to logout?",
@@ -127,16 +132,3 @@ def confLogOut():
         "title": "Logout"
     }
     return render_template(request, "accounts/auth.html", context)
-
-@regs.post("/logOut")
-def logOut():
-    if request.method == "POST":
-        #logout(request)
-        return redirect("/login")
-    context = {
-        "form": None,
-        "description": "Are you sure you want to logout?",
-        "btn_label": "Click to Confirm",
-        "title": "Logout"
-    }
-    return render_template("accounts/auth.html", context)

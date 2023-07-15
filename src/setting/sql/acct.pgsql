@@ -26,7 +26,7 @@ FROM(
 
 -- name: usr_status^
 -- check the existence of a token as blacklisted token
-   SELECT U.active as user_status, COALESCE(L.token, 'None') as token, COALESCE(L.compromised, FALSE) as token_status FROM public.users U  
+   SELECT U.active as user_status, COALESCE(L.token, '') as token, COALESCE(L.compromised, FALSE) as token_status, COALESCE(L.logged, TRUE) FROM public.users U  
    LEFT JOIN public.logtoken L
       ON L.tklog = U.ddot
    LEFT JOIN public.contacts C
@@ -80,7 +80,7 @@ FROM(
 )reg_data
 
 -- name: upd8_acc!
--- create a user contact
+-- Insert or update a user registeration
 WITH reg AS(
    INSERT INTO public.users (ddot, fullname, dob, gender)
    VALUES (:usr, :fname, :bday, :mel) ON CONFLICT(ddot) DO UPDATE

@@ -1,7 +1,7 @@
 
 import re
 import datetime
-from pydantic import BaseModel, FilePath, validator, Field, NameEmail
+from pydantic import BaseModel, FilePath, validator, Field, EmailStr
 from typing import Optional, Union
 
 
@@ -22,7 +22,7 @@ class Phone(BaseModel):
 class Contact(BaseModel):
     """check login data"""
     
-    cnt: Union[NameEmail, Phone]
+    cont: Union[EmailStr, Phone]
 
 class LogCheck(Contact):
     """check login data"""
@@ -32,9 +32,9 @@ class LogCheck(Contact):
 class PwdCheck(LogCheck):
     """Create a spotlight either from external source or internal source"""
 
-    pwd2: str
+    vpwd: str
 
-    @validator('pwd2')
+    @validator('vpwd')
     def check_pwd(cls, v, values):
         if 'pwd' in values and v != values['pwd']:
             raise ValueError('passwords do no match')
@@ -43,21 +43,20 @@ class PwdCheck(LogCheck):
 class RegCheck(LogCheck):
     """Create a spotlight either from external source or internal source"""
 
-    fullname: str
-    cntyp: bool
+    fname: str
     dt = Field(default=datetime.datetime.now())
 
-    @validator('fullname')
-    def check_name(cls, fullname):
-        if len(fullname.split(' ')) < 2 > 3:
+    @validator('fname')
+    def check_name(cls, fname):
+        if len(fname.split(' ')) < 2 > 3:
             raise ValueError('this is not a full name')
-        return fullname.title()
+        return fname.title()
 
 class finalCheck(RegCheck):
     dob: datetime.date
     pwd: Optional[str]
-    pwd2: Optional[str]
-    sex: bool
+    vpwd: Optional[str]
+    sx: bool
 
 class Mailer(BaseModel):
     """serialize notification of events from arenas and voice of people of interest"""

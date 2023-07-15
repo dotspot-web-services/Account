@@ -61,66 +61,47 @@ Profile
 				</div>
 
 				<div class="slider-wrapper">
+					{% if data %}
 					<div class="container">
-						{% set base = data.base %}
-						{% if base %}
 						<div>
-							<h4>Basics knowledge</h4>
-							<div>
-								<div>{{ base.plc }}</div>
-								<div>{{ base.dspln }}</div>
-								<div>{{ base.strt }}</div>
-								<div>{{ base.get("endt", "Present") }}</div>
-							</div>
+							<h4>Accademics</h4>
+							<div> {{profiler(data.base, edit_url, add_link, "High School")}} </div>
 						</div>
-						{% else %}
-							<button type="button" name="" id="" class="btn btn-primary mbtn-lg btn-block">
-								<a href="http://">Create basic knowledge</a>
-							</button>
-						{% endif %}
-						{% set acads = data.academic %}
-						{% if acads[0] %}
+						{% if data.base %}
 						<div>
-							<h4>Advanced knowledge</h4>
-							{{profiler(item=acads)}}
-						</div>
-						{% set instns = data.reseacher %}
-						{% if instns[0] %}
-						<div>
-							<h4>Institutions of research</h4>
-								{{profiler(item=instns)}}
+							<h6>Advanced knowledge</h6>
+							{{profiler(data.academic, edit_url, add_link, "Advanced education")}}
 						</div>
 						{% endif %}
-						{% set pubs = data.publications %}
-						{% if pubs[0] %}
+						{% if data.academic %}
 						<div>
-							<h4>Publications</h4> 
-								{{profiler(bubs)}}
+							<h6>Institutions of research</h6>
+							{{profiler(data.reseacher, edit_url, add_link, "Research")}}
 						</div>
-						{% endif %}
+						<div>
+							<h6>Publications</h6> 
+							{{profiler(data.publications, edit_url, add_link, "Publication")}}
+						</div>
 					{% endif %}
 					</div>
-					{% set skill = data.skill %}
-					{% if skill %}
+					
 					<div>
 						<h4>Acquired skills</h4>
-							{{profiler(skill)}}
+							{{profiler(data.skill, edit_url, add_link, "Skill")}}
 					</div>
-					{% endif %}
 
-					{% set award = data.awards %}
-					{% if award[0] %}
 					<div>
 						<h4>Recognitions</h4>
-							{{profiler(award)}}
+							{{profiler(data.awards, edit_url, add_link, "Award")}}
 					</div>
-					{% endif %}
-
-					{% set socs = data.socials %}
-					{% if socs[0] %}
 					<div>
 						<h4>Social life</h4>
-							{{profiler(socs)}}
+							{{profiler(data.socials, edit_url, add_link, "Social")}}
+					</div>
+					{% else %}
+					<div class="container center-h">
+						<h2>You don't have a profile yet</h2>
+						<a href="http://">Create profile</a>
 					</div>
 					{% endif %}
 				</div>

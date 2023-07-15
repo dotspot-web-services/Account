@@ -3,8 +3,8 @@
   display: none;
 }
 
-@media print, screen and (max-width: 1024px){
-  #loga{
+@media print, screen and (max-width: 800px){
+  #head-account form{
     display: none;
   }
 

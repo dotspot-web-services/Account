@@ -1,4 +1,36 @@
 
+{% macro report(reports, spot, arena) -%}
+
+    <div class="report">
+        <div><i class="bi bi-flag"></i> <i class="bi bi-three-dots-vertical"></i></div>
+        {% for item in reports %}
+        <div>
+            <a href="http://?arena={{ arena }}%spot={{ spot }}">
+                <small>{{item}}</small>
+            </a> 
+        </div>
+        {% endfor %}
+    </div>
+
+{%- endmacro %}
+
+{% macro input(attrs, label) -%}
+    <div>
+
+    </div>
+    <input
+        type="{{ attrs.get('type', 'text') }}" name="{{ name }}" class="{{ attrs.get('class', '') }}" 
+        {% if attrs.placeholder %} placeholder="{{ attrs.placeholder }}"
+        {% else %}placeholder="Enter {{ label }}" {% endif %}
+        {% if data[name] is defined %} value="{{ data[name] }}" {% endif %} {% if attrs.required is defined %} required {% endif %}
+    />
+    {% if attr.note is defined %}
+        <div class="">{{ note(attr.note) }}</div> 
+    {% endif %}
+    <div class="alert-danger">{% if error[name] is defined %} value="{{ error[name] }}" {% endif %}</div>
+
+{%- endmacro %}
+
 {% macro select(options, name) -%}
 
     <select name="{{ name }}" required>
@@ -11,14 +43,36 @@
 
 {%- endmacro %}
 
-{% macro radio(radios, name) -%}
+{% macro note(tag) -%}
 
-    {% for label, input in radios.items() %}
-        <label> <span> {{ label }} </span> 
-        <input type="radio" name="{{ name }}" value="{{ input.get('value') }}">
-        </label>
+    {% if tag.a %}
+    {% for text, href in tag.a.items() %}
+    <a href="{{ href }}">{{ text }}</a>
     {% endfor %}
+    {% elif tag.span %}
+    <span> {{ tag.span }} </span>
+    {% elif tag.div is defined %}
+    <div>{{ tag.div }}</div>
+    {% endif %}
 
+{%- endmacro %}
+
+{% macro radcheck(attr, label) -%}
+
+    <div>
+        <input type="{{ attr.type }}" name="{{ attr.name }}" value="{{ attr.value }}">
+        <label for="{{ attr.name }}">
+            {% if attr.label %}
+            {%set tag = label.split('{}') %}
+            {% for item in tag%}
+            {{ item }} {{ note({'a':attr.label.a[tag.index(item)]}) }}
+            {% endfor %}
+            {% else %}
+            {{ label }}
+            {% endif %}
+        </label>
+    </div>
+    
 {%- endmacro %}
 
 {% macro button(btn_attr) -%}
@@ -31,28 +85,31 @@
 
 {%- endmacro %}
 
-{% macro profiler(item) -%}
-    {% for row in item %}
-    <div>
+{% macro profiler(item, edit_url, add_link, prof_name) -%}
+
+    {% if item != "" %}
+        {% for row in item %}
         <div>
-            <div>{{ row["plc"] }}</div>
-            <div>{{ row["dspln"] }}</div>
-            <div>{{ row["strt"] }}</div>
-            <div>{{ row.get("endt", "Present") }}</div>
+            <div>
+                <div>{{ row.plc }}</div>
+                <div>{{ row.dspln }}</div>
+                <div>{{ row.strt }}</div>
+                <div>{{ row.get("endt", "Present") }}</div>
+            </div>
+        <div></div>
+        {% if session.get('usr') %}
+        <div class="float-right">
+            <a href="http://{{ edit_url + '?' + row.id }}"><i class="fa fa-pencil" aria-hidden="true"></i>Edit</a>
         </div>
-    {% else %}
-    <div></div>
-    {% endfor %}
+        {% endif %}
+        {% endfor %}
+    {% endif %}
     {% if session.get('usr') %}
-    <div class="float-right">
-        <a href="http://"><i class="fa fa-pencil" aria-hidden="true"></i>Edit</a>
-    </div>
     </div>
         <button type="button" name="" id="" class="btn btn-primary mbtn-lg btn-block">
-            <a href="http://">Add research institution</a>
+            <a href="{{add_link}}"> {{ prof_name }} </a>
         </button>
-    {% else %}
-    </div>
     {% endif %}
+    </div>
 
 {%- endmacro %}

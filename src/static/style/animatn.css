@@ -4,12 +4,10 @@
   transition: all 0.3s;
   transform: translate(-0%);
 }
-
 .slider-wrapper{
   position: relative;
   height: 100%;
 }
-
 .slider-wrapper .dots {
   position: absolute;
   bottom: 10px;

@@ -6,6 +6,8 @@ from pydantic import (
     RedisDsn,
     PostgresDsn,
     DirectoryPath,
+    FilePath,
+    FileUrl,
     EmailStr,
     NameEmail,
     Field)
@@ -14,7 +16,7 @@ class CheckSet(BaseSettings):
     """set data up"""
     secret: str = Field(default=None, env='ATUSEC')
     log_rod: int = Field(default=None, env='LOG_H')
-    media_folder: DirectoryPath = Field(default="src/static/test_upload")
+    media_folder: DirectoryPath = Field("/home/johnmba/flaskproject/Account/src/static/test_upload")
     allowed_extension: tuple = Field(default=("MPG", "JPEG", "PNG"), const=True)
     file_size: int = Field(default= 16 * 1024 * 1024, const=True)
     dormain: str = Field(default="questarenz.com", env="DORMAIN")
@@ -28,9 +30,10 @@ class Settings(BaseSettings):
     
     auth_key: Optional[str]
     api_key: Optional[str] = Field(env='my_api_key')
-
-    redis_dsn: RedisDsn = 'redis://user:pass@localhost:6379/1'
+    #host="localhost", port=6379, db=1, password="j7+jOomYiIP6APPxSBaxR8vcmqjkPnknGN0GHDEmYF3z9ChJ10XkIJPmN5k0ql5PlY60TXiW0AVDQv13@localhost:6379/1"
+    redis_dsn: RedisDsn = 'redis://Auth:j7+jOomYiIP6APPxSBaxR8vcmqjkPnknGN0GHDEmYF3z9ChJ10XkIJPmN5k0ql5PlY60TXiW0AVDQv13@localhost:6379/{}'
     pg_dsn: PostgresDsn = Field(..., env='DEV_URI', alias="just_get")
+    redis_env_dsn: RedisDsn = Field(..., env="DEV_REDIS", alias="redis_get")
 
     special_function: PyObject = 'math.cos'
 

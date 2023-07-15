@@ -1,3 +1,7 @@
+
+{% from 'components/macros.html' import note with context %}
+
+
 {% extends 'base.html' %}
 
 {% block head_title %}
@@ -6,38 +10,18 @@ Profile
 
 {% block content %}
 
-<div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
-    
-    <div class="">
-    
-        <p>{{ desc | safe }}</p>
+<div class="containter">    
+    <p>{{ note(desc) }}</p>
         
-        {% if data %}
-        <div class="prof-form">
-        {% include "components/form.html"%}
-        </div>
-
-        {% else %}
-
-        <div class="prof-form">
-        {% include "components/form.html"%}
-        </div>
-        
-        {% endif %}
-
-    </div>
+    <div class="prof-form">
+    {% include "components/form.html"%}
+    </div> 
 </div>
-<div id="nav-btn" class="gap">
-    {% if left_btn_ref %}
-    <a href="{{left_btn_ref}}" class="nav-link float-left" id="left-btn">
-        <button class="btn btn-outline-success my-2 my-sm-0">Back</button>
-    </a>
-    {% endif %}
-    {% if right_btn_ref %}
-    <a href="{{right_btn_ref}}" class="nav-link float-right" id="right-btn">
+{% if session["create_profile"] and skip %}
+<div class="gap">
+    <a href="{{ skip }}" class="nav-link float-right" id="right-btn">
         <button class="btn btn-outline-success my-2 my-sm-0">Skip</button>
     </a>
-    {% endif %}
 </div>
-
+{% endif %}
 {% endblock %}

@@ -1,17 +1,22 @@
 
-{% from 'components/macros.html' import radio, button, select with context %}
+{% from 'components/macros.html' import input, radcheck, note, button, select with context %}
 
-<form method="{{ form_attr.get('method') }}" action="{{ form_attr.get('action') }}" {% if form_attr.get("class") %} class="{{ form_attr.get('class') }}" {% endif %} {% if form_attr.get("id") %} id="{{ form_attr.get('id') }}" {% endif %} enctype="multipart/form-data">
+
+{% set form_attr, inputs = endpt | formData(fields)() %}
+<div class="alert-danger">{% if error and error.form %} {{ error.form }} {% endif %}</div>
+<form method="post" action="{{ form_attr.get('action') }}" {% if form_attr.get("class") %} class="{{ form_attr.get('class') }}" {% endif %} {% if form_attr.get("id") %} id="{{ form_attr.get('id') }}" {% endif %} enctype="multipart/form-data">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     {% for label, attrs in inputs.items() %}
-    {% if attrs.get('labels') %}
+    {% if attrs.type == "checkbox" or attrs.type == "radio" %}
     <div>
         <fieldset>
-            <legend>
-                {{ label }}
-            </legend>
-            {{ radio( attrs.get('labels'), attrs.get('name')) }}
-            {% if note is defined and note.get(name) %} <div class="{{ note.get('class') }}">{{ note.get(name) | safe }}</div> {% endif %}
+            {% if label is not string %}
+            {% for item in label | unique %}
+            {{ radcheck(attrs, item) }}
+            {% endfor %}
+            {% else %}
+            {{ radcheck(attrs, label) }}
+            {% endif %}
         </fieldset>
     </div>
     
@@ -22,24 +27,28 @@
                 Academic qualification
             </legend>
             {{ select(attrs.get('options'), attrs.get('name')) }}
-            {% if note is defined and note.get(name) %} <div class="{{ note.get('class') }}">{{ note.get(name) | safe }}</div> {% endif %}
         </fieldset>
     </div>
     {% else %}
-    {% set name = attrs.get("name") %}
+
     <fieldset>
-    <div class="form-group">
-        <div><label for="{{ name }}">{{ label }}</label></div>
-        <input
-            type="{{ attrs.get('type') }}" name="{{ name }}" class="{{ attrs.get('class') }}" placeholder="{{ attrs.get('placeholder') }}"
-            {% if data is defined %} value="{{ data[name] }}" {% endif %} required
-        />
-        <div class="alert-danger"></div>
-        {% if note is defined and note.get(name) %} <div class="{{ note.get('class') }}">{{ note.get(name) | safe }}</div> {% endif %}
-    </div>
+        <legend>
+            <label for="attrs.name">{{ label }}</label>
+        </legend>
+        <div class="form-group">
+            <input
+                type="{{ attrs.type | default('text', true) }}" name="{{attrs.name }}" class="{{ attrs.get('class', '') }}" 
+                placeholder="{{ attrs.placeholder | default('Enter' + ' ' + label, true) }}"
+                {% if data %} value="{{ data.get(attrs.name) }}" {% endif %} {% if attrs.required is defined %} required {% endif %}
+            />
+        </div>
+        {% if attrs.note is defined %}
+            <div class="">{{ note(attrs.note) }}</div> 
+        {% endif %}
+        <div class="alert-danger">{% if error and error.get(attrs.name) %} {{ error.get(attrs.name) }} {% endif %}</div>
+    </fieldset>
     {% endif %}
     {% endfor %}
-    </fieldset>
 
     {% set btn_attr = form_attr['button'] %}
     {{ button(btn_attr) }}

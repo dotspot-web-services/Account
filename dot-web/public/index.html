@@ -28,6 +28,24 @@
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <header>
+      <div id="pgHeader" class="container-fluid">
+        <div class="logo-hom-wrapa">
+          <div id="logo">
+            <a class="navbar-brand" href="/">QUESTARENZ</a>
+          </div>
+          {% if home_nav is defined %}
+          <div class="nav-item">
+            <a href="/" class="nav-link">{{ home_nav }}</a>
+          </div>
+          {% endif %} 
+        </div>
+          {% block navBar %}
+          {% endblock navBar %}
+        </div>
+
+      </div>
+    </header>
     <div id="root"></div>
     <!--
       This HTML file is a template.

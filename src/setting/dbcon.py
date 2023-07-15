@@ -1,12 +1,14 @@
 
 #from functools import wraps
 #from re import S
+from os import environ
 
 from psycopg2 import connect
 from psycopg2.extras import RealDictCursor, NamedTupleCursor
 from aiosql import from_path
 from pydantic.types import FilePath
 from flask import g
+import redis 
 
 from .base.setting import Settings, CheckSet
 
@@ -15,7 +17,7 @@ from .base.setting import Settings, CheckSet
 
 class DbSet(object):
     """"""
-    def __init__(self, sql_filename=None):
+    def __init__(self, sql_filename:FilePath=None):
         """connect and load sql into aiosql for sql operations
 
         Args:
@@ -23,9 +25,9 @@ class DbSet(object):
         """
         self.sql: FilePath = sql_filename
         if self.sql is None:
-            self.__sql = 'src/setting/sql/acct.pgsql'
+            self.__sql = '/home/johnmba/flaskproject/Account/src/setting/sql/acct.pgsql'
         else:
-            self.__sql = f'src/setting/sql/{self.sql}'
+            self.__sql = f'/home/johnmba/flaskproject/Account/src/setting/sql/{self.sql}'
         self._model = from_path(
             sql_path=self.__sql, driver_adapter='psycopg2'
         )
@@ -52,6 +54,19 @@ class DbSet(object):
         if data_level == 2:
             db.cursor_factory = NamedTupleCursor
         return db
+    
+    def get_redis(self, db):
+        """connect to redis database specifying the database number
+
+        Args:
+            db (int): the database to be connected with
+
+        Returns:
+           redis: connected redis database
+        """
+        
+        redis_url = Settings().dict().get("redis_env_dsn")
+        return redis.Redis(redis_url.format(db))
 
     async def access_cursor(self, query_obj):
         async with self.get_db() as conn:
@@ -69,6 +84,18 @@ class DbSet(object):
         if db is not None:
             db.close()
 
+def setdb():#
+    #engine = create_engine('postgresql://accounts:napapaGod4me@localhost/accountsdb')
+    pg_dns = {
+        "host": "localhost",
+        "port": 5432,
+        "user": "accounts",
+        "password": "napapaGod4me",
+        "database": "accountsdb"
+    }
+    db = DbSet("table.pgsql")#database="test",
+    with connect(**pg_dns) as con:
+        db._model.cr8_schema(con)
 
 if __name__ == "__main__":
     pg = DbSet()
