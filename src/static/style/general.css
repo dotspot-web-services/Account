@@ -2,6 +2,15 @@
 article,aside,details,figcaption,figure,footer,header,hgroup,nav,section,summary{
   display:block
 }
+img{
+  border:0;-ms-interpolation-mode:bicubic
+ }
+svg:not(:root){
+  overflow:hidden
+}
+figure, form{
+  margin:0
+}
 *{
   padding: 0;
   margin: 0;
@@ -278,30 +287,6 @@ h2 > a{
   –––––––––––––––––––––––––––––––––––––––––––––––––– 
 */
 
-.rAside{
-  box-sizing: border-box;
-  border:1px solid #cbcbcb;
-  margin-top:18px;
-  margin-right: 10px;
-  background:linear-gradient(solid #cbcbcb #fbfbfb);
-  margin-top: 60px;
-}
-
-a:focus{
-  outline:thin dotted
-}
-
-a:hover, a:active{
-  outline:0
-}
-.spotbg{
-  background-color: #ebebeb;
-  margin-top: 4px;
-  margin-left: 4px
-}
-
-/* page head styles */
-
 
 /* LIMELIGHT
   –––––––––––––––––––––––––––––––––––––––––––––––––– 
@@ -382,39 +367,4 @@ h6{
   #limlit {
     max-width: 100%;
   }
-}
-
-/* profiles */
-
-.prof-pix-wrapa{
-  height: 250px;
-  width: 250px;
-  border-radius: 50%;
-  background-color: #2ecc71;
-}
-.prof-pix-edit{
-  padding: 10px;
-  margin: 20px 10px;
-}
-.gap{
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-  justify-items: center;
-  margin: 20px;
-  padding: 10px;
-}
-.left{
-  position: absolute;
-  left: 5px;
-}
-.left{
-  position: absolute;
-  right: 5px;
-}
-.prof-pix{
-  height: 88%;
-  width: 88%;
-  padding: 10px;
-  margin-left: 20px;
 }

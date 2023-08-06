@@ -1,14 +1,13 @@
 
 #from functools import wraps
 #from re import S
-from os import environ
 
 from psycopg2 import connect
 from psycopg2.extras import RealDictCursor, NamedTupleCursor
 from aiosql import from_path
 from pydantic.types import FilePath
 from flask import g
-import redis 
+import redis
 
 from .base.setting import Settings, CheckSet
 
@@ -36,7 +35,7 @@ class DbSet(object):
 
     # cursor_factory=extras.RealDictCursor        
 
-    def get_db(self, data_level=0):
+    def get_db(self, data_level:int=0):
         """the type of data to be loaded
 
         Args:
