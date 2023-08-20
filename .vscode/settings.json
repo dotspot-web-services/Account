@@ -1,13 +1,14 @@
 {
+    "python.analysis.typeCheckingMode": "off",
     "sqltools.connections": [
         {
             "previewLimit": 50,
             "server": "localhost",
             "port": 5432,
-            "askForPassword": true,
-            "driver": "AWS Redshift",
-            "name": "pg_quest",
-            "connectString": "postgres://QuestMasterDb:tFAtf6hCXdRhfWZ@questdb.cugmxolkmuvk.us-east-2.rds.amazonaws.com:5432/quest"
+            "driver": "PostgreSQL",
+            "name": "accdb",
+            "database": "accountsdb",
+            "username": "accounts"
         }
     ]
 }

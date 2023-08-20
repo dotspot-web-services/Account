@@ -1,15 +1,22 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Run on Kubernetes",
-      "type": "cloudcode.kubernetes",
-      "request": "launch",
-      "skaffoldConfig": "/home/johnmba/questarenz/skaffold.yaml",
-      "watch": true,
-      "cleanUp": true,
-      "portForward": true,
-      "imageRegistry": "minikube"
-    }
-  ]
+    "configurations": [
+        {
+            "name": "Kubernetes: Run/Debug",
+            "type": "cloudcode.kubernetes",
+            "request": "launch",
+            "skaffoldConfig": "${workspaceFolder}/skaffold.yaml",
+            "watch": true,
+            "cleanUp": true,
+            "portForward": true,
+            "debug": [
+                {
+                    "image": "accounts-api",
+                    "containerName": "accounts-api",
+                    "sourceFileMap": {
+                        "${workspaceFolder}": "/app"
+                    }
+                }
+            ]
+        }
+    ]
 }

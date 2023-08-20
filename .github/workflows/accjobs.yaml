@@ -1,0 +1,10 @@
+name: Account flask test
+
+on:
+  push:
+    build: [ master ]
+  pull_request:
+    build: [ master ]
+
+jobs:
+  name:

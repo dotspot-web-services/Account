@@ -1,0 +1,66 @@
+
+<input type="radio" id="item1" name="spot" checked>
+<input type="radio" id="item2" name="spot">
+<input type="radio" id="item3" name="spot">
+<input type="radio" id="item4" name="spot">
+<input type="radio" id="item5" name="spot">
+
+<div class="slider-wrapper">
+    <ul class="arrows">
+        <li>
+            <label for="item1"></label>
+        </li>
+        <li>
+            <label for="item2"></label>
+        </li>
+        <li>
+            <label for="item3"></label>
+        </li>
+        <li>
+            <label for="item4"></label>
+        </li>
+    </ul>
+
+    <div class="slider">
+        {% if data["qots"] %}
+            {% for qot in data["qots"] %}
+            <div class="slide">
+                {% include "components/quote.html"%}
+            </div>
+            {% enfor %}
+        {% else %}
+            {% for limit in data["limlit"] %}
+            <div class="slide">
+                {% include "components/limlit.html" %}
+            </div>
+            {% enfor %}
+        {% endif %}
+    </div>
+
+    <ul class="arrows">
+        <li>
+            <label for="item1"></label>
+        </li>
+        <li>
+            <label for="item2"></label>
+        </li>
+        <li>
+            <label for="item3"></label>
+        </li>
+        <li>
+            <label for="item4"></label>
+        </li>
+    </ul>
+    
+    <ul class="dots">
+        <li>
+            <label for="item1"></label>
+        </li>
+        <li>
+            <label for="item2"></label>
+        </li>
+        <li>
+            <label for="item3"></label>
+        </li>
+    </ul>
+</div>

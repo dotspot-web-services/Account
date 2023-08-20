@@ -1,0 +1,101 @@
+.slider{
+  display: flex;
+  justify-content: center;
+  transition: all 0.3s;
+  transform: translate(-0%);
+}
+.slider-wrapper{
+  position: relative;
+  height: 100%;
+}
+.slider-wrapper .dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+}
+.slider-wrapper .dots label {
+  display: inline-block;
+  margin: 5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid #fff;
+  transition: background 0.25s;
+}
+
+/* SLIDER WIDTHS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– */
+  ._4sl-wt{
+    width: 500%;
+  }
+
+  ._3sl-wt{
+    width: 300%;
+  }
+
+.gradient-item{
+  display: flex;
+  flex-basis: 100%;
+  transition: flex-basis 1s ease;
+}
+
+.arrows label::before,
+.arrows label::after {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: #000;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 24px 24px;
+  background-color: #fff;
+  opacity: 0.5;
+  transition: opacity 0.25s;
+}
+.arrows label::before {
+  left: 10px;
+}
+.arrows label::after {
+  right: 10px;
+}
+
+[id="item1"]:checked ~ main .slider{
+  transform: translate(-0%);
+}
+[id="item2"]:checked ~ main .slider{
+  transform: translate(-33.333%);
+}
+[id="item3"]:checked ~ main .slider{
+  transform: translate(-66.666%);
+}
+
+[id^="item"]:checked ~ .main .slider-wrapper .arrows [for^="item"]:hover::before,
+[id^="item"]:checked ~ .main .slider-wrapper .arrows [for^="item"]:hover::after {
+  opacity: 1;
+}
+
+[id="item1"]:checked ~ main .slider-wrapper .arrows [for="item3"]::before,
+[id="item2"]:checked ~ main .slider-wrapper .arrows [for="item1"]::before,
+[id="item3"]:checked ~ main .slider-wrapper .arrows [for="item2"]::before{
+  content: '';
+  background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/162656/arrow-prev-slideshow.svg);
+}
+
+[id="image1"]:checked ~ main .slider-wrapper .arrows [for="item2"]::after,
+[id="image2"]:checked ~ main .slider-wrapper .arrows [for="item3"]::after,
+[id="image3"]:checked ~ main .slider-wrapper .arrows [for="item1"]::after {
+  content: '';
+  background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/162656/arrow-next-slideshow.svg);
+}
+
+[id="item1"]:checked ~ main .slider-wrapper .dots [for="item1"],
+[id="item2"]:checked ~ main .slider-wrapper .dots [for="item2"],
+[id="item3"]:checked ~ main .slider-wrapper .dots [for="item3"] {
+  background: #fff;
+}

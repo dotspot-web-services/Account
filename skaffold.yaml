@@ -1,0 +1,38 @@
+apiVersion: skaffold/v2beta22
+kind: Config
+metadata:
+  name: account
+build:
+  artifacts:
+    - image: accounts-api
+      docker:
+        dockerfile: Dockerfile
+  tagPolicy:
+    sha256: {}
+deploy:
+  kubectl:
+    manifests:
+      - account.deployment.yaml
+      - account.service.yaml
+
+#portForward:
+#  # Cloud Code automatically port forwards resources,
+#  # or users can define explicit port forwards here.
+#  # For more info, visit https://skaffold.dev/docs/pipeline-stages/port-forwarding/#UDPF
+#  - resourceType: service
+#    resourceName: accounts-intel
+#    port: 80
+#    localPort: 4503
+#  - resourceType: service
+#    resourceName: arena-intel
+#    port: 81
+#    localPort: 8503
+#  - resourceType: service
+#    resourceName: spots-intel
+#    port: 82
+#    localPort: 9503
+#  - resourceType: service
+#    resourceName: services-intel
+#    port: 83
+#    localPort: 6503
+#

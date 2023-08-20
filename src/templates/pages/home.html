@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block extra_css%}
+<link rel="stylesheet" href="../static/style/animation.css">
+{% endblock %}
+{% block head_title %}
+Home
+{% endblock %}
+
+{% block navBar %}
+    {% include "components/nav.html" %}
+{% endblock %}
+
+{% block content %}
+
+<main>
+    <div class='rel__postn center__h bgPt'>
+        <div id="toggler" class='abs__postn center__h'>
+            <small>
+                <i class="bi bi-chevron-compact-down" aria-hidden="true">Limelight</i> 
+            </small>
+        </div>									
+        <div id="limlit" class="rel__postn center__h">
+            {% include "components/limlit.html" %}
+        </div>
+    </div>
+</main>
+<section>
+    <div class="srch">
+        <div class="collapsed rel__postn center__h" data-bs-toggle="collapse" data-bs-target="#srch-result">
+            <div class="">
+                {% include "components/quote.html"%}
+            </div>
+            <form class="dflex" id="srcha">
+                <input 
+                    type="search" name="srch-inp" placeholder="Search and and connect the Dots"
+                    list="search-suggestions" id="search-data"
+                >
+                <button type="submit" class="btn btn-secondary"><span class="fa fa-search"></span> Search</button>
+            </form>
+        </div>
+        <div id="srch-result accordion-collapse collapse show" data-bs-parent="#limesrch">
+            <datalist>
+                <option value=""></option>
+            </datalist>
+        </div>
+    </div>
+</section>
+<!-- the triangle of life, Your philosophy reflects what you do and what you do reflects on people around you and vice-versa -->    
+{% endblock %}

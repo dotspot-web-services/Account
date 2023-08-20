@@ -1,4 +1,15 @@
 .vscode
+<<<<<<< HEAD
 .dockerignore
 .readmes
 server
+=======
+.Dockerignore
+.readmes
+server
+.env
+.gitignore
+README.md
+account.deployment.yaml
+account.service.yaml
+>>>>>>> dev

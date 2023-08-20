@@ -1,33 +1,23 @@
 
-# Dockerfile to build glpk container images
-# Based on Ubuntu
+# Use base Python image from Docker Hub
+FROM python:3.9
 
-# Set the base image to Ubuntu
-FROM ubuntu:latest
 
-USER root
-
-# Install wget
-RUN apt-get update -y && apt-get install -y \
-wget \
-build-essential \
-python3 \
-python3-pip \
-libpq-dev python3-dev \
---no-install-recommends \
-&& rm -rf /var/lib/apt/lists/*
-
-RUN pip install --upgrade pip
-
-RUN pip3 install --trusted-host pypi.python.org pipenv 
-
+# Set the working directory to /app
 WORKDIR /app
 
+# copy the requirements file used for dependencies
+#COPY requirements.txt .
+RUN pip install --upgrade pip
+
+# Install any needed packages specified in requirements.txt
+#RUN pip install --trusted-host pypi.python.org -r requirements.txt
+RUN pip3 install --trusted-host pypi.python.org pipenv 
+
+# Copy the rest of the working directory contents into the container at /app
 COPY . .
 
 RUN pipenv install --system --deploy --ignore-pipfile
 
-RUN export LC_ALL=C.UTF-8
-RUN export LANG=C.UTF-8
-RUN export FLASK_APP=server
-ENTRYPOINT ["uwsgi", "uwsgi.ini"]
+# Run app.py when the container launches
+ENTRYPOINT ["python", "src/accounts.py"]
