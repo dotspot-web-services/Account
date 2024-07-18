@@ -42,7 +42,7 @@ SELECT JSON_BUILD_OBJECT(
    ORDER BY awardt
    )awds))),
    'summary', ROW_TO_JSON((SELECT plcs FROM(
-   SELECT U.fullname as name, B.acad as typ, B.place as plc, B.doing as dspln, A.place as instn, 
+   SELECT U.fullname as name, B.acad as typ, B.place as plc, B.doing as dspln, A.place as instn,
    A.doing as fld, A.stage as ttl, W.place as at, W.doing as wrk FROM public.basics B
    JOIN public.users U ON U.ddot = B.usrba JOIN public.academics A ON A.bacid = B.basid
    JOIN public.workplace W ON W.usrwkp = U.ddot WHERE U.ddot = :usr
@@ -60,17 +60,17 @@ JSON_BUILD_OBJECT(
    "locations", (
       SELECT DISTINCT B.place as plc, A.place as skul, W.place as wrkpl, I.place as instuted, D.place as evnt
       FROM public.users U JOIN public.basics B ON B.usrba = U.ddot
-      JOIN PUBLIC.awards D ON A.usraw = U.ddot JOIN public.contacts C  ON C.usrcont = U.ddot 
+      JOIN PUBLIC.awards D ON A.usraw = U.ddot JOIN public.contacts C  ON C.usrcont = U.ddot
       JOIN public.research R ON R.cntid = R.cntres JOIN public.institution I ON I.resin = R.resid
-      JOIN public.academics A ON B.usrba = A.basid JOIN public.workplace W ON W.usrwkp = U.ddot 
+      JOIN public.academics A ON B.usrba = A.basid JOIN public.workplace W ON W.usrwkp = U.ddot
       WHERE ddot = :usr
    ),
    "services", (
       SELECT DISTINCT B.doing as dspln, A.doing as fld, W.doing as wrk, D.doing as awd, I.doing as area, S.titl, S.typ
       FROM public.users U JOIN public.basics B ON B.usrba = U.ddot JOIN PUBLIC.socials S ON S.usrso = U.ddot
-      JOIN PUBLIC.awards D ON A.usraw = U.ddot JOIN public.contacts C  ON C.usrcont = U.ddot 
+      JOIN PUBLIC.awards D ON A.usraw = U.ddot JOIN public.contacts C  ON C.usrcont = U.ddot
       JOIN public.research R ON R.cntid = R.cntres JOIN public.institution I ON I.resin = R.resid
-      JOIN public.academics A ON B.usrba = A.basid JOIN public.workplace W ON W.usrwkp = U.ddot 
+      JOIN public.academics A ON B.usrba = A.basid JOIN public.workplace W ON W.usrwkp = U.ddot
       WHERE ddot = :usr
    )
 )
@@ -106,49 +106,6 @@ FROM(
    ORDER BY medt
 )pictures
 
--- name: cr8_pub<!
--- add a users research publication
-INSERT INTO public.pubs (usrpb, inpub, field, title, fyl, publsdt)
-VALUES (:usr, :instn, :fld, :ttl, :fyl, :pubdt);
-
--- name: upd8_pub!
--- update users research publication
-INSERT INTO public.pubs (pubid, inpub, usrpb, field, title, fyl, publsdt)
-VALUES (:pub, :instn, :usr, :fld, :ttl, :fyl, :pubdt) ON CONFLICT(pubid) DO UPDATE
-SET field = :fld, title = :ttl, fyl = :fyl, publsdt = :pubdt WHERE pubid = :pub AND inpub = :instn;
-
--- name: pub_rit$
--- get a user
-SELECT pubid FROM public.pubs WHERE pubid = :pub AND usrpb = :usr;
-
--- name: del_pub
--- get a user
-DELETE FROM public.pubs WHERE pubid = :pub AND usrpb = :usr;
-
--- name: usr_pubs
--- fetch all publications from a user and institution
-SELECT ROW_TO_JSON(publication)
-FROM(
-   SELECT field, title, file as doc, publsdt FROM PUBLIC.pubs
-   WHERE pubid = :pub
-)publication
-
--- name: pub^
--- fetch details of a particular publication
-SELECT ROW_TO_JSON(publication)
-FROM(
-   SELECT field, title, file as doc, publsdt FROM PUBLIC.pubs
-   WHERE pubid = :pub
-)publication
-
--- name: pubs
--- fetch all publications 
-SELECT ROW_TO_JSON(publications)
-FROM(
-   SELECT pubid as id, field, title, file as doc, publsdt FROM PUBLIC.pubs
-   WHERE usrpb = :usr;
-   ORDER BY pubdt
-)publications
 
 -- name: cr8_soc!
 -- add a user's social life profile

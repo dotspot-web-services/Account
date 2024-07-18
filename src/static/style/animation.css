@@ -1,24 +1,26 @@
-
 /*Carousel Slide.....................................................................*/
 
 #frontpage .carousel-fade {
   overflow: hidden;
 }
 
-#frontpage .carousel-control-prev, #frontpage .carousel-control-next {
+#frontpage .carousel-control-prev,
+#frontpage .carousel-control-next {
   width: 10%;
 }
 @media (min-width: 1024px) {
-  #frontpage .carousel-control-prev, #frontpage .carousel-control-next {
+  #frontpage .carousel-control-prev,
+  #frontpage .carousel-control-next {
     width: 5%;
   }
 }
-#frontpage .carousel-control-next-icon, #frontpage .carousel-control-prev-icon {
+#frontpage .carousel-control-next-icon,
+#frontpage .carousel-control-prev-icon {
   background: none;
   font-size: 32px;
   line-height: 1;
 }
-#frontpage .btn-get-started{
+#frontpage .btn-get-started {
   font-weight: 500;
   font-size: 16px;
   letter-spacing: 1px;
@@ -29,21 +31,30 @@
   transition: 0.5s;
   margin: 10px;
   color: #fff;
-  background: rgba(11, 11, 97,0.5);
+  background: rgba(11, 11, 97, 0.5);
   /*background: rgba(40, 202, 102, 0.5);*/
 }
-#frontpage .btn-get-started:hover{
+#frontpage .btn-get-started:hover {
   background: #fff;
   color: hsl(145, 64%, 54%);
 }
 
-
 @keyframes slide__port {
-  20% {margin-left: 0px;}
-  40% {margin-left: -100%;}
-  60% {margin-left: -100%;}
-  70% {margin-left: -200%;}
-  90% {margin-left: -200%;}
+  20% {
+    margin-left: 0px;
+  }
+  40% {
+    margin-left: -100%;
+  }
+  60% {
+    margin-left: -100%;
+  }
+  70% {
+    margin-left: -200%;
+  }
+  90% {
+    margin-left: -200%;
+  }
 }
 @keyframes tonext {
   75% {
@@ -136,10 +147,10 @@
 }
 
 /*Slide navigatons...................*/
-.carousel{
+.carousel {
   position: relative;
 }
-.carousel-indicators{
+.carousel-indicators {
   bottom: 5px;
 }
 .carousel__viewport {
@@ -154,7 +165,7 @@
   scroll-snap-type: x mandatory;
   overflow: hidden;
 }
-.carousel__viewport__slide{
+.carousel__viewport__slide {
   position: relative;
   flex: 0 0 100%;
   width: 100%;
@@ -164,7 +175,7 @@
   width: 100%;
   margin-right: 0;
 }
-.carousel-caption{
+.carousel-caption {
   top: 0;
   bottom: 0;
   left: 0;
@@ -184,8 +195,8 @@
   background-clip: padding-box;
   border-top: 10px solid transparent;
   border-bottom: 10px solid transparent;
-  opacity: .5;
-  transition: opacity .6s ease;
+  opacity: 0.5;
+  transition: opacity 0.6s ease;
 }
 .carousel::before,
 .carousel::after,
@@ -210,7 +221,7 @@
 }
 .carousel::before,
 .carousel::after {
-  content: '';
+  content: "";
   z-index: 1;
   background-color: #fff;
   opacity: 0.5;
@@ -252,12 +263,11 @@
   font-size: 0;
   transition: transform 0.1s;
 }
-.carousel__navigation-button:active{
+.carousel__navigation-button:active {
   color: #fff;
   background-color: #fff;
 }
 /* slide navigation ends here .................. */
-
 
 /* lineup class and keyframes */
 @keyframes anim-lineUp {
@@ -278,7 +288,7 @@
   }
 }
 
-.line{
+.line {
   width: 100%;
   height: 4rem;
   border: 1px solid black;
@@ -289,18 +299,18 @@
   animation: 2s anim-lineUp ease-out;
 }
 
-
 /* text animation */
-.italic{
+.italic {
   font-style: italic !important;
   font-family: "tahoma", sans-serif;
   font-size: 11px;
   text-align: left;
   line-height: 15px;
-  text-shadow: 1px 0.5px #222324, /*2px 2px #222324,*/ 0.5px 1px #222324;
+  text-shadow:
+    1px 0.5px #222324,
+    /*2px 2px #222324,*/ 0.5px 1px #222324;
 }
-.animate-charcter-color
-{
+.animate-charcter-color {
   /*font: 0.8em/1.3em  'Public Sans', sans-serif;*/
   letter-spacing: 0.125em;
   text-transform: uppercase;

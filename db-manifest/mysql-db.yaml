@@ -1,0 +1,223 @@
+## @section MySQL common parameters
+##
+
+## Bitnami MySQL image
+## ref: https://hub.docker.com/r/bitnami/mysql/tags/
+## @param image.registry MySQL image registry
+## @param image.repository MySQL image repository
+## @param image.tag MySQL image tag (immutable tags are recommended)
+## @param image.digest MySQL image digest in the way sha256:aa....
+## Please note this parameter, if set, will override the tag
+## @param image.pullPolicy MySQL image pull policy
+## @param image.pullSecrets Specify docker-registry secret names as an array
+## @param image.debug Specify if debug logs should be enabled
+##
+---
+image:
+  tag: 8.0.34-debian-11-r75
+  # digest: ""
+  ##
+  ## Optionally specify an array of imagePullSecrets
+  ## (secrets must be manually created in the namespace)
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ## Example:
+  ## pullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  ## Set to true if you would like to see extra information on logs
+  ## It turns BASH and/or NAMI debugging in the image
+  ##
+  debug: true
+## @param architecture MySQL architecture (`standalone` or `replication`)
+##
+architecture: replication
+## MySQL Authentication parameters
+##
+auth:
+  ## @param auth.database Name for a custom database to create
+  ## ref:
+  ## https://github.com/bitnami/containers/tree/main/bitnami/mysql#creating-a-database-on-first-run
+  ##
+  database: AccountDb
+  ## @param auth.replicationUser MySQL replication user
+  ## ref:
+  ## https://github.com/bitnami/containers/tree/main/bitnami/mysql#setting-up-a-replication-cluster
+  ##
+  replicationUser: replicator
+  ## @param auth.existingSecret Use existing secret for password details.
+  ## The secret has to contain the keys
+  ## `mysql-root-password`, `mysql-replication-password` and `mysql-password`
+  ## NOTE: When it's set the auth.rootPassword, auth.password, auth.replicationPassword are ignored.
+  ##
+  existingSecret: aumqsct
+## @param initdbScripts Dictionary of initdb scripts
+## Specify dictionary of scripts to be run at first boot
+## Example:
+initdbScripts:
+  table.sql:
+    /DB/table\.sql
+    # !/bin/bash
+    # echo "Do something."
+##
+## @param initdbScriptsConfigMap ConfigMap with the initdb scripts (Note: Overrides `initdbScripts`)
+##
+## @param startdbScripts Dictionary of startdb scripts
+## Specify dictionary of scripts to be run every time the container is started
+## Example:
+## startdbScripts:
+##   my_start_script.sh: |
+##      #!/bin/bash
+##      echo "Do something."
+##
+## @param startdbScriptsConfigMap ConfigMap with the startdb scripts
+## (Note: Overrides `startdbScripts`)
+##
+# startdbScriptsConfigMap: ""
+
+## @section MySQL Primary parameters
+##
+
+primary:
+  ##
+  configuration: |-
+    [mysqld]
+    default_authentication_plugin=mysql_native_password
+    skip-name-resolve
+    explicit_defaults_for_timestamp
+    basedir=/opt/bitnami/mysql
+    plugin_dir=/opt/bitnami/mysql/lib/plugin
+    port=3306
+    socket=/opt/bitnami/mysql/tmp/mysql.sock
+    datadir=/bitnami/mysql/data
+    tmpdir=/opt/bitnami/mysql/tmp
+    max_allowed_packet=16M
+    bind-address=*
+    pid-file=/opt/bitnami/mysql/tmp/mysqld.pid
+    log-error=/opt/bitnami/mysql/logs/mysqld.log
+    character-set-server=UTF8
+    slow_query_log=0
+    long_query_time=10.0
+
+    [client]
+    port=3306
+    socket=/opt/bitnami/mysql/tmp/mysql.sock
+    default-character-set=UTF8
+    plugin_dir=/opt/bitnami/mysql/lib/plugin
+
+    [manager]
+    port=3306
+    socket=/opt/bitnami/mysql/tmp/mysql.sock
+    pid-file=/opt/bitnami/mysql/tmp/mysqld.pid
+  ##
+  persistence:
+    ##
+    size: 4Gi
+    ## @param primary.persistence.selector Selector to match an existing Persistent Volume
+    ## selector:
+    ##   matchLabels:
+    ##     app: my-app
+    ##
+    ##
+
+secondary:
+  replicaCount: 1
+  configuration: |-
+    [mysqld]
+    default_authentication_plugin=mysql_native_password
+    skip-name-resolve
+    explicit_defaults_for_timestamp
+    basedir=/opt/bitnami/mysql
+    plugin_dir=/opt/bitnami/mysql/lib/plugin
+    port=3306
+    socket=/opt/bitnami/mysql/tmp/mysql.sock
+    datadir=/bitnami/mysql/data
+    tmpdir=/opt/bitnami/mysql/tmp
+    max_allowed_packet=16M
+    bind-address=*
+    pid-file=/opt/bitnami/mysql/tmp/mysqld.pid
+    log-error=/opt/bitnami/mysql/logs/mysqld.log
+    character-set-server=UTF8
+    slow_query_log=0
+    long_query_time=10.0
+
+    [client]
+    port=3306
+    socket=/opt/bitnami/mysql/tmp/mysql.sock
+    default-character-set=UTF8
+    plugin_dir=/opt/bitnami/mysql/lib/plugin
+
+    [manager]
+    port=3306
+    socket=/opt/bitnami/mysql/tmp/mysql.sock
+    pid-file=/opt/bitnami/mysql/tmp/mysqld.pid
+  ## @param secondary.existingConfigmap Name of existing
+  ## ConfigMap with MySQL Secondary configuration.
+  ## NOTE: When it's set the 'configuration' parameter is ignored
+  ##
+  # existingConfigmap: ""
+  # resources:
+  ## Example:
+  ## limits:
+  ##    cpu: 250m
+  ##    memory: 256Mi
+  ##
+  ## Examples:
+  ## requests:
+  ##    cpu: 250m
+  ##    memory: 256Mi
+  ##
+  ##
+  persistence:
+    size: 4Gi
+  service:
+    ## @param secondary.service.type MySQL secondary Kubernetes service type
+    ##
+    type: ClusterIP
+    ## @param secondary.service.ports.mysql MySQL secondary Kubernetes service port
+    ##
+    ports:
+      mysql: 3306
+serviceAccount:
+  ## @param serviceAccount.create Enable the creation of a ServiceAccount for MySQL pods
+  ##
+  create: true
+  ## @param serviceAccount.name Name of the created ServiceAccount
+  ## If not set and create is true, a name is generated using the mysql.fullname template
+  ##
+  name: mysqlsrvc
+  ## @param serviceAccount.annotations Annotations for MySQL Service Account
+  ##
+  # annotations: {}
+  ## @param serviceAccount.automountServiceAccountToken
+  ## Automount service account token for the server service account
+  ##
+  automountServiceAccountToken: true
+
+##
+networkPolicy:
+  ## @param networkPolicy.enabled Enable creation of NetworkPolicy resources
+  ##
+  enabled: false
+  ## @param networkPolicy.allowExternal The Policy model to apply.
+  ## When set to false, only pods with the correct
+  ## client label will have network access to the port MySQL is listening
+  ## on. When true, MySQL will accept connections from any source
+  ## (with the correct destination port).
+  ##
+  allowExternal: true
+  ## @param networkPolicy.explicitNamespacesSelector A Kubernetes LabelSelector to
+  ## explicitly select namespaces from which ingress traffic could be allowed to MySQL
+  ## If explicitNamespacesSelector is missing or set to {}, only client Pods that are in the
+  ## networkPolicy's namespace and that match other criteria,
+  ## the ones that have the good label, can reach the DB.
+  ## But sometimes, we want the DB to be accessible to clients from other namespaces,
+  ## in this case, we can use this LabelSelector to select these namespaces,
+  ## note that the networkPolicy's namespace should also be explicitly added.
+  ##
+  ## Example:
+  ## explicitNamespacesSelector:
+  ##   matchLabels:
+  ##     role: frontend
+  ##   matchExpressions:
+  ##    - {key: role, operator: In, values: [frontend]}
+  ##

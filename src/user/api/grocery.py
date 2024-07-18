@@ -1,13 +1,15 @@
+"""user external activities resource"""
 
-from flask_restful import Resource
-from flask import request
 from bleach import clean
+from flask import request
+from flask_restful import Resource
 from pydantic import ValidationError
 
-from user.grocerySerializer import Object, CreateAward, CreateSoc
-from setting.decs import Auth as authenticate, Responders as response
 from setting.dbcon import DbSet as _DBSET
-from setting.helper import FileUp, convert_errors
+from setting.decs import Auth as authenticate
+from setting.decs import Responders as response
+from setting.helper import convert_errors
+from user.grocerySerializer import CreateAward, CreateSoc, Object
 
 
 class Awards(Resource):
@@ -20,7 +22,7 @@ class Awards(Resource):
 
     @response
     @authenticate
-    def post(self, usr):
+    def post(self, usr: int | str) -> tuple[int, dict[str, str] | str]:
         """Register user's award profile as many as user have
 
         Args:
@@ -32,30 +34,39 @@ class Awards(Resource):
             response_message(str): The response status message
         """
 
-        if isinstance(usr, tuple):
-            return usr
+        code: int = 422
+        data: str | dict[str, str] = ""
 
-        awd_data = request.get_json()
-        
+        if isinstance(usr, str):
+            return 401, usr
+
         try:
-           check = CreateAward(
-               plc=awd_data.get('plc'), act=awd_data.get('orgsatn'), ttl=awd_data.get('ttl'),
-                awdt=awd_data.get('awdt')
+            awd_data = request.get_json()
+            check = CreateAward(
+                plc=awd_data.get("locatn"),
+                act=awd_data.get("orgsatn"),
+                ttl=awd_data.get("ttl"),
+                awdt=awd_data.get("awdt"),
             )
         except ValidationError as err:
-            errors = convert_errors(err=err)
-            return 422, errors
+            data = convert_errors(err=err)
+            return code, data
 
         with self._db.get_db() as con:
             self._db._model.cr8_awd(
-                con, usr=usr, plc=clean(check.plc), acts=clean(check.acts), titl=clean(check.ttl), 
-                awdt=check.awdt
+                con,
+                usr=usr,
+                plc=clean(check.plc),
+                acts=clean(check.acts),
+                titl=clean(check.ttl),
+                awdt=check.awdt,
             )
-        return 201
+            code = 201
+        return code, data
 
     @response
     @authenticate
-    def get(self, usr):
+    def get(self, usr: int | str) -> tuple[int, dict[str, str] | str]:
         """Fetct a record of user's work profile
         Args:
             usr (int): the user from token authentication
@@ -66,27 +77,28 @@ class Awards(Resource):
             response_message(str): The response status message
         """
 
-        if isinstance(usr, tuple):
-            return usr
+        code: int = 404
+        data: str | dict[str, str] = ""
+
+        if isinstance(usr, str):
+            return 401, usr
 
         if not (qs := request.values):
             usr_data = usr
-        
+
         with self._db.get_db(data_level=1) as con:
+            code = 201
             if usr_data:
                 data = self._db._model.usr_awds(con, usr=usr)
-                return 201, data
-            elif id := qs.get("id"): 
-                data = self._db._model.awd(con, id=id)
-                return 201, data
+            elif data_id := qs.get("id"):
+                data = self._db._model.awd(con, data_id=data_id)
             elif srch := qs["srch"]:
                 data = self._db._model.awds(con, usr=usr, pg=srch)
-                return 201, data
-        return 401
-    
+        return code, data
+
     @response
     @authenticate
-    def put(self, usr):
+    def put(self, usr: int | str) -> tuple[int, dict[str, str] | str]:
         """Update a record of user's work profile
         Args:
             usr (int): the user from token authentication
@@ -96,36 +108,43 @@ class Awards(Resource):
             response_code(int): The status code of the response
             response_message(str): The response status message
         """
-        # get the post data
 
-        if isinstance(usr, tuple):
-            return usr
+        code: int = 422
+        data: str | dict[str, str] = ""
 
-        awd_data = request.get_json()
-        
+        if isinstance(usr, str):
+            return 401, usr
+
         try:
-           check = CreateAward(
-                plc=awd_data.get('plc'), act=awd_data.get('orgsatn'), ttl=awd_data.get('ttl'),
-                awdt=awd_data.get('dt'), awd=awd_data.get('award')
+            awd_data = request.get_json()
+            check = CreateAward(
+                plc=awd_data.get("locatn"),
+                act=awd_data.get("orgsatn"),
+                ttl=awd_data.get("ttl"),
+                awdt=awd_data.get("dt"),
+                awd=awd_data.get("award"),
             )
         except ValidationError as err:
-            errors = convert_errors(err=err)
-            return 422, errors
+            data = convert_errors(err=err)
+            return code, data
 
         with self._db.get_db() as con:
+            code = 401
             if self._db._model.awd_rit(con, usr=usr, awd=check.obj):
-                return 401
-            elif self._db._model.cr8_awd(
-                con, usr=usr, plc=clean(check.plc), acts=clean(check.acts), titl=clean(check.ttl), 
-                awdt=check.awdt
-            ):
-                return 201
-            else:
-                return 401
+                self._db._model.cr8_awd(
+                    con,
+                    usr=usr,
+                    plc=clean(check.plc),
+                    acts=clean(check.acts),
+                    titl=clean(check.ttl),
+                    awdt=check.awdt,
+                )
+                code = 201
+        return code, data
 
     @response
     @authenticate
-    def delete(self, usr):
+    def delete(self, usr: int | str) -> tuple[int, dict[str, str] | str]:
         """Delete a record of user's work profile
 
         Args:
@@ -137,26 +156,37 @@ class Awards(Resource):
             response_message(str): The response status message
         """
 
-        if isinstance(usr, tuple):
-            return usr
-        
+        code: int = 404
+        data: str | dict[str, str] = ""
+
+        if isinstance(usr, str):
+            return 401, usr
+
         awd = request.values
 
-        if not (check := Object(plc=awd.get('awd'))):
-            return 401
+        if not (check := Object(plc=awd.get("awd"))):
+            return code, data
         with self._db.get_db() as con:
+            code = 401
             if self._db._model.awd_rit(con, usr=usr, awd=check.obj):
-                return 401
-            elif self._db._model.del_awd(con, usr=usr, awd=check.obj):
-                return 201
-            else:
-                return 401
-    
-    def options(self):
-        return {'Allow' : ['POST', 'GET']}, 200, \
-        {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods' : '*',
-        'Access-Control-Allow-Headers': '*', 'cross-site-cookies': 'session', 
-        'samesite': 'Lax'}
+                self._db._model.del_awd(con, usr=usr, awd=check.obj)
+                code = 201
+        return code, data
+
+    def options(self) -> tuple[dict[str, list[str]], int, dict[str, str]]:
+        """cross site permissions"""
+
+        return (
+            {"Allow": ["POST", "GET"]},
+            200,
+            {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*",
+                "Access-Control-Allow-Headers": "*",
+                "cross-site-cookies": "session",
+                "samesite": "Lax",
+            },
+        )
 
 
 class Socs(Awards):
@@ -164,7 +194,7 @@ class Socs(Awards):
 
     @response
     @authenticate
-    def post(self, usr):
+    def post(self, usr: int | str) -> tuple[int, dict[str, str] | str] | int:
         """Register user's hubby profile
         Args:
             usr (int): the user from token authentication
@@ -175,26 +205,31 @@ class Socs(Awards):
             response_message(str): The response status message
         """
 
-        if isinstance(usr, tuple):
-            return usr
+        code: int = 422
+        data: str | dict[str, str] = ""
 
-        soc_data = request.get_json()
-        
+        if isinstance(usr, str):
+            return 401, usr
+
         try:
-           check = CreateSoc(titl=soc_data.get('titl'), typ=soc_data.get('typ'))
+            soc_data = request.get_json()
+            check = CreateSoc(titl=soc_data.get("titl"), typ=soc_data.get("typ"))
         except ValidationError as err:
-            errors = convert_errors(err=err)
-            return 422, errors
+            data = convert_errors(err=err)
+            return code, data
 
         with self._db.get_db() as con:
-            self._db._model.cr8_soc(con, usr=usr, typ=clean(check.typ), ttl=clean(check.title))
-        return 201
+            self._db._model.cr8_soc(
+                con, usr=usr, typ=clean(check.typ), ttl=clean(check.title)
+            )
+            code = 201
+        return code
 
     @response
     @authenticate
-    def get(self, usr):
+    def get(self, usr: int | str) -> tuple[int, dict[str, str] | str] | int:
         """Fetch a user's hubby profile
-    
+
         Args:
             usr (int): the user from token authentication
             token_status (Bool): The status of the token, if it is time bound
@@ -204,28 +239,28 @@ class Socs(Awards):
             response_message(str): The response status message
         """
 
-        if isinstance(usr, tuple):
-            return usr
+        code: int = 401
+        data: str | dict[str, str] = ""
+
+        if isinstance(usr, str):
+            return 401, usr
 
         if not (qs := request.values):
             usr_data = usr
-        
+
         with self._db.get_db(data_level=1) as con:
+            code = 201
             if usr_data:
                 data = self._db._model.usr_socs(con, usr=usr)
-                return 201, data
             elif srch := qs["srch"]:
                 data = self._db._model.socs(con, usr=usr, pg=srch)
-                return 201, data
-            if id := qs.get("id"): # takes user to social arena
+            if id := qs.get("id"):  # takes user to social arena
                 data = self._db._model.soc(con, usr=usr, id=id)
-                return 201, data
-            
-        return 401
+        return code, data
 
     @response
     @authenticate
-    def put(self, usr):
+    def put(self, usr: int | str) -> tuple[int, dict[str, str] | str] | int:
         """Update a user's hubby profile
 
         Args:
@@ -236,30 +271,32 @@ class Socs(Awards):
             response_code(int): The status code of the response
             response_message(str): The response status message
         """
-        # get the post data
 
-        if isinstance(usr, tuple):
-            return usr
+        code: int = 422
+        data: str | dict[str, str] = ""
 
-        soc_data = request.get_json()
-        
+        if isinstance(usr, str):
+            return 401, usr
+
         try:
-           check = CreateSoc(titl=soc_data.get('titl'), typ=soc_data.get('typ'))
+            soc_data = request.get_json()
+            check = CreateSoc(titl=soc_data.get("ttl"), typ=soc_data.get("typ"))
         except ValidationError as err:
-            errors = convert_errors(err=err)
-            return 422, errors
+            data = convert_errors(err=err)
+            return code, data
 
         with self._db.get_db() as con:
+            code = 401
             if self._db._model.soc_rit(con, usr=usr, awd=check.obj):
-                return 401
-            elif self._db._model.upd8_soc(con, usr=usr, typ=clean(check.typ), ttl=clean(check.title)):
-                return 201
-            else:
-                return 401
+                self._db._model.upd8_soc(
+                    con, usr=usr, typ=clean(check.typ), ttl=clean(check.title)
+                )
+                code = 201
+        return code
 
     @response
     @authenticate
-    def delete(self, usr):
+    def delete(self, usr: int | str) -> tuple[int, dict[str, str] | str]:
         """Delete a user's hubby profile
 
         Args:
@@ -271,20 +308,22 @@ class Socs(Awards):
             response_message(str): The response status message
         """
 
-        if isinstance(usr, tuple):
-            return usr
+        code: int = 422
+        data: str | dict[str, str] = ""
+
+        if isinstance(usr, str):
+            return 401, usr
 
         soc = request.values
 
-        if not (check := Object(obj=soc.get('soc'))):
-            return 401
+        if not (check := Object(obj=soc.get("soc"))):
+            return code, data
         with self._db.get_db() as con:
+            code = 401
             if self._db._model.soc_rit(con, usr=usr, soc=check.obj):
-                return 401
-            elif self._db._model.del_soc(con, usr=usr, soc=check.obj):
-                return 201
-            else:
-                return 401
+                self._db._model.del_soc(con, usr=usr, soc=check.obj)
+                code = 201
+        return code, data
 
 
 class Avatars(Socs):
@@ -294,36 +333,7 @@ class Avatars(Socs):
 
     @response
     @authenticate
-    def post(self, usr):
-        """Upload a user's profile picture
-
-        Args:
-            usr (int): the user from token authentication
-            token_status (Bool): The status of the token, if it is time bound
-
-        Returns:
-            response_code(int): The status code of the response
-            response_message(str): The response status message
-        """
-
-        if isinstance(usr, tuple):
-            return usr
-        
-        file = request.files
-        print(request.form)
-        print(request.args)
-
-        upload = FileUp(file=file["file"])
-        if not (check:= upload()):
-            return 401
-        print(check)
-        with self._db.get_db() as con:
-            self._db._model.cr8_pix(con, medfor=usr, file_path=check)
-        return 201
-
-    @response
-    @authenticate
-    def get(self, usr):
+    def get(self, usr: int | str) -> tuple[int, dict[str, str] | str]:
         """Fetch a user's profile picture
 
         Args:
@@ -335,27 +345,26 @@ class Avatars(Socs):
             response_message(str): The response status message
         """
 
-        if isinstance(usr, tuple):
-            return usr
+        code: int = 404
+        data: str | dict[str, str] = ""
+
+        if isinstance(usr, str):
+            return 401, usr
 
         if not (qs := request.values):
             usr_data = usr
-        else:
-            usr_data = None
-        
+
         with self._db.get_db(data_level=1) as con:
+            code = 201
             if usr_data:
-                print(usr_data)
                 data = self._db._model.pix(con, usr=usr_data)
-                return 201, data
-            elif id := qs.get("id"): 
+            elif id := qs.get("id"):
                 data = self._db._model.pixs(con, usr=usr, id=id)
-                return 201, data
-        return 401
+        return code, data
 
     @response
     @authenticate
-    def delete(self, usr):
+    def delete(self, usr: int | str) -> tuple[int, dict[str, str] | str]:
         """Delete a user's profile picture
 
         Args:
@@ -367,20 +376,22 @@ class Avatars(Socs):
             response_message(str): The response status message
         """
 
-        if isinstance(usr, tuple):
-            return usr
+        code: int = 404
+        data: str | dict[str, str] = ""
+
+        if isinstance(usr, str):
+            return 401, usr
 
         pix = request.values
 
-        if not (check := Object(obj=pix.get('pix'))):
-            return 401
-        with self._db.get_db() as con:
-            if self._db._model.pix_rit(con, usr=usr, pix=check.obj):
-                return 401
-            elif self._db._model.del_pix(con, usr=usr, pix=check.obj):
-                return 201
-            else:
-                return 401
+        if check := Object(obj=pix.get("pix")):
+            code = 401
+            with self._db.get_db() as con:
+                if self._db._model.pix_rit(con, usr=usr, pix=check.obj):
+                    self._db._model.del_pix(con, usr=usr, pix=check.obj)
+                code = 201
+        return code, data
+
 
 class Profiles(Socs):
     """
@@ -389,7 +400,7 @@ class Profiles(Socs):
 
     @response
     @authenticate
-    def get(self, usr):
+    def get(self, usr: int | str) -> tuple[int, dict[str, str] | str]:
         """_summary_
 
         Args:
@@ -401,25 +412,60 @@ class Profiles(Socs):
             response_message(str): The response status message
         """
 
-        if isinstance(usr, tuple):
-            return usr
+        code: int = 404
+        data: str | dict[str, str] = ""
+
+        if isinstance(usr, str):
+            return 401, usr
 
         if not (qs := request.values):
             usr_data = usr
-        
+
         with self._db.get_db(data_level=1) as con:
+            code = 201
             if usr_data:
                 data = self._db._model.usr_prof(con, usr=usr)
-                return 201, data
             elif srch := qs["init"]:
                 con = self._db.get_db()
                 data = self._db._model.prof_arenz(con, usr=usr)
-                return 201, data
             elif srch := qs["srch"]:
                 data = self._db._model.profs(con, usr=usr, pg=srch)
-                return 201, data
-            elif id := qs.get("id"): 
-                data = self._db._model.prof(con, usr=usr, id=id)
-                return 201, data       
-        return 401
-    
+            elif data_id := qs.get("id"):
+                data = self._db._model.prof(con, usr=usr, data_id=data_id)
+        return code, data
+
+    @response
+    @authenticate
+    def delete(self, usr: int | str) -> tuple[int, dict[str, str] | str]:
+        """_summary_
+
+        Args:
+            usr (int): the user from token authentication
+            token_status (Bool): The status of the token, if it is time bound
+
+        Returns:
+            response_code(int): The status code of the response
+            response_message(str): The response status message
+        """
+
+        code: int = 404
+        data: str | dict[str, str] = ""
+
+        if isinstance(usr, str):
+            return 401, usr
+
+        if not (qs := request.values):
+            usr_data = usr
+
+        with self._db.get_db(data_level=1) as con:
+            code = 201
+            if usr_data:
+                data = self._db._model.usr_prof(con, usr=usr)
+            elif srch := qs["init"]:
+                con = self._db.get_db()
+                data = self._db._model.prof_arenz(con, usr=usr)
+            elif srch := qs["srch"]:
+                data = self._db._model.profs(con, usr=usr, pg=srch)
+            elif data_id := qs.get("id"):
+                data = self._db._model.prof(con, usr=usr, data_id=data_id)
+        return code, data

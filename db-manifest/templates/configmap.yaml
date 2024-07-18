@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+name: “{{.Chart.Name}}-{{.Release.Name}}”
+  - |
+    {{include “chart.labels” . | indent 2}}
+    {{include “chart.annotations” . | indent 2}}
+data:
+DBHOST: {{.Values.global.initdb.postgresql.host | quote}}
+DBPORT: {{.Values.global.initdb.postgresql.port | quote}}
+UMDBNAME: {{.Values.global.initdb.postgresql.umdbname | quote}}

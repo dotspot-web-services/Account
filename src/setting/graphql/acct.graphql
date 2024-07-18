@@ -1,0 +1,115 @@
+schema {
+  query: Query
+}
+
+type User {
+  usrpt: ID!
+  username: String!
+  pix: String!
+}
+
+type Arena {
+  arnspt: ID!
+  arena: String!
+  pix: String!
+}
+
+type Account {
+  basid: ID!
+  usrba: User!
+  arnspt: Arena!
+  plc: String!
+  typ: Boolean!
+  dspln: String!
+  strtd: String!
+  endt: String!
+}
+
+type AccountResult {
+  success: Boolean!
+  errors: [String]
+  post: Account
+}
+
+type AccountResults {
+  success: Boolean!
+  errors: [String]
+  post: [Account]
+}
+
+type Log {
+  acmid: ID!
+  usr: User!
+  plc: String!
+  dspln: String!
+  acad: Boolean!
+  strtd: String!
+  endd: String!
+}
+
+type LogResult {
+  success: Boolean!
+  errors: [String]
+  post: Log
+}
+
+type LogResults {
+  success: Boolean!
+  errors: [String]
+  post: [Log]
+}
+
+type Reset {
+  acmid: ID!
+  usr: User!
+  plc: Arena!
+  dspln: String!
+  acad: Boolean!
+  strtd: String!
+  endd: String!
+}
+
+type ResetResult {
+  success: Boolean!
+  errors: [String]
+  post: Log
+}
+
+type ResetResults {
+  success: Boolean!
+  errors: [String]
+  post: [Log]
+}
+
+type Query {
+  listAccount: AccountResults!
+  getAccount(id: ID!): AccountResult!
+  listLog: LogResults!
+  getLog(id: ID!): LogResult!
+
+  listReset: ResetResults!
+  getReset(id: ID!): ResetResult!
+}
+
+type Mutation {
+  createAccount(
+    fname: String
+    cont: String!
+    dob: String!
+    typ: String!
+    sx: String!
+  ): AccountResult!
+  updateAccount(
+    fname: String
+    cont: String!
+    dob: String!
+    typ: String!
+    sx: String!
+  ): AccountResult!
+
+  createLogin(bacid: ID!, plc: String, dspln: String!): User
+  updateLogin(acmid: ID!, bacid: ID!, plc: String): User
+
+  logout(usr: ID!, cnt: String!, plc: String): User
+  resetAccount(wkpid: ID!, usrwkp: ID!, plc: String): User
+}

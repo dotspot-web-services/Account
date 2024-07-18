@@ -1,3 +1,4 @@
+---
 apiVersion: skaffold/v2beta22
 kind: Config
 metadata:
@@ -14,11 +15,11 @@ deploy:
     manifests:
       - account.deployment.yaml
       - account.service.yaml
-
-#portForward:
+# portForward:
 #  # Cloud Code automatically port forwards resources,
 #  # or users can define explicit port forwards here.
-#  # For more info, visit https://skaffold.dev/docs/pipeline-stages/port-forwarding/#UDPF
+#  # For more info, visit:
+# https://skaffold.dev/docs/pipeline-stages/port-forwarding/#UDPF
 #  - resourceType: service
 #    resourceName: accounts-intel
 #    port: 80

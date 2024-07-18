@@ -1,23 +1,48 @@
+# for the sake of docker compose
 
-# Use base Python image from Docker Hub
-FROM python:3.9
+FROM python:3.12-slim as build
 
+ENV PYROOT /pyroot
+ENV PYTHONUSERBASE $PYROOT
 
-# Set the working directory to /app
+RUN apt-get update && \
+    apt-get upgrade && \
+    apt-get install -y --no-install-recommends libldap2-dev libsasl2-dev libssl-dev && \
+    apt-get clean autoclean && rm -rf /var/lib/apt/* /var/cache/apt/* && \
+    apt-get autoremove --purge && \
+    pip install pipenv --no-cache-dir
+
 WORKDIR /app
 
-# copy the requirements file used for dependencies
-#COPY requirements.txt .
-RUN pip install --upgrade pip
+COPY Pipfile* .
 
-# Install any needed packages specified in requirements.txt
-#RUN pip install --trusted-host pypi.python.org -r requirements.txt
-RUN pip3 install --trusted-host pypi.python.org pipenv 
+RUN PIP_USER=1 PIP_IGNORE_INSTALLED=1 pipenv install --system --deploy --ignore-pipfile
 
-# Copy the rest of the working directory contents into the container at /app
-COPY . .
+### Final stage
+FROM python:3.12-slim as final
 
-RUN pipenv install --system --deploy --ignore-pipfile
+WORKDIR /app
 
-# Run app.py when the container launches
-ENTRYPOINT ["python", "src/accounts.py"]
+RUN set -ex \
+    # Create a non-root user
+    && addgroup --system --gid 1001 appgroup \
+    && adduser --system --uid 1001 --gid 1001 --no-create-home appuser \
+    # Upgrade the package index and install security upgrades
+    && apt-get update \
+    && apt-get upgrade -y
+
+COPY --from=build $PYROOT/lib/ $PYROOT/lib/
+COPY ./src src
+
+
+# Clean up
+RUN apt-get autoremove -y \
+    && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/*
+
+EXPOSE 8000
+
+ENTRYPOINT [cmd, "--ini", "src/setapp/wsgi.py"]
+
+# Set the user to run the application
+COPY --chown=app:app . /app

@@ -1,32 +1,38 @@
-form{
-    padding: 10px;
-    margin: 20px 5px;
-} 
-form > button, #reg input[type="submit"], #loga input[type="submit"]{
-    margin-bottom: 50px;
-    width: 30%;
-    padding: 8px;
-    color: #2ecc71;
-    margin-left: 50%;
-    transform: translateX(-50%);
-    font-weight: bold;
-    font-size: larger;
+form {
+  padding: 10px;
+  margin: 20px 5px;
 }
-form > .note{
-    text-align: center;
-    font-size: 1.15em;
-    font-weight: bold;
-    color: #068a3d;
-    padding: 10px;
-    margin-bottom: 15px;
+form > button,
+#reg input[type="submit"],
+#loga input[type="submit"] {
+  margin-bottom: 50px;
+  width: 30%;
+  padding: 8px;
+  color: #2ecc71;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  font-weight: bold;
+  font-size: larger;
 }
-button,input[type="button"],input[type="reset"],input[type="submit"]{
+form > .note {
+  text-align: center;
+  font-size: 1.15em;
+  font-weight: bold;
+  color: #068a3d;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+button,
+input[type="button"],
+input[type="reset"],
+input[type="submit"] {
   cursor: pointer;
   -webkit-appearance: button;
   overflow: visible;
 }
-button[disabled],input[disabled]{
-  cursor:default;
+button[disabled],
+input[disabled] {
+  cursor: default;
 }
 legend,
 fieldset,
@@ -56,7 +62,7 @@ textarea {
 input,
 select,
 textarea {
-  border: 1.5px solid #2ecc71;;
+  border: 1.5px solid #2ecc71;
   background-color: white;
   border-radius: 0.25rem;
 }
@@ -97,7 +103,7 @@ input[type="radio"]:checked {
   );
 }
 input[type="checkbox"]:checked {
-  background: url('images/check.svg') no-repeat center / 75% auto;
+  background: url("images/check.svg") no-repeat center / 75% auto;
 }
 label {
   display: inline-block;
@@ -118,13 +124,15 @@ select {
 input[type="checkbox"]:checked {
   background: url("images/check.svg") no-repeat center / 75% auto;
 }
-button, input[type="submit"] {
+button,
+input[type="submit"] {
   font: 1.25rem sans-serif;
   border-radius: 0.25rem;
   cursor: pointer;
   padding: 0.75rem 1.25rem;
 }
-button[type="submit"], input[type="submit"] {
+button[type="submit"],
+input[type="submit"] {
   background-color: hsl(151, 73%, 50%);
   color: white;
 }
@@ -146,16 +154,16 @@ textarea:focus {
 }
 button:focus {
   outline: none;
-  box-shadow: 0 0 0 2px #2ecc71;;
+  box-shadow: 0 0 0 2px #2ecc71;
 }
-.overlay{
-position: absolute;
-min-height: 100%;
-min-width: 100%;
-left: 0;
-top: 0;
-background: rgba(0, 0, 0, 0.6);
-};
+.overlay {
+  position: absolute;
+  min-height: 100%;
+  min-width: 100%;
+  left: 0;
+  top: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
 
 input[type="radio"],
 input[type="checkbox"] {
@@ -166,120 +174,122 @@ input[type="checkbox"] {
 input[type="radio"] {
   border-radius: 50%;
 }
-fieldset > div{
-    text-align: left;
-    font: 0.85em sans-serif;
-    padding-bottom: 4px;
+fieldset > div {
+  text-align: left;
+  font: 0.85em sans-serif;
+  padding-bottom: 4px;
 }
 
 /* ----LOGIN----*/
 
-#head-account form{
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
+#head-account form {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }
-#head-account fieldset{
-    border-color: inherit;
-    border-width: 0;
-    margin-left: 5px;
-    display: block;
+#head-account fieldset {
+  border-color: inherit;
+  border-width: 0;
+  margin-left: 5px;
+  display: block;
 }
-#head-account legend{
-    text-align: left;
-    text-transform: capitalize;
-    color: #e5e5e5fe;
-    font: 1.10rem sans-serif;
+#head-account legend {
+  text-align: left;
+  text-transform: capitalize;
+  color: #e5e5e5fe;
+  font: 1.1rem sans-serif;
 }
-#head-account input[type="text"], #head-account input[type="password"] {
-    width: 170px;
+#head-account input[type="text"],
+#head-account input[type="password"] {
+  width: 170px;
 }
-#head-account input[type="submit"]{
-    font: 1.15rem sans-serif;
-    padding: 0.35rem;
+#head-account input[type="submit"] {
+  font: 1.15rem sans-serif;
+  padding: 0.35rem;
 }
-input[type="password"] a{
-    color: #ff0000;
+input[type="password"] a {
+  color: #ff0000;
 }
-.log-in-btn{
-    position: relative;
-    height: 60px;
-    width: 60px;
-    border-radius: 50%;
-    background-color: #fff;
-    border: 2px bold green;
-} 
-.log-in-btn .icon-wrap{
-    margin-bottom: 8px;
+.log-in-btn {
+  position: relative;
+  height: 60px;
+  width: 60px;
+  border-radius: 50%;
+  background-color: #fff;
+  border: 2px bold green;
 }
-.log-in-btn .ico-txt{
-    margin-bottom: 9px;
-    color: #2ecc71;
+.log-in-btn .icon-wrap {
+  margin-bottom: 8px;
 }
-.icon-wrap{
-    height: 40px;
-    width: 40px;
-    cursor: pointer;
+.log-in-btn .ico-txt {
+  margin-bottom: 9px;
+  color: #2ecc71;
 }
-.icon-wrap img{
-    margin-left: 10px;
+.icon-wrap {
+  height: 40px;
+  width: 40px;
+  cursor: pointer;
 }
-.ico-txt{
-    font-size: 10px;
-    font-weight: bold;
-    line-height: 0;
-    letter-spacing: 0.5px;
+.icon-wrap img {
+  margin-left: 10px;
 }
-#head-account div > label{
-    text-align: left;
-    display: block;
-    color: #e5e5e5;
+.ico-txt {
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 0;
+  letter-spacing: 0.5px;
 }
-#head-account input[type="text"]{
-    margin-bottom: 20px;
+#head-account div > label {
+  text-align: left;
+  display: block;
+  color: #e5e5e5;
 }
-#head-account .inp-wrap, input[type="submit"]{
-    margin-left: 5px;
+#head-account input[type="text"] {
+  margin-bottom: 20px;
 }
-#head-account label{
+#head-account .inp-wrap,
+input[type="submit"] {
+  margin-left: 5px;
+}
+#head-account label {
   vertical-align: middle;
   margin-bottom: 0;
 }
 
 /*................SEARCH DOTS...........*/
-.srch{
-    position: absolute;
-    bottom: 10%;
-    left: 5%;
-    right: 5%;
+.srch {
+  position: absolute;
+  bottom: 10%;
+  left: 5%;
+  right: 5%;
 }
-.srch > div{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    max-width: 760px;
-    min-width: 400px;
-    position: relative;
+.srch > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 760px;
+  min-width: 400px;
+  position: relative;
 }
-#srcha{
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    border: #2ecc71 1.5px;
-    border-style: inset;
-    padding: unset;
-    margin: unset;
+#srcha {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  border: #2ecc71 1.5px;
+  border-style: inset;
+  padding: unset;
+  margin: unset;
 }
 #head-account button,
 #srcha input[type="search"],
-#srcha > button{
-    margin-bottom: 0;
-    padding: 8px;
-    margin-left: unset;
-    transform: none;
-    height: inherit;
+#srcha > button {
+  margin-bottom: 0;
+  padding: 8px;
+  margin-left: unset;
+  transform: none;
+  height: inherit;
 }
-#srcha > button{
-    width: 150px;
+#srcha > button {
+  width: 150px;
 }

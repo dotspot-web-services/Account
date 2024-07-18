@@ -1,65 +1,75 @@
-
-import re
 import datetime
-from pydantic import BaseModel, FilePath, validator, Field, EmailStr
-from typing import Optional, Union
+import re
+from typing import Union
+
+from pydantic import BaseModel, EmailStr, Field, FilePath, field_validator
 
 
 class Phone(BaseModel):
-    numb:str
+    numb: str
 
-    @validator('numb')
-    def checkcont(cls, numb):
-        phone = re.compile(r'''((\d{3}|\(\d{3}\))? (\s|-|\.)? (\d{3}) (\s|-|\.)? (\d{4}) (\s*(ext|x|ext.)\s*(\d{2,5}))?)''', re.VERBOSE )
-        if isinstance(numb, list):
-            for cone in numb:
+    @field_validator("numb")
+    @classmethod
+    def checkcont(cls, num: field_validator) -> ValueError | str:
+        phone = re.compile(
+            r"""((\d{3}|\(\d{3}\))? (\s|-|\.)? (\d{3})
+                (\s|-|\.)? (\d{4}) (\s*(ext|x|ext.)\s*(\d{2,5}))?
+            )""",
+            re.VERBOSE,
+        )
+        if isinstance(num, list):
+            for cone in num:
                 if phone.match(cone):
-                    return numb.title()
-        elif phone.match(numb):
-            return numb.title()
-        raise ValueError('this is not a phone number')
+                    return cone.title()
+        elif phone.match(num):
+            return num.title()
+        raise ValueError("this is not a phone number")
+
 
 class Contact(BaseModel):
     """check login data"""
-    
+
     cont: Union[EmailStr, Phone]
+
 
 class LogCheck(Contact):
     """check login data"""
 
     pwd: str
 
+
 class PwdCheck(LogCheck):
-    """Create a spotlight either from external source or internal source"""
+    """Check password"""
 
     vpwd: str
 
-    @validator('vpwd')
-    def check_pwd(cls, v, values):
-        if 'pwd' in values and v != values['pwd']:
-            raise ValueError('passwords do no match')
+    @field_validator("vpwd")
+    def check_pwd(cls, v: str, values: field_validator) -> ValueError | str:
+        if "pwd" in values and v != values["pwd"]:
+            raise ValueError("passwords do no match")
         return v
 
+
 class RegCheck(LogCheck):
-    """Create a spotlight either from external source or internal source"""
+    """Check registeration detail"""
 
     fname: str
-    dt = Field(default=datetime.datetime.now())
+    dt: datetime.datetime = Field(default=datetime.datetime.now())
 
-    @validator('fname')
-    def check_name(cls, fname):
-        if len(fname.split(' ')) < 2 > 3:
-            raise ValueError('this is not a full name')
-        return fname.title()
+    @field_validator("fname")
+    def check_name(cls, name: field_validator) -> ValueError | str:
+        if len(name.split(" ")) < 2 > 3:
+            raise ValueError("this is not a full name")
+        return name.title()
+
 
 class finalCheck(RegCheck):
     dob: datetime.date
-    pwd: Optional[str]
-    vpwd: Optional[str]
     sx: bool
 
+
 class Mailer(BaseModel):
-    """serialize notification of events from arenas and voice of people of interest"""
+    """Serialize email data"""
 
     subject: str
     content: str

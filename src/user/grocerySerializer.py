@@ -1,29 +1,29 @@
-
 import datetime
-
-from pydantic import BaseModel, FilePath, Field, PositiveInt
 from typing import Optional
+
+from pydantic import BaseModel, Field, PositiveInt
 
 
 class Object(BaseModel):
-
     obj: Optional[PositiveInt]
 
+
 class CreateAward(Object):
-    """Create a spotlight either from external source or internal source"""
+    """Check award data"""
 
     plc: str
     acts: str
     ttl: int
     awdt: datetime.date
-    dt = Field(default=datetime.datetime.now())
+    dt: datetime.datetime = Field(default=datetime.datetime.now())
 
 
 class CreateSoc(Object):
-    """serialize notification of events from arenas and voice of people of interest"""
+    """
+    serialize notification of events from arenas
+    voice of people of interest
+    """
 
     title: str
     typ: str
-    timestamp = Field(default=datetime.datetime.now())
-
-
+    timestamp: datetime.datetime = Field(default=datetime.datetime.now())

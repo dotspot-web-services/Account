@@ -1,10 +1,10 @@
-.slider{
+.slider {
   display: flex;
   justify-content: center;
   transition: all 0.3s;
   transform: translate(-0%);
 }
-.slider-wrapper{
+.slider-wrapper {
   position: relative;
   height: 100%;
 }
@@ -27,15 +27,15 @@
 
 /* SLIDER WIDTHS
   –––––––––––––––––––––––––––––––––––––––––––––––––– */
-  ._4sl-wt{
-    width: 500%;
-  }
+._4sl-wt {
+  width: 500%;
+}
 
-  ._3sl-wt{
-    width: 300%;
-  }
+._3sl-wt {
+  width: 300%;
+}
 
-.gradient-item{
+.gradient-item {
   display: flex;
   flex-basis: 100%;
   transition: flex-basis 1s ease;
@@ -65,32 +65,40 @@
   right: 10px;
 }
 
-[id="item1"]:checked ~ main .slider{
+[id="item1"]:checked ~ main .slider {
   transform: translate(-0%);
 }
-[id="item2"]:checked ~ main .slider{
+[id="item2"]:checked ~ main .slider {
   transform: translate(-33.333%);
 }
-[id="item3"]:checked ~ main .slider{
+[id="item3"]:checked ~ main .slider {
   transform: translate(-66.666%);
 }
 
-[id^="item"]:checked ~ .main .slider-wrapper .arrows [for^="item"]:hover::before,
-[id^="item"]:checked ~ .main .slider-wrapper .arrows [for^="item"]:hover::after {
+[id^="item"]:checked
+  ~ .main
+  .slider-wrapper
+  .arrows
+  [for^="item"]:hover::before,
+[id^="item"]:checked
+  ~ .main
+  .slider-wrapper
+  .arrows
+  [for^="item"]:hover::after {
   opacity: 1;
 }
 
 [id="item1"]:checked ~ main .slider-wrapper .arrows [for="item3"]::before,
 [id="item2"]:checked ~ main .slider-wrapper .arrows [for="item1"]::before,
-[id="item3"]:checked ~ main .slider-wrapper .arrows [for="item2"]::before{
-  content: '';
+[id="item3"]:checked ~ main .slider-wrapper .arrows [for="item2"]::before {
+  content: "";
   background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/162656/arrow-prev-slideshow.svg);
 }
 
 [id="image1"]:checked ~ main .slider-wrapper .arrows [for="item2"]::after,
 [id="image2"]:checked ~ main .slider-wrapper .arrows [for="item3"]::after,
 [id="image3"]:checked ~ main .slider-wrapper .arrows [for="item1"]::after {
-  content: '';
+  content: "";
   background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/162656/arrow-next-slideshow.svg);
 }
 

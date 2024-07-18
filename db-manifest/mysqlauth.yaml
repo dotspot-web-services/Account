@@ -1,0 +1,10 @@
+---
+apiVersion: "v1"
+kind: "Secret"
+metadata:
+  name: "aumqsct"
+  namespace: "registry"
+data:
+  mysql-root-password: "TzdvbUpER0M4VEFQcFUyWVR3aFYK"
+  mysql-replication-password: "TUxodm9rdVY2NHBybDVyZXdxRnkK"
+  mysql-password: "b1VNSmczUzBzeTdpTkJDMXdTRngK"
