@@ -1,0 +1,7 @@
+{
+  "default": true,
+  "MDO13": {
+    "line_length": 250,
+    "tables": false
+  }
+}

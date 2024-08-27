@@ -1,0 +1,39 @@
+{
+  "regAPI": [
+    {
+      "fname": "Nwanja mba",
+      "cont": "nwanjamba@gmail.com",
+      "dob": "1991-01-02",
+      "pwd": "naJesus4me",
+      "pwd2": "naJesus4me",
+      "typ": true,
+      "sx": true
+    },
+    {
+      "fname": "Ogbonnaya Aja",
+      "cont": "ogboaja@gmail.com",
+      "dob": "1990-01-02",
+      "pwd": "naJesus4me",
+      "pwd2": "naJesus4me",
+      "typ": true,
+      "sx": true
+    }
+  ],
+
+  "acadAPI": {
+    "displn": "science",
+    "plc": "F.G.C.",
+    "strt": "2003-01-02",
+    "end": "2009-01-02",
+    "acad": true
+  },
+
+  "awardAPI": {
+    "locatn": "okposi",
+    "orgsatn": "dotspot",
+    "ttl": "Mr Dedicated",
+    "awdt": "2024-04-05"
+  },
+
+  "base": { "typ": "cheers", "ttl": "cheers master" }
+}
