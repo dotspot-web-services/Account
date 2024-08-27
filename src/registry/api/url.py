@@ -14,7 +14,7 @@ from .registry import Login, Logout, Register
 registryBp = Blueprint("rega", __name__, "/registry")
 
 schema = make_executable_schema(
-    load_schema_from_path("src/setting/graphql/acct.graphql"),
+    load_schema_from_path("setting/graphql/acct.graphql"),
     [accs, logs, reset],
     snake_case_fallback_resolvers,
 )

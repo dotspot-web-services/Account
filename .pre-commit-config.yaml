@@ -41,11 +41,12 @@ repos:
   #        ["--ignore-unknown", "--no-error-on-unmatched-pattern", "!chart/**"]
 
   # Lint: Markdown
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.41.0
-    hooks:
-      - id: markdownlint
-        args: ["--fix"]
+  # - repo: https://github.com/igorshubovych/markdownlint-cli
+  #  rev: v0.41.0
+  #  hooks:
+  #    - id: markdownlint
+  #      args: ["--fix"]
+  # default: true
 
   # - repo: https://github.com/asottile/pyupgrade
   #   rev: v3.15.0

@@ -1,5 +1,6 @@
 # from functools import wraps
 # from re import S
+from os import getenv
 import bz2
 import redis
 from aiosql import from_path
@@ -7,7 +8,7 @@ from flask import g
 from mysql.connector import connect
 from pydantic import FilePath
 
-from .base.setting import CheckSet, Settings
+from base.setting import CheckSet
 
 # "postgres://QuestMasterDb:tFAtf6hCXdRhfWZ@questdb.cugmxolkmuvk.us-east-2.rds.amazonaws.com:5432/quest"
 
@@ -25,7 +26,7 @@ class DbSet(object):
         if self.sql is None:
             self.__sql = "src/setting/sql/acct.pgsql"
         else:
-            self.__sql = f"src/setting/sql/{self.sql}"
+            self.__sql = f"setting/sql/{self.sql}"
         self._model = from_path(sql_path=self.__sql, driver_adapter="psycopg2")
 
     _oda = CheckSet()
@@ -43,16 +44,21 @@ class DbSet(object):
             [type]: [description]
         """
 
-        db = getattr(g, "_database", None)
+        db = None  # getattr(g, "_database", None)
         if db is None:
-            db = g._database = connect(Settings().model_dump().get("pg_dsn"))
+            db = g._database = connect(
+                user="AccRemoteTest",
+                password="testDride4Safety",
+                host="http://0.0.0.0",
+                database="AccRemoteTestDb",
+            )  # Settings().model_dump().get("DEV_MySQL_URL"))
         if data_level == 1:
             db.cursor(dictionary=True)
         if data_level == 2:
             db.cursor(named_tuple=True)
         return db
 
-    def get_redis(self, db: int) -> redis.Redis[bytes]:
+    def get_redis(self, db: int) -> "redis.Redis[bytes]":
         """connect to redis database specifying the database number
 
         Args:
@@ -62,10 +68,12 @@ class DbSet(object):
            redis: connected redis database
         """
 
-        redis_url = Settings().model_dump().get("redis_env_dsn")
+        redis_url: str = getenv(
+            "DEV_REDIS", ""
+        )  # Settings().model_dump().get("DEV_REDIS")
         return redis.Redis(redis_url.format(db))
 
-    def compres(self, rds: redis.Redis[bytes], key: str, data: bytes) -> None:
+    def compres(self, rds: "redis.Redis[bytes]", key: str, data: bytes) -> None:
         # Set the compressed string as value
         rds.set(key, bz2.compress(data))
 
@@ -103,4 +111,7 @@ def setdb() -> None:
 
 
 if __name__ == "__main__":
-    pg: object = DbSet()
+    pg = DbSet()
+    con = pg.get_db()
+    con.execute("select * from users")
+    print(con.fetchall())

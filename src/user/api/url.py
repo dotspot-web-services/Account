@@ -11,10 +11,10 @@ from flask_restful import Api
 from .grocery import Avatars, Awards, Profiles, Socs
 from .queries import usrs
 
-groceBp = Blueprint("groca", __name__)
+groceBp = Blueprint("groca", __name__, url_prefix="usr")
 
 schema = make_executable_schema(
-    load_schema_from_path("src/setting/graphql/groce.graphql"),
+    load_schema_from_path("setting/graphql/groce.graphql"),
     usrs,
     snake_case_fallback_resolvers,
 )

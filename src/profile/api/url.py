@@ -15,7 +15,7 @@ profBp = Blueprint("profa", __name__, url_prefix="/profiler")
 profAPI = Api(app=profBp)
 
 schema = make_executable_schema(
-    load_schema_from_path("src/setting/graphql/prof.graphql"),
+    load_schema_from_path("setting/graphql/prof.graphql"),
     profs,
     snake_case_fallback_resolvers,
 )
@@ -54,7 +54,7 @@ def graphql_server() -> tuple[jsonify, int]:
     return jsonify(result), status_code
 
 
-profAPI.add_resource(Basic, "/Basics")
-profAPI.add_resource(Accademics, "/Accademics")
-profAPI.add_resource(Resacher, "/Researcher")
-profAPI.add_resource(Works, "/Works")
+profAPI.add_resource(Basic, "/basics")
+profAPI.add_resource(Accademics, "/accademics")
+profAPI.add_resource(Resacher, "/researcher")
+profAPI.add_resource(Works, "/works")

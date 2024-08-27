@@ -7,9 +7,8 @@ from flask_restful import Resource
 from pydantic import ValidationError
 
 from setting.dbcon import DbSet as _DBSET
-from setting.decs import Auth as authenticate
+from setting.decs import Auth as authenticate, Cache
 from setting.decs import Responders as response
-from setting.decs import quemsg
 from setting.helper import convert_errors
 
 from ..serializer import LogCheck, PwdCheck, RegCheck, finalCheck
@@ -22,6 +21,7 @@ class Register(Resource):
 
     def __init__(self) -> None:
         self._db = _DBSET()
+        self.cache = Cache()
 
     def __hash_pwd(self, pwd: str) -> bcrypt.hashpw:
         """User password encryption
@@ -74,7 +74,7 @@ class Register(Resource):
                 pwd=self.__hash_pwd(pwd=check.pwd).decode("utf8"),
                 cnt=check.cnt,
             ):
-                quemsg(
+                self.cache.quemsg(
                     user_data=check.model_dump(exclude={"pwd", "pwd2"}),
                     queue_name="newAccount",
                 )
@@ -130,7 +130,7 @@ class Register(Resource):
                 actv=True,
                 verfd=True,
             ):
-                quemsg(
+                self.cache.quemsg(
                     user_data=check.model_dump(exclude={"cont", "dob", "cntyp", "sx"}),
                     queue_name="createArena",
                 )
@@ -222,7 +222,7 @@ class Login(Register):
                     token = authenticate(func=usr.usr).encode_auth(days=3)
                     self._db._model.cr8_tkn(con, tkn=token)
                     # notification Email for new device login
-                    # quemsg(user_data=check, queue_name="account changes")
+                    # self.cache.quemsg(user_data=check, queue_name="account changes")
                     code = 200
                     data = {"token": str(token)}
                 if usr_data.user_status is False:
@@ -272,7 +272,7 @@ class Login(Register):
             if self._db._model.upd8_pwd(
                 con, usr=usr, pwd=self.__hash_pwd(pwd=check.pwd).decode("utf8")
             ):
-                quemsg(
+                self.cache.quemsg(
                     user_data=check.model_dump(exclude={"pwd", "vpwd"}),
                     queue_name="accountChanges",
                 )
@@ -396,7 +396,7 @@ class Reset(Logout):
 
         with self._db.get_db() as con:
             if cont := self._db._model.get_cont(con, cnt=contact):
-                quemsg(user_data={"cont": cont}, queue_name="resetAccount")
+                self.cache.quemsg(user_data={"cont": cont}, queue_name="resetAccount")
                 code = 201
         return code, data
 

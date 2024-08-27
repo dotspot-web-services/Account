@@ -30,10 +30,10 @@ services:
       - ./db-manifest/DB/table.sql:/docker-entrypoint-initdb.d/table.sql
       - acc-db:/var/lib/mysql
   api:
-    build: .
     env_file:
       - .env
-    command: python -u /src/accounts.py
+    build: .
+    # command: python -u ./src/accounts.py
     develop:
       watch:
         - action: sync
@@ -43,6 +43,8 @@ services:
           path: Pipfile.lock
     ports:
       - "5000:5000"
+    expose:
+      - "3000"
     volumes:
       - .:/app
     links:

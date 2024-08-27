@@ -1,5 +1,17 @@
 {
-  "host": "https://jsonplaceholder.typicode.com",
-  "getAPI": "/posts/1",
-  "postAPI": "/posts"
+  "host": "http://0.0.0.0:5000",
+  "regAPI": "/accounts/registry/reg",
+  "loginAPI": "/accounts/registry/login",
+  "logoutAPI": "/accounts/registry/logout",
+  "resetAPI": "/accounts/api/reset",
+
+  "baseAPI": "/profiles/profiler/basics",
+  "acadAPI": "/profiles/profiler/accademics",
+  "resrchAPI": "/profiles/profiler/resacher",
+  "workAPI": "/profiles/profiler/works",
+
+  "awardAPI": "/users/usr/awards",
+  "socialAPI": "/users/usr/socials",
+  "pictureAPI": "/users/usr/pictures",
+  "profileAPI": "/users/usr/profiles"
 }

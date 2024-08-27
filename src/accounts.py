@@ -10,16 +10,16 @@ accounts.register_blueprint(usrs, url_prefix="/users")
 
 
 if __name__ == "__main__":
-    import secrets
-    import string
-
-    alphabet = string.ascii_letters + string.digits
-    while True:
-        password = "".join(secrets.choice(alphabet) for i in range(20))
-        if (
-            any(c.islower() for c in password)
-            and any(c.isupper() for c in password)
-            and sum(c.isdigit() for c in password) >= 3
-        ):
-            break
-    accounts.run(host="0.0.0.0", threaded=True)
+    # import secrets
+    # import string
+    #
+    # alphabet = string.ascii_letters + string.digits
+    # while True:
+    #    password = "".join(secrets.choice(alphabet) for i in range(20))
+    #    if (
+    #        any(c.islower() for c in password)
+    #        and any(c.isupper() for c in password)
+    #        and sum(c.isdigit() for c in password) >= 3
+    #    ):
+    #        break
+    accounts.run(host="0.0.0.0", debug=True)

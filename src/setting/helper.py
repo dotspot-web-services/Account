@@ -1,9 +1,8 @@
 import os
-import shutil
 import smtplib
 from typing import Any
 
-import requests
+# import requests
 from dns.resolver import query
 from flask import flash, redirect, render_template, request, session, url_for
 from pydantic import FilePath, ValidationError
@@ -43,16 +42,14 @@ def downloader(url: str, directory: str, fname: FilePath | str = "") -> FilePath
     """
     if fname == "":
         fname = os.path.basename(url)
-    dl_path = os.path.join(directory, fname)
-    with requests.get(url, stream=True) as r:
-        with open(dl_path, "wb") as f:
-            shutil.copyfileobj(fsrc=r.raw, fdst=f)
-    return dl_path
+    # dl_path = os.path.join(directory, fname)
+    # with requests.get(url, stream=True) as r:
+    #    with open(dl_path, "wb") as f:
+    #        shutil.copyfileobj(fsrc=r.raw, fdst=f)
+    # return dl_path
 
 
-def handle_ui_response(
-    status: int, data: dict[str, str], flas: str = ""
-) -> render_template | redirect | None:
+def handle_ui_response(status: int, data: dict[str, str], flas: str = "") -> str | None:
     """_summary_
 
     Args:

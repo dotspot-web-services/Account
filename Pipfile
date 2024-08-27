@@ -23,6 +23,7 @@ uwsgi = "*"
 mysql-connector = "*"
 types-redis = "*"
 types-bleach = "*"
+markdown = "*"
 
 [dev-packages]
 ptvsd = "*"

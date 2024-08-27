@@ -7,7 +7,7 @@ class TestAwardMultiEnv:
     def test_award_get_200_ok(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -15,7 +15,7 @@ class TestAwardMultiEnv:
         get_api = env_config["awardAPI"]
         get_api_response_data = response_data["awardAPI"]
         # send request
-        response = requests.get(host + get_api, headers=header)
+        response = requests.get(host + get_api, headers=user_one)
         # assert
         assert response.status_code == 200
         assert response.json() == get_api_response_data
@@ -24,7 +24,7 @@ class TestAwardMultiEnv:
     def test_award_get_401_unauthorized(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -32,7 +32,7 @@ class TestAwardMultiEnv:
         get_api = env_config["awardAPI"]
         get_api_response_data = response_data["awardAPI"]
         # send request
-        response = requests.get(host + get_api, headers=header)
+        response = requests.get(host + get_api, headers=user_one)
         # assert
         assert response.status_code == 401
         assert response.json() == get_api_response_data
@@ -41,7 +41,7 @@ class TestAwardMultiEnv:
     def test_award_get_404_not_found(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -49,7 +49,7 @@ class TestAwardMultiEnv:
         get_api = env_config["awardAPI"]
         get_api_response_data = response_data["awardAPI"]
         # send request
-        response = requests.get(host + get_api, headers=header)
+        response = requests.get(host + get_api, headers=user_one)
         # assert
         assert response.status_code == 404
         assert response.json() == get_api_response_data
@@ -59,7 +59,7 @@ class TestAwardMultiEnv:
     def test_award_post_200_ok(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -70,7 +70,7 @@ class TestAwardMultiEnv:
         post_api_response_data = response_data["awardAPI"]
         # Your test code here
         response = requests.post(
-            host + post_api, json=post_api_request_data, headers=header
+            host + post_api, json=post_api_request_data, headers=user_one
         )
         print("verify the response status code")
         assert response.status_code == 201
@@ -81,7 +81,7 @@ class TestAwardMultiEnv:
     def test_award_post_401_unauthorized(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -92,7 +92,7 @@ class TestAwardMultiEnv:
         post_api_response_data = response_data["awardAPI"]
         # Your test code here
         response = requests.post(
-            host + post_api, json=post_api_request_data, headers=header
+            host + post_api, json=post_api_request_data, headers=user_one
         )
         print("verify the response status code")
         assert response.status_code == 401
@@ -103,7 +103,7 @@ class TestAwardMultiEnv:
     def test_award_post_422_data_error(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -114,7 +114,7 @@ class TestAwardMultiEnv:
         post_api_response_data = response_data["awardAPI"]
         # Your test code here
         response = requests.post(
-            host + post_api, json=post_api_request_data, headers=header
+            host + post_api, json=post_api_request_data, headers=user_one
         )
         print("verify the response status code")
         assert response.status_code == 422
@@ -125,7 +125,7 @@ class TestAwardMultiEnv:
     def test_award_post_404_not_found(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -136,7 +136,7 @@ class TestAwardMultiEnv:
         post_api_response_data = response_data["awardAPI"]
         # Your test code here
         response = requests.post(
-            host + post_api, json=post_api_request_data, headers=header
+            host + post_api, json=post_api_request_data, headers=user_one
         )
         print("verify the response status code")
         assert response.status_code == 404
@@ -148,7 +148,7 @@ class TestAwardMultiEnv:
     def test_award_put_200_ok(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -159,7 +159,7 @@ class TestAwardMultiEnv:
         post_api_response_data = response_data["awardAPI"]
         # Your test code here
         response = requests.post(
-            host + post_api, json=post_api_request_data, headers=header
+            host + post_api, json=post_api_request_data, headers=user_one
         )
         print("verify the response status code")
         assert response.status_code == 201
@@ -170,7 +170,7 @@ class TestAwardMultiEnv:
     def test_award_put_401_unauthorized(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -181,7 +181,7 @@ class TestAwardMultiEnv:
         post_api_response_data = response_data["awardAPI"]
         # Your test code here
         response = requests.post(
-            host + post_api, json=post_api_request_data, headers=header
+            host + post_api, json=post_api_request_data, headers=user_one
         )
         print("verify the response status code")
         assert response.status_code == 401
@@ -192,7 +192,7 @@ class TestAwardMultiEnv:
     def test_award_put_422_data_error(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -203,7 +203,7 @@ class TestAwardMultiEnv:
         post_api_response_data = response_data["awardAPI"]
         # Your test code here
         response = requests.post(
-            host + post_api, json=post_api_request_data, headers=header
+            host + post_api, json=post_api_request_data, headers=user_one
         )
         print("verify the response status code")
         assert response.status_code == 422
@@ -214,7 +214,7 @@ class TestAwardMultiEnv:
     def test_award_put_404_not_found(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -225,7 +225,7 @@ class TestAwardMultiEnv:
         post_api_response_data = response_data["awardAPI"]
         # Your test code here
         response = requests.post(
-            host + post_api, json=post_api_request_data, headers=header
+            host + post_api, json=post_api_request_data, headers=user_one
         )
         print("verify the response status code")
         assert response.status_code == 404
@@ -237,7 +237,7 @@ class TestAwardMultiEnv:
     def test_award_delte_200_ok(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -245,7 +245,7 @@ class TestAwardMultiEnv:
         get_api = env_config["awardAPI"]
         get_api_response_data = response_data["awardAPI"]
         # send request
-        response = requests.get(host + get_api, headers=header)
+        response = requests.get(host + get_api, headers=user_one)
         # assert
         assert response.status_code == 200
         assert response.json() == get_api_response_data
@@ -254,7 +254,7 @@ class TestAwardMultiEnv:
     def test_award_delete_401_unauthorized(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -262,7 +262,7 @@ class TestAwardMultiEnv:
         get_api = env_config["awardAPI"]
         get_api_response_data = response_data["awardAPI"]
         # send request
-        response = requests.get(host + get_api, headers=header)
+        response = requests.get(host + get_api, headers=user_one)
         # assert
         assert response.status_code == 401
         assert response.json() == get_api_response_data
@@ -271,7 +271,7 @@ class TestAwardMultiEnv:
     def test_award_delete_404_not_found(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -279,7 +279,7 @@ class TestAwardMultiEnv:
         get_api = env_config["awardAPI"]
         get_api_response_data = response_data["awardAPI"]
         # send request
-        response = requests.get(host + get_api, headers=header)
+        response = requests.get(host + get_api, headers=user_one)
         # assert
         assert response.status_code == 404
         assert response.json() == get_api_response_data
@@ -291,7 +291,7 @@ class TestSocialMultiEnv:
     def test_social_get_200_ok(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -299,7 +299,7 @@ class TestSocialMultiEnv:
         get_api = env_config["socialAPI"]
         get_api_response_data = response_data["socialAPI"]
         # send request
-        response = requests.get(host + get_api, headers=header)
+        response = requests.get(host + get_api, headers=user_one)
         # assert
         assert response.status_code == 200
         assert response.json() == get_api_response_data
@@ -308,7 +308,7 @@ class TestSocialMultiEnv:
     def test_social_get_401_unauthorized(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -316,7 +316,7 @@ class TestSocialMultiEnv:
         get_api = env_config["socialAPI"]
         get_api_response_data = response_data["socialAPI"]
         # send request
-        response = requests.get(host + get_api, headers=header)
+        response = requests.get(host + get_api, headers=user_one)
         # assert
         assert response.status_code == 401
         assert response.json() == get_api_response_data
@@ -325,7 +325,7 @@ class TestSocialMultiEnv:
     def test_social_get_404_not_found(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -333,7 +333,7 @@ class TestSocialMultiEnv:
         get_api = env_config["socialAPI"]
         get_api_response_data = response_data["socialAPI"]
         # send request
-        response = requests.get(host + get_api, headers=header)
+        response = requests.get(host + get_api, headers=user_one)
         # assert
         assert response.status_code == 404
         assert response.json() == get_api_response_data
@@ -343,7 +343,7 @@ class TestSocialMultiEnv:
     def test_social_post_200_ok(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -354,7 +354,7 @@ class TestSocialMultiEnv:
         post_api_response_data = response_data["socialAPI"]
         # Your test code here
         response = requests.post(
-            host + post_api, json=post_api_request_data, headers=header
+            host + post_api, json=post_api_request_data, headers=user_one
         )
         print("verify the response status code")
         assert response.status_code == 201
@@ -365,7 +365,7 @@ class TestSocialMultiEnv:
     def test_social_post_401_unauthorized(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -376,7 +376,7 @@ class TestSocialMultiEnv:
         post_api_response_data = response_data["socialAPI"]
         # Your test code here
         response = requests.post(
-            host + post_api, json=post_api_request_data, headers=header
+            host + post_api, json=post_api_request_data, headers=user_one
         )
         print("verify the response status code")
         assert response.status_code == 401
@@ -387,7 +387,7 @@ class TestSocialMultiEnv:
     def test_social_post_422_data_error(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -398,7 +398,7 @@ class TestSocialMultiEnv:
         post_api_response_data = response_data["socialAPI"]
         # Your test code here
         response = requests.post(
-            host + post_api, json=post_api_request_data, headers=header
+            host + post_api, json=post_api_request_data, headers=user_one
         )
         print("verify the response status code")
         assert response.status_code == 422
@@ -409,7 +409,7 @@ class TestSocialMultiEnv:
     def test_social_post_404_not_found(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -420,7 +420,7 @@ class TestSocialMultiEnv:
         post_api_response_data = response_data["socialAPI"]
         # Your test code here
         response = requests.post(
-            host + post_api, json=post_api_request_data, headers=header
+            host + post_api, json=post_api_request_data, headers=user_one
         )
         print("verify the response status code")
         assert response.status_code == 404
@@ -432,7 +432,7 @@ class TestSocialMultiEnv:
     def test_social_put_200_ok(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -443,7 +443,7 @@ class TestSocialMultiEnv:
         post_api_response_data = response_data["socialAPI"]
         # Your test code here
         response = requests.post(
-            host + post_api, json=post_api_request_data, headers=header
+            host + post_api, json=post_api_request_data, headers=user_one
         )
         print("verify the response status code")
         assert response.status_code == 201
@@ -454,7 +454,7 @@ class TestSocialMultiEnv:
     def test_social_put_401_unauthorized(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -465,7 +465,7 @@ class TestSocialMultiEnv:
         post_api_response_data = response_data["socialAPI"]
         # Your test code here
         response = requests.post(
-            host + post_api, json=post_api_request_data, headers=header
+            host + post_api, json=post_api_request_data, headers=user_one
         )
         print("verify the response status code")
         assert response.status_code == 401
@@ -476,7 +476,7 @@ class TestSocialMultiEnv:
     def test_social_put_422_data_error(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -487,7 +487,7 @@ class TestSocialMultiEnv:
         post_api_response_data = response_data["socialAPI"]
         # Your test code here
         response = requests.post(
-            host + post_api, json=post_api_request_data, headers=header
+            host + post_api, json=post_api_request_data, headers=user_one
         )
         print("verify the response status code")
         assert response.status_code == 422
@@ -498,7 +498,7 @@ class TestSocialMultiEnv:
     def test_social_put_404_not_found(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -509,7 +509,7 @@ class TestSocialMultiEnv:
         post_api_response_data = response_data["socialAPI"]
         # Your test code here
         response = requests.post(
-            host + post_api, json=post_api_request_data, headers=header
+            host + post_api, json=post_api_request_data, headers=user_one
         )
         print("verify the response status code")
         assert response.status_code == 404
@@ -521,7 +521,7 @@ class TestSocialMultiEnv:
     def test_social_delte_200_ok(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -529,7 +529,7 @@ class TestSocialMultiEnv:
         get_api = env_config["socialAPI"]
         get_api_response_data = response_data["socialAPI"]
         # send request
-        response = requests.get(host + get_api, headers=header)
+        response = requests.get(host + get_api, headers=user_one)
         # assert
         assert response.status_code == 200
         assert response.json() == get_api_response_data
@@ -538,7 +538,7 @@ class TestSocialMultiEnv:
     def test_social_delete_401_unauthorized(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -546,7 +546,7 @@ class TestSocialMultiEnv:
         get_api = env_config["socialAPI"]
         get_api_response_data = response_data["socialAPI"]
         # send request
-        response = requests.get(host + get_api, headers=header)
+        response = requests.get(host + get_api, headers=user_one)
         # assert
         assert response.status_code == 401
         assert response.json() == get_api_response_data
@@ -555,7 +555,7 @@ class TestSocialMultiEnv:
     def test_social_delete_404_not_found(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -563,7 +563,7 @@ class TestSocialMultiEnv:
         get_api = env_config["socialAPI"]
         get_api_response_data = response_data["socialAPI"]
         # send request
-        response = requests.get(host + get_api, headers=header)
+        response = requests.get(host + get_api, headers=user_one)
         # assert
         assert response.status_code == 404
         assert response.json() == get_api_response_data
@@ -575,7 +575,7 @@ class TestprofileMultiEnv:
     def test_profile_get_200_ok(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -583,7 +583,7 @@ class TestprofileMultiEnv:
         get_api = env_config["profileAPI"]
         get_api_response_data = response_data["profileAPI"]
         # send request
-        response = requests.get(host + get_api, headers=header)
+        response = requests.get(host + get_api, headers=user_one)
         # assert
         assert response.status_code == 200
         assert response.json() == get_api_response_data
@@ -592,7 +592,7 @@ class TestprofileMultiEnv:
     def test_profile_get_401_unauthorized(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -600,7 +600,7 @@ class TestprofileMultiEnv:
         get_api = env_config["profileAPI"]
         get_api_response_data = response_data["profileAPI"]
         # send request
-        response = requests.get(host + get_api, headers=header)
+        response = requests.get(host + get_api, headers=user_one)
         # assert
         assert response.status_code == 401
         assert response.json() == get_api_response_data
@@ -609,7 +609,7 @@ class TestprofileMultiEnv:
     def test_profile_get_404_not_found(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -617,7 +617,7 @@ class TestprofileMultiEnv:
         get_api = env_config["profileAPI"]
         get_api_response_data = response_data["profileAPI"]
         # send request
-        response = requests.get(host + get_api, headers=header)
+        response = requests.get(host + get_api, headers=user_one)
         # assert
         assert response.status_code == 404
         assert response.json() == get_api_response_data
@@ -627,7 +627,7 @@ class TestprofileMultiEnv:
     def test_profile_post_200_ok(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -638,7 +638,7 @@ class TestprofileMultiEnv:
         post_api_response_data = response_data["profileAPI"]
         # Your test code here
         response = requests.post(
-            host + post_api, json=post_api_request_data, headers=header
+            host + post_api, json=post_api_request_data, headers=user_one
         )
         print("verify the response status code")
         assert response.status_code == 201
@@ -649,7 +649,7 @@ class TestprofileMultiEnv:
     def test_profile_post_401_unauthorized(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -660,7 +660,7 @@ class TestprofileMultiEnv:
         post_api_response_data = response_data["profileAPI"]
         # Your test code here
         response = requests.post(
-            host + post_api, json=post_api_request_data, headers=header
+            host + post_api, json=post_api_request_data, headers=user_one
         )
         print("verify the response status code")
         assert response.status_code == 401
@@ -672,7 +672,7 @@ class TestprofileMultiEnv:
     def test_profile_delte_200_ok(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -680,7 +680,7 @@ class TestprofileMultiEnv:
         get_api = env_config["profileAPI"]
         get_api_response_data = response_data["profileAPI"]
         # send request
-        response = requests.get(host + get_api, headers=header)
+        response = requests.get(host + get_api, headers=user_one)
         # assert
         assert response.status_code == 200
         assert response.json() == get_api_response_data
@@ -689,7 +689,7 @@ class TestprofileMultiEnv:
     def test_profile_delete_401_unauthorized(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -697,7 +697,7 @@ class TestprofileMultiEnv:
         get_api = env_config["profileAPI"]
         get_api_response_data = response_data["profileAPI"]
         # send request
-        response = requests.get(host + get_api, headers=header)
+        response = requests.get(host + get_api, headers=user_one)
         # assert
         assert response.status_code == 401
         assert response.json() == get_api_response_data
@@ -706,7 +706,7 @@ class TestprofileMultiEnv:
     def test_profile_delete_404_not_found(
         self,
         env_config: dict[str, str],
-        header: dict[str, str],
+        user_one: dict[str, str],
         request_data: dict[str, str],
         response_data: dict[str, str],
     ) -> None:
@@ -714,7 +714,7 @@ class TestprofileMultiEnv:
         get_api = env_config["profileAPI"]
         get_api_response_data = response_data["profileAPI"]
         # send request
-        response = requests.get(host + get_api, headers=header)
+        response = requests.get(host + get_api, headers=user_one)
         # assert
         assert response.status_code == 404
         assert response.json() == get_api_response_data

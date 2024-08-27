@@ -147,7 +147,7 @@ class Auth(Auths):
 class Cache(Auths):
     def __init__(
         self,
-        func: Callable[[int | str | None], Any] | str,
+        func: Callable[[int | str | None], Any] | str = "",
     ) -> None:
         super().__init__(func)
         self.__cache = self.db.get_redis(db=10)
@@ -298,7 +298,7 @@ class Responders(Responder):
         instance: Callable[..., tuple[dict[str, Any], int]],
         owner: int,
     ) -> partial[tuple[dict[str, Any], int]]:
-        return partial(instance)
+        return partial(self, instance)
 
     def __call__(self, instance: int | str | None) -> tuple[dict[str, Any], int]:
         func = self._func(instance)
