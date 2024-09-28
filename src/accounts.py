@@ -1,28 +1,25 @@
+from profile.urls import profs
 
-from flask import Flask, g
+from registry.urls import accs
+from setapp.setApp import accounts
+from user.urls import usrs
 
-from registry.urls.url import registryBp
-from profile.urls.url import profBp
-from user.urls.url import groceBp
+accounts.register_blueprint(accs, url_prefix="/accounts")
+accounts.register_blueprint(profs, url_prefix="/profiles")
+accounts.register_blueprint(usrs, url_prefix="/users")
 
-
-def setAp(config):
-    accounts = Flask(__name__)
-
-    #spot.config.from_object(config)
-    accounts.config.from_pyfile(config)
-    accounts.register_blueprint(registryBp, url_prefix="/Registry")
-    accounts.register_blueprint(profBp, url_prefix="/Profiles")
-    accounts.register_blueprint(groceBp, url_prefix="/Groceries")
-
-    return accounts
 
 if __name__ == "__main__":
-    accounts = setAp('config.py')
-    accounts.run(debug=True)
-
-    @accounts.teardown_appcontext
-    def teardown_db(exception):
-        db = getattr(g, '_database', None)
-        if db is not None:
-            db.close()
+    # import secrets
+    # import string
+    #
+    # alphabet = string.ascii_letters + string.digits
+    # while True:
+    #    password = "".join(secrets.choice(alphabet) for i in range(20))
+    #    if (
+    #        any(c.islower() for c in password)
+    #        and any(c.isupper() for c in password)
+    #        and sum(c.isdigit() for c in password) >= 3
+    #    ):
+    #        break
+    accounts.run(host="0.0.0.0", debug=True)

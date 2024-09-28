@@ -1,6 +1,8 @@
+
 venv
 spot.pgsql
 views.pgsql
+table.pgsql
 static-root/
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
@@ -162,3 +164,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#files under consideration
+mutations.py

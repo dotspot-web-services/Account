@@ -1,0 +1,175 @@
+{% from 'components/macros.html' import profiler with context %}
+
+{% extends 'base.html' %}
+
+{% block head_title %}
+Profile
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+	<div class="container">
+		<div class="prof-pix-wrapa d-block">
+			<div class="prof-pix ">
+				{% if data.get('pix') %}
+				{% set usr = data.get('pix') %}
+				{% endif %}
+				{% set pix = usr or "/static/icon/avatar.png" %}
+				<img src="{{ pix }}" alt="" srcset="">
+			</div>
+		</div>
+
+		{% if g["usr"] %}
+		<div class="edit-pix">
+			<form action="/Profiles/Profile" method="POST" enctype="multipart/form-data">
+				<input type="file" name="med" id="med" required>
+				<button type="submit">upload</button>
+			</form>
+			<div><i class="fa fa-pencil" aria-hidden="true"></i>Edit</a></div>
+		</div>
+		{% endif %}
+	</div>
+
+	<div class="content-fluid">
+		<div class="content-fluid">
+			<summary>
+				{% set totals = data.get('totals') %}
+				{% if data.get('summary') %}
+				{% set sumry = data.get('summary') %}
+				{{sumry.get('name')}} optained high school education at {{sumry.get('plc')}} in line of
+				{{sumry.get('dspln')}}. Advanced the knowledge to acquire {{sumry.get('ttl')}}
+				in {{sumry.get('fld')}} at {{sumry.get('instn')}} and has worked at {{sumry.get('at')}}
+				as {{sumry.get('wrk')}}. {{sumry.get('name')}} has a total of {{totals.get('pubno')}}
+				publications with {{totals.get('awdno')}} awards
+				{% endif %}
+			</summary>
+		</div>
+
+		<div class="container-fluid">
+			<div class="portfolio">
+				<div class="menu-wrapper">
+					<div class="menu-item">
+						<a href="#">About</a>
+					</div>
+					<div class="menu-item">
+						<a href="#">Arena</a>
+					</div>
+					<div class="menu-item">
+						<a href="#">Awards</a>
+					</div>
+				</div>
+
+				<div class="slider-wrapper">
+					{% if data %}
+					<div class="container">
+						<div>
+							<h4>Accademics</h4>
+							<div> {{profiler(data.base, edit_url, add_link, "High School")}} </div>
+						</div>
+						{% if data.base %}
+						<div>
+							<h6>Advanced knowledge</h6>
+							{{profiler(data.academic, edit_url, add_link, "Advanced education")}}
+						</div>
+						{% endif %}
+						{% if data.academic %}
+						<div>
+							<h6>Institutions of research</h6>
+							{{profiler(data.reseacher, edit_url, add_link, "Research")}}
+						</div>
+						<div>
+							<h6>Publications</h6> 
+							{{profiler(data.publications, edit_url, add_link, "Publication")}}
+						</div>
+					{% endif %}
+					</div>
+					
+					<div>
+						<h4>Acquired skills</h4>
+							{{profiler(data.skill, edit_url, add_link, "Skill")}}
+					</div>
+
+					<div>
+						<h4>Recognitions</h4>
+							{{profiler(data.awards, edit_url, add_link, "Award")}}
+					</div>
+					<div>
+						<h4>Social life</h4>
+							{{profiler(data.socials, edit_url, add_link, "Social")}}
+					</div>
+					{% else %}
+					<div class="container center-h">
+						<h2>You don't have a profile yet</h2>
+						<a href="http://">Create profile</a>
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	#pgBackground{
+		padding: 2rem;
+		margin: 3rem;
+	}
+
+	.pix img{
+		width: 30rem;
+		height: 30rem;
+		border-radius: 50%;
+	}
+
+	#abt{
+		display: flex;
+	}
+
+.menu-wrapper > div {
+    margin-right: 20px;
+    font-size: 0.9em;
+    text-transform: uppercase;
+}
+
+#home-margin{
+    margin-right: 50px;
+}
+
+.menu-item{
+    height: 22px;
+    margin-top: 3px;
+    border-bottom: 1px solid transparent;
+    transition: border-bottom 0.5s;
+}
+
+.menu-item a{
+	color: #8a8a8a;
+	text-decoration: none;
+	transition: color 0.5s;
+}
+
+.menu-item:hover{
+	border-bottom: 1px solid black;
+}
+
+.menu-item a:hover{
+	color: black;
+}
+
+.active-link{
+	border-bottom: 1px solid black;
+}
+
+.active-link a{
+	color: black !important;
+}
+.menu-wrapper{
+	padding: 1.5rem;
+	padding-bottom: 0.2rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+</style>
+{% endblock %}

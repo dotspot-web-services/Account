@@ -1,0 +1,295 @@
+form {
+  padding: 10px;
+  margin: 20px 5px;
+}
+form > button,
+#reg input[type="submit"],
+#loga input[type="submit"] {
+  margin-bottom: 50px;
+  width: 30%;
+  padding: 8px;
+  color: #2ecc71;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  font-weight: bold;
+  font-size: larger;
+}
+form > .note {
+  text-align: center;
+  font-size: 1.15em;
+  font-weight: bold;
+  color: #068a3d;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+button,
+input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+  cursor: pointer;
+  -webkit-appearance: button;
+  overflow: visible;
+}
+button[disabled],
+input[disabled] {
+  cursor: default;
+}
+legend,
+fieldset,
+select,
+textarea,
+input,
+button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+button,
+fieldset,
+input,
+legend,
+select,
+textarea {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+input,
+select,
+textarea {
+  border: 1.5px solid #2ecc71;
+  background-color: white;
+  border-radius: 0.25rem;
+}
+input[type="search"],
+input[type="text"],
+input[type="password"],
+input[type="email"],
+select,
+textarea {
+  font: 1.15rem / 1.5 sans-serif;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+}
+textarea {
+  min-height: 10rem;
+}
+select {
+  background: url("images/down-arrow.svg") no-repeat center right 0.75rem;
+}
+input[type="radio"],
+input[type="checkbox"] {
+  height: 1.5em;
+  width: 1.5em;
+  vertical-align: middle;
+}
+input[type="radio"] {
+  border-radius: 50%;
+}
+input[type="radio"] {
+  border-radius: 50%;
+}
+input[type="radio"]:checked {
+  background-image: radial-gradient(
+    hsl(163, 73%, 50%) 40%,
+    transparent calc(40% + 1px)
+  );
+}
+input[type="checkbox"]:checked {
+  background: url("images/check.svg") no-repeat center / 75% auto;
+}
+label {
+  display: inline-block;
+  font: bold 1.2rem sans-serif;
+  margin-bottom: 0.5rem;
+}
+textarea {
+  min-height: 10rem;
+}
+input::placeholder,
+textarea::placeholder {
+  opacity: 1; /* Firefox */
+  color: hsl(161, 73%, 50%);
+}
+select {
+  background: url("images/down-arrow.svg") no-repeat center right 0.75rem;
+}
+input[type="checkbox"]:checked {
+  background: url("images/check.svg") no-repeat center / 75% auto;
+}
+button,
+input[type="submit"] {
+  font: 1.25rem sans-serif;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  padding: 0.75rem 1.25rem;
+}
+button[type="submit"],
+input[type="submit"] {
+  background-color: hsl(151, 73%, 50%);
+  color: white;
+}
+button[type="submit"]:hover {
+  background-color: hsl(166, 90%, 70%);
+}
+button[type="reset"] {
+  text-decoration: underline;
+  margin-left: 1rem;
+}
+button[type="reset"]:hover {
+  text-decoration: none;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px hsl(166, 90%, 70%);
+}
+button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #2ecc71;
+}
+.overlay {
+  position: absolute;
+  min-height: 100%;
+  min-width: 100%;
+  left: 0;
+  top: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+  height: 1.5em;
+  width: 1.5em;
+  vertical-align: middle;
+}
+input[type="radio"] {
+  border-radius: 50%;
+}
+fieldset > div {
+  text-align: left;
+  font: 0.85em sans-serif;
+  padding-bottom: 4px;
+}
+
+/* ----LOGIN----*/
+
+#head-account form {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+#head-account fieldset {
+  border-color: inherit;
+  border-width: 0;
+  margin-left: 5px;
+  display: block;
+}
+#head-account legend {
+  text-align: left;
+  text-transform: capitalize;
+  color: #e5e5e5fe;
+  font: 1.1rem sans-serif;
+}
+#head-account input[type="text"],
+#head-account input[type="password"] {
+  width: 170px;
+}
+#head-account input[type="submit"] {
+  font: 1.15rem sans-serif;
+  padding: 0.35rem;
+}
+input[type="password"] a {
+  color: #ff0000;
+}
+.log-in-btn {
+  position: relative;
+  height: 60px;
+  width: 60px;
+  border-radius: 50%;
+  background-color: #fff;
+  border: 2px bold green;
+}
+.log-in-btn .icon-wrap {
+  margin-bottom: 8px;
+}
+.log-in-btn .ico-txt {
+  margin-bottom: 9px;
+  color: #2ecc71;
+}
+.icon-wrap {
+  height: 40px;
+  width: 40px;
+  cursor: pointer;
+}
+.icon-wrap img {
+  margin-left: 10px;
+}
+.ico-txt {
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 0;
+  letter-spacing: 0.5px;
+}
+#head-account div > label {
+  text-align: left;
+  display: block;
+  color: #e5e5e5;
+}
+#head-account input[type="text"] {
+  margin-bottom: 20px;
+}
+#head-account .inp-wrap,
+input[type="submit"] {
+  margin-left: 5px;
+}
+#head-account label {
+  vertical-align: middle;
+  margin-bottom: 0;
+}
+
+/*................SEARCH DOTS...........*/
+.srch {
+  position: absolute;
+  bottom: 10%;
+  left: 5%;
+  right: 5%;
+}
+.srch > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 760px;
+  min-width: 400px;
+  position: relative;
+}
+#srcha {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  border: #2ecc71 1.5px;
+  border-style: inset;
+  padding: unset;
+  margin: unset;
+}
+#head-account button,
+#srcha input[type="search"],
+#srcha > button {
+  margin-bottom: 0;
+  padding: 8px;
+  margin-left: unset;
+  transform: none;
+  height: inherit;
+}
+#srcha > button {
+  width: 150px;
+}

@@ -1,0 +1,130 @@
+schema {
+  query: Query
+}
+
+type User {
+  usrpt: ID!
+  username: String!
+  pix: String!
+}
+
+type Arena {
+  arnspt: ID!
+  arena: String!
+  pix: String!
+}
+
+type Award {
+  awd: ID!
+  locatn: String
+  orgsatn: String!
+  ttl: String!
+  awdt: String!
+}
+
+type AwardResult {
+  success: Boolean!
+  errors: [String]
+  post: Award
+}
+
+type AwardResults {
+  success: Boolean!
+  errors: [String]
+  post: [Award]
+}
+
+type Social {
+  soc: ID!
+  ttl: String!
+  typ: String!
+  socdt: String!
+}
+
+type SocialResult {
+  success: Boolean!
+  errors: [String]
+  post: Social
+}
+
+type SocialResults {
+  success: Boolean!
+  errors: [String]
+  post: [Social]
+}
+
+type Visitor {
+  soc: ID!
+  ttl: String!
+  typ: String!
+  socdt: String!
+}
+
+type VisitorResult {
+  success: Boolean!
+  errors: [String]
+  post: Visitor
+}
+
+type VisitorResults {
+  success: Boolean!
+  errors: [String]
+  post: [Visitor]
+}
+
+type Profile {
+  usr: User!
+  arena: Arena!
+}
+
+type ProfileResult {
+  success: Boolean!
+  errors: [String]
+  post: Profile
+}
+
+type ProfileResults {
+  success: Boolean!
+  errors: [String]
+  post: [Profile]
+}
+
+type Query {
+  listAward: AwardResults!
+  getAward(id: ID!): AwardResult!
+
+  listSocial: SocialResults!
+  getSocial(id: ID!): SocialResult!
+
+  listVisitor: VisitorResults!
+  getVisitor(id: ID!): VisitorResult!
+
+  listProfile: ProfileResults!
+  getProfile(usr: ID!): ProfileResult!
+}
+
+type Mutation {
+  createAward(
+    locatn: String
+    orgsatn: String!
+    ttl: String!
+    awdt: String!
+  ): AwardResult!
+  updateAward(
+    awd: ID!
+    locatn: String
+    orgsatn: String!
+    ttl: String!
+    awdt: String!
+  ): AwardResult!
+  deleteAward(awd: ID): AwardResult!
+
+  createSocial(ttl: String, typ: String!): SocialResult!
+  updateSocial(soc: ID!, ttl: String, typ: String!): SocialResult!
+  deleteSocial(soc: ID): SocialResult!
+
+  createVisitor(usr: String, src: String!): VisitorResult!
+  updateVisitor(visit: ID!, ttl: String, typ: String!): VisitorResult!
+  blockVisitor(visit: ID): VisitorResult!
+  deleteProfile(visit: ID): User!
+}

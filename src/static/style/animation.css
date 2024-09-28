@@ -1,0 +1,339 @@
+/*Carousel Slide.....................................................................*/
+
+#frontpage .carousel-fade {
+  overflow: hidden;
+}
+
+#frontpage .carousel-control-prev,
+#frontpage .carousel-control-next {
+  width: 10%;
+}
+@media (min-width: 1024px) {
+  #frontpage .carousel-control-prev,
+  #frontpage .carousel-control-next {
+    width: 5%;
+  }
+}
+#frontpage .carousel-control-next-icon,
+#frontpage .carousel-control-prev-icon {
+  background: none;
+  font-size: 32px;
+  line-height: 1;
+}
+#frontpage .btn-get-started {
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 1px;
+  text-align: center;
+  display: inline-block;
+  padding: 8px 32px;
+  border-radius: 50px;
+  transition: 0.5s;
+  margin: 10px;
+  color: #fff;
+  background: rgba(11, 11, 97, 0.5);
+  /*background: rgba(40, 202, 102, 0.5);*/
+}
+#frontpage .btn-get-started:hover {
+  background: #fff;
+  color: hsl(145, 64%, 54%);
+}
+
+@keyframes slide__port {
+  20% {
+    margin-left: 0px;
+  }
+  40% {
+    margin-left: -100%;
+  }
+  60% {
+    margin-left: -100%;
+  }
+  70% {
+    margin-left: -200%;
+  }
+  90% {
+    margin-left: -200%;
+  }
+}
+@keyframes tonext {
+  75% {
+    left: 0;
+  }
+  95% {
+    left: 100%;
+  }
+  98% {
+    left: 100%;
+  }
+  99% {
+    left: 0;
+  }
+}
+@keyframes tostart {
+  75% {
+    left: 0;
+  }
+  95% {
+    left: -300%;
+  }
+  98% {
+    left: -300%;
+  }
+  99% {
+    left: 0;
+  }
+}
+@keyframes snap {
+  96% {
+    scroll-snap-align: center;
+  }
+  97% {
+    scroll-snap-align: none;
+  }
+  99% {
+    scroll-snap-align: none;
+  }
+  100% {
+    scroll-snap-align: center;
+  }
+}
+
+@-webkit-keyframes animate-loading {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes animate-loading {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.carousel__snapper {
+  position: relative;
+  top: 0;
+  left: 0;
+  height: 100%;
+  scroll-snap-align: center;
+}
+
+@media (hover: hover) {
+  .carousel__snapper {
+    animation-name: tonext, snap;
+    animation-timing-function: ease;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+  }
+  .carousel__viewport:last-child .carousel__snapper {
+    animation-name: tostart, snap;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .carousel__snapper {
+    animation-name: none;
+  }
+}
+.carousel:hover .carousel__snapper,
+.carousel:focus-within .carousel__snapper {
+  animation-name: none;
+}
+
+/*Slide navigatons...................*/
+.carousel {
+  position: relative;
+}
+.carousel-indicators {
+  bottom: 5px;
+}
+.carousel__viewport {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  overflow-x: scroll;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  overflow: hidden;
+}
+.carousel__viewport__slide {
+  position: relative;
+  flex: 0 0 100%;
+  width: 100%;
+}
+.carousel-item {
+  display: block;
+  width: 100%;
+  margin-right: 0;
+}
+.carousel-caption {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.carousel-indicators li {
+  box-sizing: content-box;
+  -ms-flex: 0 1 auto;
+  flex: 0 1 auto;
+  width: 30px;
+  height: 3px;
+  margin-right: 3px;
+  margin-left: 3px;
+  text-indent: -999px;
+  cursor: pointer;
+  background-color: #fff;
+  background-clip: padding-box;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  opacity: 0.5;
+  transition: opacity 0.6s ease;
+}
+.carousel::before,
+.carousel::after,
+.carousel__prev,
+.carousel__next {
+  position: absolute;
+  top: 50%;
+  width: 4rem;
+  height: 4rem;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  font-size: 0;
+  outline: 0;
+}
+.carousel::before,
+.carousel__prev {
+  left: -1rem;
+}
+.carousel::after,
+.carousel__next {
+  right: -1rem;
+}
+.carousel::before,
+.carousel::after {
+  content: "";
+  z-index: 1;
+  background-color: #fff;
+  opacity: 0.5;
+  background-size: 1.5rem 1.5rem;
+  background-repeat: no-repeat;
+  background-position: center center;
+  color: #333;
+  font-size: 2.5rem;
+  line-height: 4rem;
+  text-align: center;
+  pointer-events: none;
+}
+.carousel::before {
+  background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/162656/arrow-prev-slideshow.svg);
+}
+.carousel::after {
+  background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/162656/arrow-next-slideshow.svg);
+}
+.carousel__navigation {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  text-align: center;
+}
+.carousel__navigation-list,
+.carousel__navigation-item {
+  display: inline-block;
+}
+.carousel__navigation-button {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  background-color: #333;
+  background-clip: content-box;
+  border: 0.25rem solid transparent;
+  border-radius: 50%;
+  font-size: 0;
+  transition: transform 0.1s;
+}
+.carousel__navigation-button:active {
+  color: #fff;
+  background-color: #fff;
+}
+/* slide navigation ends here .................. */
+
+/* lineup class and keyframes */
+@keyframes anim-lineUp {
+  0% {
+    opacity: 0;
+    transform: translateY(80%);
+  }
+  20% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+}
+
+.line {
+  width: 100%;
+  height: 4rem;
+  border: 1px solid black;
+  padding: 0;
+  margin-bottom: 16px;
+}
+.lineUp {
+  animation: 2s anim-lineUp ease-out;
+}
+
+/* text animation */
+.italic {
+  font-style: italic !important;
+  font-family: "tahoma", sans-serif;
+  font-size: 11px;
+  text-align: left;
+  line-height: 15px;
+  text-shadow:
+    1px 0.5px #222324,
+    /*2px 2px #222324,*/ 0.5px 1px #222324;
+}
+.animate-charcter-color {
+  /*font: 0.8em/1.3em  'Public Sans', sans-serif;*/
+  letter-spacing: 0.125em;
+  text-transform: uppercase;
+  text-shadow: #0003;
+  background-image: linear-gradient(
+    -225deg,
+    #231557 0%,
+    #44107a 29%,
+    #ff1361 67%,
+    #fff800 100%
+  );
+  background-size: auto auto;
+  background-clip: border-box;
+  background-size: 150% auto;
+  color: #fff;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textclip 20s linear infinite;
+  display: inline-block;
+}
+@keyframes textclip {
+  to {
+    background-position: 200% center;
+  }
+}

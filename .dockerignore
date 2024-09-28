@@ -1,0 +1,8 @@
+.vscode
+.Dockerignore
+.readmes
+server
+.env
+.gitignore
+account.deployment.yaml
+account.service.yaml

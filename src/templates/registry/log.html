@@ -1,0 +1,8 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container bgPt rel__postn center__h">
+  <div id="loga">
+    {% with endpt=endpt, fields=fields %} {% include 'components/form.html' %}
+    {% endwith %}
+  </div>
+</div>
+{% endblock %}

@@ -1,27 +1,63 @@
+# for the sake of docker compose
 
-# Use base Python image from Docker Hub
-FROM python:3.9
+FROM python:3.12-alpine AS build
 
+ENV PYROOT /pyroot
+ENV PYTHONUSERBASE $PYROOT
 
-WORKDIR /app
+FROM build AS builder
 
-COPY . .
+RUN apk update && \
+    apk add --upgrade && apk add openldap-dev build-base linux-headers \
+    musl-dev fuse fuse-dev libffi-dev
+RUN pip install --upgrade pip && pip install pipenv --no-cache-dir
+#WORKDIR /app
 
-# Set the working directory to /app
-WORKDIR /app
+COPY Pipfile* .
 
-# copy the requirements file used for dependencies
-#COPY requirements.txt .
-RUN pip install --upgrade pip
+RUN PIP_USER=1 PIP_IGNORE_INSTALLED=1 pipenv install --system --deploy --ignore-pipfile
 
-# Install any needed packages specified in requirements.txt
-#RUN pip install --trusted-host pypi.python.org -r requirements.txt
-RUN pip3 install --trusted-host pypi.python.org pipenv 
+##cmd:pip3# Final stage
+FROM build
 
-# Copy the rest of the working directory contents into the container at /app
-COPY . .
+#WORKDIR /app
 
-RUN pipenv install --system --deploy --ignore-pipfile
+#RUN set -ex \
+#    # Create a non-root user
+#    && addgroup --system --gid 1001 appgroup \
+#    && adduser --system --uid 1001 --gid 1001 --no-create-home appuser \
+#    # Upgrade the package index and install security upgrades
+#    && apt-get update \
+#    && apt-get upgrade -y
 
-# Run app.py when the container launches
-ENTRYPOINT ["python", "src/accounts.py"]
+COPY --from=builder $PYROOT/lib/ $PYROOT/lib/
+COPY --from=builder $PYROOT/bin/ $PYROOT/bin/
+
+ENV PATH="$PYROOT/bin:$PATH"
+
+# Create and switch to a new user
+RUN addgroup -S accgroup && adduser -S accuser -G accgroup
+
+# Tell docker that all future commands should run as the appuser user
+WORKDIR /home/accapp
+USER accuser
+COPY ./src .
+COPY README.md .
+
+# Clean up
+#RUN apt-get autoremove -y \
+#    && apt-get clean -y \
+#    && rm -rf /var/lib/apt/lists/*
+
+EXPOSE 8000
+#CMD [ "uwsgi", "--socket", "0.0.0.0:3031", \
+#               "--uid", "uwsgi", \
+#               "--protocol", "uwsgi", \
+#               "--wsgi", "wsgi:account" ]
+#
+CMD ["uwsgi", "--ini", "wsgi.ini"]
+
+#CMD ["--ini", "src/setapp/wsgi.py"]
+
+# Set the user to run the application
+COPY --chown=app:app . /accapp

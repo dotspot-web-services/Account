@@ -1,0 +1,106 @@
+
+{% from 'components/macros.html' import report %}
+<article class=""> 
+    <header class="row align-content-space-between mb-3">
+        <div class="text-left">
+            <h4>
+                <a href="#">
+                    {{spot.titl}}
+                </a>
+            </h4>
+            <div class="stats">
+                <span>
+                    <small>
+                        <i class="fa fa-at" aria-hidden="true"></i><a href="#">{{spot.affair}}</a>
+                    </small>
+                </span>
+                <span>
+                    <small>
+                        {% if spot.voice %} 
+                        <i class="fa fa-podcast" aria-hidden="true"></i>
+                        {% else %}
+                        <i class="fa fa-podcast" aria-hidden="true"></i></i>
+                        <a href="#"> {{spot.arena}} </a>
+                        {% endif %}
+                    </small>
+                </span>
+                <span disabled="disabled" class="fsm">
+                    <small></small>
+                </span>
+                <span>
+                    <small> :: <a href="#"> 23 </a></small>
+                </span>
+            </div>            
+        </div>
+        {{ report(reports, spot.id, spot.arena) }}
+    </header> 
+    <div class="content">
+        <figure>
+            <div class="media">
+                <video class="tmp" controls>
+                    <source src="/static/media/vidtest.mp4" type="video/mp4">
+                </video>
+            </div>
+        </figure>
+        <section>
+            <div class="text-left">
+                <p> {{spot.detail}} </p>
+            </div>
+        </section>
+    </div>
+    <aside>
+        <div id="stats" class="spcflx">
+            <span class="stats">
+                <a href="#">
+                    <small>23 <i class="bi bi-quote"></i></small> 
+                </a>
+            </span>
+            
+            <span class="stats">
+                <a href="#">
+                    <small>23 <i class="fa fa-comments-o" aria-hidden="true"></i></small> 
+                </a>
+            </span>
+            
+            <span class="stats">
+                <a href="#">
+                    <small>23<i class="bi bi-eye"></i></small>
+                </a>
+            </span>  
+        </div>
+    </aside>
+    <footer><div class="wrapa">
+        <div id="social" class="spcflx">
+            <span class="stat_actn">
+                <button disabled="disabled" class="btn btn-outline-primary btn-sm">
+                    <a href="#">
+                        {% if spot.voice %}
+                        <i class="bi bi-star"> <small>Share</small></i>
+                        {% else %}
+                        <i class="fa fa-hand-rock-o" aria-hidden="true"> <small>Agree</small></i>
+                        {% endif %}<!--star denotes interest and fist denotes agreement-->
+                    </a>
+                </button>
+            </span>    
+            <span class="stat_actn">
+                <button disabled="disabled" class="btn btn-outline-primary btn-sm">
+                    <a href="#">
+                        <i class="fa fa-comment-o" aria-hidden="true"> <small>Comment</small></i>
+                    </a>
+                </button>
+            </span>    
+            <span class="stat_actn">
+                <button disabled="disabled" class="btn btn-outline-primary btn-sm">
+                    <a href="#">
+                        {% if spot.voice %}
+                        <i class="bi bi-share"> <small>Share</small></i>
+                        {% else %}
+                        <i class="bi bi-box-arrow-in-left"> <small>Refer</small></i>
+                        {% endif %}
+                    </a>
+                </button>
+            </span>
+        </div>
+        <div id="socontent"></div>  
+    </div></footer>  
+</article>

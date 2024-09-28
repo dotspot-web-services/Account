@@ -1,0 +1,15 @@
+{% from 'components/macros.html' import note with context %} {% extends
+'base.html' %} {% block head_title %} Profile {% endblock %} {% block content %}
+
+<div class="containter">
+  <p>{{ note(desc) }}</p>
+
+  <div class="prof-form">{% include "components/form.html"%}</div>
+</div>
+{% if session["create_profile"] and skip %}
+<div class="gap">
+  <a href="{{ skip }}" class="nav-link float-right" id="right-btn">
+    <button class="btn btn-outline-success my-2 my-sm-0">Skip</button>
+  </a>
+</div>
+{% endif %} {% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="container bgPt rel__postn center__h">
+  {% if fields == "contact" %}
+  <h1>Account Recovery</h1>
+  <p>To recover an account you have to fill the form below</p>
+  {% elif fields == "recover" %}
+  <p>Fill in your new password</p>
+  {% elif note %}
+  <p>{{ note }}</p>
+  {% endif %} {% with endpt=endpt, fields=fields %} {% include
+  'components/form.html' %} {% endwith %}
+</div>
+
+{% endblock %}

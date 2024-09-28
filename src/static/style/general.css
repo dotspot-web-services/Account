@@ -1,0 +1,403 @@
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+nav,
+section,
+summary {
+  display: block;
+}
+img {
+  border: 0;
+  -ms-interpolation-mode: bicubic;
+}
+svg:not(:root) {
+  overflow: hidden;
+}
+figure,
+form {
+  margin: 0;
+}
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  text-rendering: optimizeLegibility;
+}
+
+*::-webkit-scrollbar {
+  width: 0;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: transparent;
+  border: none;
+}
+html,
+button,
+input,
+select,
+textarea {
+  font-family: sans-serif;
+}
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+audio,
+canvas,
+video,
+img {
+  display: inline-block;
+  width: inherit;
+  height: inherit;
+}
+body {
+  font:
+    14px/22px "Quattrocento Sans",
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
+  font-weight: 300;
+  margin: 0px;
+  padding: 0px 0 20px 0px;
+}
+.container-fluid {
+  height: 100vh;
+}
+.container {
+  width: 700px;
+  height: inherit;
+}
+a {
+  transition: all 0.3s ease 0s;
+  text-decoration: none;
+}
+ul {
+  list-style: none;
+}
+ol,
+li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+p {
+  padding: 5px;
+  line-height: 22px;
+  letter-spacing: normal;
+  word-spacing: normal;
+  font-size: 1.15em;
+  font:
+    1em/1.5 "Public Sans",
+    sans-serif;
+}
+strong,
+h1,
+h2 {
+  padding: 5px;
+  color: #2ecc71;
+  width: inherit;
+}
+input {
+  height: 30px;
+}
+#moto,
+.italisize {
+  font:
+    italic 0.6em/1.2em "Public Sans",
+    sans-serif;
+}
+.grad__bkground {
+  background: linear-gradient(141deg, #a1bebc 0%, #8b999b 51%, #40535a 75%);
+}
+h2 > a {
+  display: block;
+  max-width: 100%;
+  line-height: 1;
+  color: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rel__postn {
+  position: relative;
+}
+.abs__postn {
+  position: absolute;
+}
+
+.bgPt {
+  padding-top: 75px;
+}
+._10padTp {
+  padding-top: 10px;
+}
+.sm__pad {
+  padding: 5px;
+}
+.mTop {
+  margin-top: 5px;
+}
+.float__left {
+  float: left;
+}
+.dflex {
+  display: inline-flex;
+}
+.clearfix {
+  content: "";
+  clear: both;
+}
+.sticky__postn {
+  position: sticky;
+  font-weight: bolder;
+}
+.center__v {
+  left: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.center__h {
+  left: 50%;
+  transform: translate(-50%);
+}
+
+.view__more {
+  margin-left: 50%;
+  transform: translateX(-50%);
+  -webkit-font-smoothing: antialised;
+  -moz-osz-font-smoothng: grayscale;
+  font-size: medium;
+  color: #068a3d;
+  cursor: pointer;
+  word-break: keep-all;
+}
+
+/* NAV HEADER
+  –––––––––––––––––––––––––––––––––––––––––––––––––– */
+#pgHeader {
+  padding: 10px 20px 5px 20px;
+  margin: 0;
+  position: fixed;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-content: center;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  transition: 0.3s 0.3s;
+  text-align: center;
+  background: url(/static/media/hdbckgr.jpg) #2ecc71;
+  box-shadow: 1px 0px 2px rgba(16, 15, 65, 0.9);
+  z-index: 99;
+  -webkit-font-smoothing: antialiased;
+  max-height: 70px;
+}
+
+#brand-name a {
+  color: #2ecc71;
+  text-decoration: none;
+  transition: color 0.5s;
+}
+
+#brand-name {
+  background-color: #2ecc71;
+  right: 2rem;
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #2ecc71;
+}
+#brand-name > a {
+  color: #fff;
+  margin-top: 3px;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.menu-wrapper > div {
+  margin-right: 20px;
+  font-size: 0.9em;
+  text-transform: uppercase;
+}
+#home-margin {
+  margin-right: 50px;
+}
+.menu-item {
+  height: 22px;
+  border-bottom: 1px solid transparent;
+  transition: border-bottom 0.5s;
+}
+.menu-item a {
+  color: #fff;
+  text-decoration: none;
+  transition: color 0.5s;
+}
+.menu-item a:hover {
+  border-bottom: 1px solid #8a8a8a;
+  color: #8a8a8a;
+  transition: all 0.3s ease 30ms;
+}
+.active-link a {
+  color: #8a8a8a !important;
+}
+
+#head-account {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#logo {
+  font-family: Georgia;
+  font-weight: bold;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+#logo a {
+  text-decoration: none;
+  font-size: 35px;
+  color: #fff;
+}
+
+.logo-hom-wrapa .nav-item {
+  margin-left: 20px;
+}
+.nav-item {
+  font-size: 1.48em;
+  letter-spacing: 0.5px;
+  line-height: 30px;
+  margin: 10px 10px 10px 25px;
+}
+.nav-item a,
+.info a {
+  color: #fbfbfb;
+}
+.info {
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  text-align: left;
+  cursor: pointer;
+  margin-left: 5px;
+}
+.moto {
+  padding: 1.5rem;
+  color: #2ecc71;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 25px;
+  word-spacing: -1px;
+}
+._5pxML {
+  margin-left: 5px;
+}
+.container {
+  max-width: 600px;
+}
+
+/* MAIN BODY
+  ––––––––––––––––––––––––––––––––––––––––––––––––––
+*/
+
+/* LIMELIGHT
+  ––––––––––––––––––––––––––––––––––––––––––––––––––
+*/
+#limlit .report {
+  position: absolute;
+  top: 0px;
+  right: 2px;
+}
+#limlit {
+  height: 270px;
+  max-width: 650px;
+  min-width: 500px;
+  margin: 0;
+  padding: 0;
+  border-style: inset;
+}
+#limlit .carousel-inner,
+#limlit .carousel {
+  height: inherit;
+}
+#limlit .usr_column {
+  box-sizing: border-box;
+  width: 28%;
+  height: 96%;
+  padding: 10px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+#limlit .spot {
+  width: 70%;
+  padding: 10px;
+  border-radius: 10px;
+  position: relative;
+  height: 96%;
+  overflow: hidden;
+}
+.limelitImg {
+  height: 100px;
+  width: 100%;
+  border-radius: 100%;
+}
+#limlit .ttl {
+  align-self: end;
+  text-align: right;
+  align-items: flex-end;
+}
+#limlit .media {
+  margin: 5px;
+  width: 100%;
+  height: 120px;
+}
+#limlit footer {
+  margin: 0;
+  padding-top: 5px;
+}
+h6 {
+  margin: 0px;
+}
+#limlit .content {
+  max-height: 300px;
+}
+#limlit section {
+  min-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+}
+#limlit article {
+  max-width: 500px;
+}
+#stats,
+#social {
+  display: flex;
+  justify-content: space-between;
+}
+@media print, screen and (min-width: 600px) and (max-width: 650px) {
+  #limlit {
+    max-width: 100%;
+  }
+}

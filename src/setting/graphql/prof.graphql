@@ -1,0 +1,188 @@
+schema {
+  query: Query
+}
+
+type User {
+  usrpt: ID!
+  username: String!
+  pix: String!
+}
+
+type Arena {
+  arnspt: ID!
+  arena: String!
+  pix: String!
+}
+
+type Base {
+  basid: ID!
+  usrba: User!
+  arnspt: Arena!
+  plc: String!
+  typ: Boolean!
+  dspln: String!
+  strtd: String!
+  endt: String!
+}
+
+type BaseResult {
+  success: Boolean!
+  errors: [String]
+  post: Base
+}
+
+type BaseResults {
+  success: Boolean!
+  errors: [String]
+  post: [Base]
+}
+
+type Accademic {
+  acmid: ID!
+  bacid: Base!
+  plc: String!
+  dspln: String!
+  acad: Boolean!
+  strtd: String!
+  endd: String!
+}
+
+type AccademicResult {
+  success: Boolean!
+  errors: [String]
+  post: Accademic
+}
+
+type AccademicResults {
+  success: Boolean!
+  errors: [String]
+  post: [Accademic]
+}
+
+type Researcher {
+  resin: ID!
+  usr: User!
+  cont: String!
+  cntres: String!
+  acres: String!
+  plc: String!
+  dspln: String!
+  acad: Boolean!
+  strtd: String!
+  endd: String!
+}
+
+type ResearcherResult {
+  success: Boolean!
+  errors: [String]
+  post: Researcher
+}
+
+type ResearcherResults {
+  success: Boolean!
+  errors: [String]
+  post: [Researcher]
+}
+
+type Work {
+  wkid: ID!
+  usrwkp: User!
+  plc: String!
+  dspln: String!
+  strtd: String!
+  endd: String!
+}
+
+type WorkResult {
+  success: Boolean!
+  errors: [String]
+  post: Work
+}
+
+type WorkResults {
+  success: Boolean!
+  errors: [String]
+  post: [Work]
+}
+
+type Query {
+  listBase: BaseResults!
+  getBase(id: ID!): BaseResult!
+  listAcademic: AccademicResults!
+  getAcademic(id: ID!): AccademicResult!
+
+  listResearcher: ResearcherResults!
+  getResearcher(id: ID!): ResearcherResult!
+  listWork: WorkResults!
+  getWork(id: ID!): WorkResult!
+}
+
+type Mutation {
+  createBase(
+    plc: String
+    dspln: String!
+    strtd: String!
+    endd: String!
+  ): BaseResult!
+  updateBase(
+    bacid: ID!
+    plc: String
+    dspln: String!
+    strtd: String!
+    endd: String!
+  ): BaseResult!
+  deleteBase(bacid: ID): BaseResult!
+  createAcademics(
+    bacid: ID!
+    plc: String
+    dspln: String!
+    acad: Boolean
+    strtd: String!
+    endd: String!
+  ): AccademicResult!
+  updateAcademics(
+    acmid: ID!
+    bacid: ID!
+    plc: String
+    dspln: String!
+    acad: Boolean
+    strtd: String!
+    endd: String!
+  ): AccademicResult!
+  deleteAcademics(acmid: ID): AccademicResult!
+
+  createResearcher(
+    usr: ID!
+    cnt: String!
+    plc: String
+    dspln: String!
+    strtd: String!
+    endd: String!
+  ): Researcher!
+  updateResearcher(
+    resid: ID!
+    usr: ID!
+    cnt: String!
+    plc: String
+    dspln: String!
+    strtd: String!
+    endd: String!
+  ): Researcher!
+  deleteResearcher(bacid: ID): ResearcherResult!
+  createWork(
+    usrwkp: ID!
+    plc: String
+    dspln: String!
+    strtd: String!
+    endd: String!
+  ): WorkResult!
+  updateWork(
+    wkpid: ID!
+    usrwkp: ID!
+    plc: String
+    dspln: String!
+    strtd: String!
+    endd: String!
+  ): WorkResult!
+  deleteWork(acmid: ID): WorkResult!
+}
